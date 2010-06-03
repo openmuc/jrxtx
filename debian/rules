@@ -1,0 +1,13 @@
+#!/usr/bin/make -f
+%:
+	dh $@ --with javahelper
+
+override_dh_auto_install:
+	$(MAKE) install RXTX_PATH=$(CURDIR)/debian/librxtx-java/usr/lib \
+			JHOME=$(CURDIR)/debian/librxtx-java/usr/share/java
+
+override_dh_auto_build:
+	$(MAKE) RXTX_PATH=/usr/lib
+
+override_dh_installchangelogs:
+	dh_installchangelogs ChangeLog

@@ -1,0 +1,4 @@
+# format version number, currently 3; this line is compulsory!
+version=3
+
+http://rxtx.qbang.org/pub/rxtx/rxtx-([0-9].*[0-9])\.zip

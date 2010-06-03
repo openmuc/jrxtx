@@ -1,0 +1,22 @@
+Source: rxtx
+Section: java
+Priority: optional
+Maintainer: Debian Java maintainers <pkg-java-maintainers@lists.alioth.debian.org>
+Uploaders: Mario Joussen <joussen@debian.org>, Scott Howard <showard314@gmail.com>
+DM-Upload-Allowed: yes
+Build-Depends: debhelper (>= 7.0.50~), libtool, javahelper, default-jdk-builddep
+Standards-Version: 3.8.4
+Homepage: http://www.rxtx.org
+Vcs-Git: git://git.debian.org/pkg-java/rxtx.git
+Vcs-Browser: http://git.debian.org/?p=pkg-java/rxtx.git
+
+
+Package: librxtx-java
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ${java:Depends}
+Provides: lib-rxtx-java
+Conflicts: lib-rxtx-java
+Description: Full Java CommAPI implementation
+ RXTX is a full implementation of the Java CommAPI from Sun. It contains
+ native libraries providing serial and parallel communication for the
+ Java Development Toolkit (jdk 1.[1-4].*).
