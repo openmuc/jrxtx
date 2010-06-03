@@ -61,8 +61,8 @@
 #include "config.h"
 #include "gnu_io_I2C.h"
 #endif /* dima */
-#include <time.h>
 #include <unistd.h>
+#include <time.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -127,6 +127,7 @@ JNIEXPORT void JNICALL Java_gnu_io_I2CPort_Initialize(
 #endif /* !__FreeBSD__ */
 #if defined(__linux__) 
 	/* Lets let people who upgraded kernels know they may have problems */
+	/*
 	if (uname (&name) == -1)
 	{
 		fprintf(stderr,"RXTX WARNING:  cannot get system name\n");
@@ -137,6 +138,7 @@ JNIEXPORT void JNICALL Java_gnu_io_I2CPort_Initialize(
 		fprintf(stderr, "\n\n\nRXTX WARNING:  This library was compiled to run with OS release %s and you are currently running OS release %s.  In some cases this can be a problem.  Try recompiling RXTX if you notice strange behavior.  If you just compiled RXTX make sure /usr/include/linux is a symbolic link to the include files that came with the kernel source and not an older copy.\n\n\npress enter to continue\n",UTS_RELEASE,name.release);
 		getchar();
 	}
+	*/
 #endif /* __linux__ */
 #endif /* WIN32 */
 }

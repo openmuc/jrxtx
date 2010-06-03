@@ -609,6 +609,7 @@ $(target_triplet)/librxtx%.@LIB_EXTENSION@: $(SPATH)/%Imp.c $(CLASSES) $(SPATH)/
 $(CLASSES): $(javafiles) $(TOP)/Makefile
 	$(JAVAH_FIX)
 	$(JAVAC) $(javafiles)
+	mkdir $(DEST)
 	$(JAVAH) `(for i in $(javahfiles);do \
 		if grep > /dev/null native.*\( $(SPATH)/gnu/io/$$i.java; then \
 			echo $(CLASSDIR).$$i; \
@@ -625,7 +626,6 @@ install: all
 			echo $$i; \
 		fi; \
 	done` $(RXTX_PATH)
-	$(INSTALL_PROGRAM) $(JARTARGET) $(JHOME)/
 
 clean-generic:
 	rm -rf $(DEST) $(TOP)/$(CLASSTOP)

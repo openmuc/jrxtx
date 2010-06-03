@@ -22093,7 +22093,7 @@ if test "$CC" = "gcc" || test "$CC"="egcs"; then
 	case $JAVA_VENDOR in
 	Tran*)
 		find_java_native_include jni.h
-		JAVAH="\$(JPATH)/bin/kaffeh -classpath \$(CLASSPATH) -d \$(DEST) -jni"
+		JAVAH="\$(JPATH)/bin/kaffeh -classpath \$(JPATH)/jre/lib/rt.jar:\$(CLASSPATH) -d \$(DEST) -jni"
 		JAVAC="\$(JPATH)/bin/javac -classpath \$(CLASSPATH) -d \$(TOP)/ -O -source 1.3 -target 1.3"
 		JAR="\$(JPATH)/bin/jar"
 		JAVADOC="\$(JPATH)/bin/javadoc -classpath \$(CLASSPATH)"
@@ -22105,7 +22105,7 @@ if test "$CC" = "gcc" || test "$CC"="egcs"; then
 		;;
 	*)
 		find_java_native_include jni_md.h
-		JAVAH="\$(JPATH)/bin/javah -classpath \$(CLASSPATH) -d \$(DEST) -jni"
+		JAVAH="\$(JPATH)/bin/javah -classpath \$(JPATH)/jre/lib/rt.jar:\$(CLASSPATH) -d \$(DEST) -jni"
 		JAVAC="\$(JPATH)/bin/javac -classpath \$(CLASSPATH) -d \$(TOP)/ -O -source 1.3 -target 1.3"
 		JAR="\$(JPATH)/bin/jar"
 		JAVADOC="\$(JPATH)/bin/javadoc"

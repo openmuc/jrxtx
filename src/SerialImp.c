@@ -66,10 +66,10 @@
 #ifdef __LCC__ /* windows lcc compiler for fd_set. probably wrong */
 #   include<winsock.h>
 #endif /* __LCC__ */
-#include <time.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <time.h>
 #include <errno.h>
 #include <limits.h>
 #include <sys/stat.h>
@@ -320,6 +320,7 @@ JNIEXPORT void JNICALL RXTXPort(Initialize)(
 #endif /* DEBUG_TIMING */
 #if defined(DEBUG) && defined(__linux__)
 	/* Lets let people who upgraded kernels know they may have problems */
+	/*
 	if (uname (&name) == -1)
 	{
 		report( "RXTX WARNING:  cannot get system name\n" );
@@ -333,6 +334,7 @@ JNIEXPORT void JNICALL RXTXPort(Initialize)(
 		report( message );
 		getchar();
 	}
+	*/
 	LEAVE( "RXTXPort:Initialize" );
 #endif /* DEBUG && __linux__ */
 }
