@@ -1,0 +1,30 @@
+Hi.
+Enclosed you'll find a version of rxtx for Windows CE.
+It was compiled using Microsoft's eMbedded Visual C++ 3.0 (which is free).
+It was tested on Compaq iPAQ 3650 (ARM).
+
+Native code is completely rewritten, since CE doesn't have overlapped IO
+(and MANY other things), but does non-overlapped better than regular Win32
+- simultanous multiple operations on the same handle are OK.
+I tried compiling this project under NT (with Visual C++ 6.0) and it
+compiles without problems but it doesn't work right because NT doesn't
+support simultanous operations without overlapping.
+Yes, that means that there's no compatibility between Win32 and Win32CE -
+neither direction. I love Microsoft.
+
+Aha, I used unicode everywhere, since both CE and Java use it internally
+(CE doesn't have ANSI at all) and I didn't find converting data back and
+forth sensible.
+
+Windows CE doesn't have stdio and console at all so I had to make printj()
+function. Look at it - it can be quite usable for other projects. Basically
+it works like printf() but uses System.out.print() for output.
+
+You can find more info on Java serial support on 
+http://www.mhobot.w.pl/java/comm
+
+Michal Hobot
+MichalHobot@netscape.net
+
+Krakow,
+Poland
