@@ -1,0 +1,10 @@
+Document: RMISecurityManager
+Title: RMISecurityManager and CommAPI workaround
+Author: Alejandro P. Revilla
+Abstract: Email describing a work around for accesing CommAPI after setting an
+RMISecurityManager().
+Section: Programming
+
+Format: HTML
+Index: /usr/share/doc/librxtx-java/RMISecurityManager.html
+Files: /usr/share/doc/librxtx-java/RMISecurityManager.html
