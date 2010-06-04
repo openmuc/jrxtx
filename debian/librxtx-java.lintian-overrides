@@ -1,2 +1,3 @@
-#The library is named properly per Debian java policy (version is not required)
-librxtx-java: package-name-doesnt-match-sonames librxtxI2C-2.2pre1 librxtxParallel-2.2pre1 librxtxRS485-2.2pre1 librxtxRaw-2.2pre1 librxtxSerial-2.2pre1
+#The library is installed into /usr/lib/jni, per Debian java policy. postrm and postinst calls are being added by debhelper
+librxtx-java: postinst-has-useless-call-to-ldconfig
+librxtx-java: postrm-has-useless-call-to-ldconfig
