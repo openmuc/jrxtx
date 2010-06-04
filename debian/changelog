@@ -19,8 +19,9 @@ rxtx (2.2pre2-1) unstable; urgency=low
       install
     - Versioned naming of RXTXcomm.jar (Debian java policy)
   * Added VCS tags to debian/control
+  * Libs now install in /usr/lib/jni instead of /usr/lib
 
- -- Scott Howard <showard314@gmail.com>  Wed, 02 Jun 2010 22:54:06 -0400
+ -- Scott Howard <showard314@gmail.com>  Thu, 03 Jun 2010 22:28:56 -0400
 
 rxtx (2.1.7r2-4) unstable; urgency=low
 
