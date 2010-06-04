@@ -1,8 +1,7 @@
-Document: RMISecurityManager
+Document: librxtx-rmisecuritymanager
 Title: RMISecurityManager and CommAPI workaround
 Author: Alejandro P. Revilla
-Abstract: Email describing a work around for accesing CommAPI after setting an
-RMISecurityManager().
+Abstract: Email describing a work around for accessing CommAPI after setting an RMISecurityManager().
 Section: Programming
 
 Format: HTML
