@@ -3,8 +3,8 @@ Origin: Mario Joussen <joussen@debian.org>, edited by Scott Howard <showard314@g
 
 Index: rxtx/Makefile.in
 ===================================================================
---- rxtx.orig/Makefile.in	2010-06-03 22:30:15.966240453 -0400
-+++ rxtx/Makefile.in	2010-06-03 22:32:45.276241106 -0400
+--- rxtx.orig/Makefile.in	2010-06-03 23:39:27.176240777 -0400
++++ rxtx/Makefile.in	2010-06-25 09:05:27.853689860 -0400
 @@ -625,7 +625,6 @@
  			echo $$i; \
  		fi; \
@@ -13,10 +13,20 @@ Index: rxtx/Makefile.in
  
  clean-generic:
  	rm -rf $(DEST) $(TOP)/$(CLASSTOP)
+@@ -635,7 +634,8 @@
+ 
+ #  create the javadoc files.
+ docs: $(CLASSES)
+-	$(JAVADOC) $(javafiles)
++	mkdir api
++	cd api && $(JAVADOC) $(javafiles)
+ 
+ ################  WIN32 CrossCompiling from here down #######################
+ 
 Index: rxtx/src/RS485Imp.c
 ===================================================================
---- rxtx.orig/src/RS485Imp.c	2010-06-03 22:30:15.776241179 -0400
-+++ rxtx/src/RS485Imp.c	2010-06-03 22:32:45.276241106 -0400
+--- rxtx.orig/src/RS485Imp.c	2010-06-03 23:39:26.986239690 -0400
++++ rxtx/src/RS485Imp.c	2010-06-25 09:05:27.863691460 -0400
 @@ -127,6 +127,7 @@
  #endif /* !__FreeBSD__ */
  #if defined(__linux__) 
@@ -35,8 +45,8 @@ Index: rxtx/src/RS485Imp.c
  }
 Index: rxtx/src/RawImp.c
 ===================================================================
---- rxtx.orig/src/RawImp.c	2010-06-03 22:30:15.796239896 -0400
-+++ rxtx/src/RawImp.c	2010-06-03 22:32:45.276241106 -0400
+--- rxtx.orig/src/RawImp.c	2010-06-03 23:39:27.026241624 -0400
++++ rxtx/src/RawImp.c	2010-06-25 09:05:27.873688869 -0400
 @@ -272,6 +272,7 @@
  #endif /* !__FreeBSD__ */
  #if defined(__linux__) 
@@ -55,8 +65,8 @@ Index: rxtx/src/RawImp.c
  }
 Index: rxtx/src/SerialImp.c
 ===================================================================
---- rxtx.orig/src/SerialImp.c	2010-06-03 22:30:15.836238168 -0400
-+++ rxtx/src/SerialImp.c	2010-06-03 22:32:45.286240180 -0400
+--- rxtx.orig/src/SerialImp.c	2010-06-03 23:39:27.056242516 -0400
++++ rxtx/src/SerialImp.c	2010-06-25 09:05:27.893687878 -0400
 @@ -320,6 +320,7 @@
  #endif /* DEBUG_TIMING */
  #if defined(DEBUG) && defined(__linux__)
@@ -75,8 +85,8 @@ Index: rxtx/src/SerialImp.c
  }
 Index: rxtx/src/I2CImp.c
 ===================================================================
---- rxtx.orig/src/I2CImp.c	2010-06-03 22:30:15.886239433 -0400
-+++ rxtx/src/I2CImp.c	2010-06-03 22:32:45.286240180 -0400
+--- rxtx.orig/src/I2CImp.c	2010-06-03 23:39:27.106240743 -0400
++++ rxtx/src/I2CImp.c	2010-06-25 09:05:27.893687878 -0400
 @@ -127,6 +127,7 @@
  #endif /* !__FreeBSD__ */
  #if defined(__linux__) 
@@ -95,8 +105,8 @@ Index: rxtx/src/I2CImp.c
  }
 Index: rxtx/src/SerialImp.cpp
 ===================================================================
---- rxtx.orig/src/SerialImp.cpp	2010-06-03 22:30:15.946240059 -0400
-+++ rxtx/src/SerialImp.cpp	2010-06-03 22:32:45.286240180 -0400
+--- rxtx.orig/src/SerialImp.cpp	2010-06-03 23:39:27.166240572 -0400
++++ rxtx/src/SerialImp.cpp	2010-06-25 09:05:27.903692271 -0400
 @@ -142,6 +142,7 @@
  #endif /* !__FreeBSD__ */
  #ifdef DEBUG
