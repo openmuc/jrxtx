@@ -5,7 +5,7 @@ Maintainer: Debian Java maintainers <pkg-java-maintainers@lists.alioth.debian.or
 Uploaders: Mario Joussen <joussen@debian.org>, Scott Howard <showard314@gmail.com>
 DM-Upload-Allowed: yes
 Build-Depends: debhelper (>= 7.0.50~), libtool, javahelper, default-jdk
-Standards-Version: 3.8.4
+Standards-Version: 3.9.1
 Homepage: http://www.rxtx.org
 Vcs-Git: git://git.debian.org/pkg-java/rxtx.git
 Vcs-Browser: http://git.debian.org/?p=pkg-java/rxtx.git
