@@ -1,3 +1,10 @@
+rxtx (2.2pre2-3) unstable; urgency=low
+
+  * Added ${java:Recommends} to debian/control to recommend links to
+    system installed javadocs per Debian Java Policy.
+
+ -- Scott Howard <showard314@gmail.com>  Sun, 03 Oct 2010 11:38:30 -0400
+
 rxtx (2.2pre2-2) unstable; urgency=low
 
   * Added javadoc to package

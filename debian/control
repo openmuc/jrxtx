@@ -14,6 +14,7 @@ Vcs-Browser: http://git.debian.org/?p=pkg-java/rxtx.git
 Package: librxtx-java
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, ${java:Depends}
+Recommends: ${java:Recommends}
 Provides: lib-rxtx-java
 Conflicts: lib-rxtx-java
 Description: Full Java CommAPI implementation
