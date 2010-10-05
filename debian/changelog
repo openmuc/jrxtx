@@ -1,4 +1,4 @@
-rxtx (2.2pre2-3) unstable; urgency=low
+rxtx (2.2pre2-3) experimental; urgency=low
 
   * Added ${java:Recommends} to debian/control to recommend links to
     system installed javadocs per Debian Java Policy.
@@ -6,7 +6,7 @@ rxtx (2.2pre2-3) unstable; urgency=low
   * Added ttyACM_ports.patch to allow for enumeration of many additional
     ports, including ttyACM used in Arduino Uno development boards.
 
- -- Scott Howard <showard314@gmail.com>  Mon, 04 Oct 2010 23:19:08 -0400
+ -- Scott Howard <showard314@gmail.com>  Tue, 05 Oct 2010 09:42:49 -0400
 
 rxtx (2.2pre2-2) unstable; urgency=low
 
