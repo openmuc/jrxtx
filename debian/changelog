@@ -1,3 +1,11 @@
+rxtx (2.2pre2-4) UNRELEASED; urgency=low
+
+  * Updated debian/copyright.
+  * debian/compat is now 7
+  * deleted debian/*.dirs, thanks to Christoph Egger
+
+ -- Scott Howard <showard314@gmail.com>  Wed, 15 Dec 2010 23:51:26 -0500
+
 rxtx (2.2pre2-3) experimental; urgency=low
 
   * Added ${java:Recommends} to debian/control to recommend links to
