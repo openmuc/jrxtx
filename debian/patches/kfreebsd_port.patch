@@ -1,0 +1,96 @@
+Description: Defines FreeBSD for kFreeBSD systems
+Bug: http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=585089
+Author: Scott Howard <showard@debian.org>
+
+Index: rxtx/src/SerialImp.h
+===================================================================
+--- rxtx.orig/src/SerialImp.h	2011-02-03 20:00:41.246264104 -0500
++++ rxtx/src/SerialImp.h	2011-02-03 20:07:21.600873187 -0500
+@@ -56,6 +56,9 @@
+ |   All trademarks belong to their respective owners.
+ --------------------------------------------------------------------------*/
+ /* gnu.io.SerialPort constants */
++#if defined(__FreeBSD__) && ! defined(__FreeBSD_kernel__)
++# define __FreeBSD_kernel__ __FreeBSD__
++#endif
+ #ifdef WIN32
+ #include "win32termios.h"
+ #endif /* WIN32 */
+Index: rxtx/src/I2CImp.h
+===================================================================
+--- rxtx.orig/src/I2CImp.h	2011-02-03 20:08:46.775472402 -0500
++++ rxtx/src/I2CImp.h	2011-02-03 20:09:42.511938438 -0500
+@@ -56,6 +56,10 @@
+ |   All trademarks belong to their respective owners.
+ --------------------------------------------------------------------------*/
+ 
++#if defined(__FreeBSD__) && ! defined(__FreeBSD_kernel__)
++# define __FreeBSD_kernel__ __FreeBSD__
++#endif
++
+ /* gnu.io.SerialPort constants */
+ #ifndef WIN32
+ #define DATABITS_5		5
+Index: rxtx/src/ParallelImp.h
+===================================================================
+--- rxtx.orig/src/ParallelImp.h	2011-02-03 20:10:34.878618274 -0500
++++ rxtx/src/ParallelImp.h	2011-02-03 20:11:32.024995220 -0500
+@@ -55,6 +55,11 @@
+ |   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ |   All trademarks belong to their respective owners.
+ --------------------------------------------------------------------------*/
++
++#if defined(__FreeBSD__) && ! defined(__FreeBSD_kernel__)
++# define __FreeBSD_kernel__ __FreeBSD__
++#endif
++
+ /* gnu.io.ParallelPort constants */
+ /*  this appears to be handled in /usr/src/linux/misc/parport_pc.c */
+ #define LPT_MODE_ANY	0
+Index: rxtx/src/RS485Imp.h
+===================================================================
+--- rxtx.orig/src/RS485Imp.h	2011-02-03 20:11:48.603944150 -0500
++++ rxtx/src/RS485Imp.h	2011-02-03 20:12:13.072392930 -0500
+@@ -54,7 +54,11 @@
+ |   License along with this library; if not, write to the Free
+ |   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ |   All trademarks belong to their respective owners.
++
+ --------------------------------------------------------------------------*/
++#if defined(__FreeBSD__) && ! defined(__FreeBSD_kernel__)
++# define __FreeBSD_kernel__ __FreeBSD__
++#endif
+ 
+ /* gnu.io.SerialPort constants */
+ #ifndef WIN32
+Index: rxtx/CNI/SerialImp.h
+===================================================================
+--- rxtx.orig/CNI/SerialImp.h	2011-02-03 20:21:21.587625958 -0500
++++ rxtx/CNI/SerialImp.h	2011-02-03 20:22:08.814633140 -0500
+@@ -55,6 +55,11 @@
+ |   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ |   All trademarks belong to their respective owners.
+ --------------------------------------------------------------------------*/
++
++#if defined(__FreeBSD__) && ! defined(__FreeBSD_kernel__)
++# define __FreeBSD_kernel__ __FreeBSD__
++#endif
++
+ /* gnu.io.SerialPort constants */
+ #ifdef WIN32
+ #include "win32termios.h"
+Index: rxtx/src/RawImp.h
+===================================================================
+--- rxtx.orig/src/RawImp.h	2011-02-03 20:12:56.299652529 -0500
++++ rxtx/src/RawImp.h	2011-02-03 20:13:31.707407913 -0500
+@@ -56,6 +56,10 @@
+ |   All trademarks belong to their respective owners.
+ --------------------------------------------------------------------------*/
+ 
++#if defined(__FreeBSD__) && ! defined(__FreeBSD_kernel__)
++# define __FreeBSD_kernel__ __FreeBSD__
++#endif
++
+ /* gnu.io.SerialPort constants */
+ #ifndef WIN32
+ #define DATABITS_5		5
