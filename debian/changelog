@@ -2,7 +2,6 @@ rxtx (2.2pre2-4) UNRELEASED; urgency=low
 
   * Updated debian/copyright.
   * debian/compat is now 8
-  * deleted debian/*.dirs, thanks to Christoph Egger
   * debian/patches/debian_porting.patch
     - Fixed a FTBFS in src/RawImp.c for systems without sys/io.h
       (Closes: #609152)
@@ -10,7 +9,7 @@ rxtx (2.2pre2-4) UNRELEASED; urgency=low
     - Fixed a FTBFS from not defining __FreeBSD_kernel__
       (Closes: #585089) 
 
- -- Scott Howard <showard@debian.org>  Thu, 03 Feb 2011 20:25:55 -0500
+ -- Scott Howard <showard@debian.org>  Thu, 03 Feb 2011 20:44:34 -0500
 
 rxtx (2.2pre2-3) experimental; urgency=low
 
