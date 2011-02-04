@@ -1,0 +1,22 @@
+Description: sys/io.h does not exist on all systems
+Bug: http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=609152
+Author: Scott Howard <showard@debian.org>
+
+Index: rxtx/src/RawImp.c
+===================================================================
+--- rxtx.orig/src/RawImp.c	2011-02-03 19:07:35.837792150 -0500
++++ rxtx/src/RawImp.c	2011-02-03 19:07:53.036705859 -0500
+@@ -101,7 +101,13 @@
+ #endif
+ #ifndef __APPLE__  /* dima */
+ #ifndef PPC
++#ifndef __sparc__
++#ifndef __hppa__
++#ifndef __mips__
+ #include <sys/io.h>
++#endif /* __mips__ */
++#endif /* __hppa__ */
++#endif /* __sparc__ */
+ #endif /* PPC */
+ #endif /* dima */
+ 
