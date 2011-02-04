@@ -1,3 +1,11 @@
+rxtx (2.2pre2-5) UNRELEASED; urgency=low
+
+  * debian/patches/kreebsd_porting.patch
+    - Fixed a FTBFS from not defining __FreeBSD_kernel__
+      (Closes: #585089)
+
+ -- Scott Howard <showard@debian.org>  Thu, 03 Feb 2011 23:59:54 -0500
+
 rxtx (2.2pre2-4) experimental; urgency=low
 
   * Updated debian/copyright.

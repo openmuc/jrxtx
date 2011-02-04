@@ -3,8 +3,8 @@ Origin: Mario Joussen <joussen@debian.org>, edited by Scott Howard <showard314@g
 
 Index: rxtx/Makefile.in
 ===================================================================
---- rxtx.orig/Makefile.in	2010-06-03 23:39:27.176240777 -0400
-+++ rxtx/Makefile.in	2010-06-25 09:05:27.853689860 -0400
+--- rxtx.orig/Makefile.in	2011-02-03 23:58:26.750047606 -0500
++++ rxtx/Makefile.in	2011-02-03 23:59:33.755767848 -0500
 @@ -625,7 +625,6 @@
  			echo $$i; \
  		fi; \
@@ -25,10 +25,10 @@ Index: rxtx/Makefile.in
  
 Index: rxtx/src/RS485Imp.c
 ===================================================================
---- rxtx.orig/src/RS485Imp.c	2010-06-03 23:39:26.986239690 -0400
-+++ rxtx/src/RS485Imp.c	2010-06-25 09:05:27.863691460 -0400
+--- rxtx.orig/src/RS485Imp.c	2011-02-03 23:59:19.666667702 -0500
++++ rxtx/src/RS485Imp.c	2011-02-03 23:59:33.755767848 -0500
 @@ -127,6 +127,7 @@
- #endif /* !__FreeBSD__ */
+ #endif /* !__FreeBSD_kernel__ */
  #if defined(__linux__) 
  	/* Lets let people who upgraded kernels know they may have problems */
 +	/*
@@ -45,17 +45,17 @@ Index: rxtx/src/RS485Imp.c
  }
 Index: rxtx/src/RawImp.c
 ===================================================================
---- rxtx.orig/src/RawImp.c	2010-06-03 23:39:27.026241624 -0400
-+++ rxtx/src/RawImp.c	2010-06-25 09:05:27.873688869 -0400
-@@ -272,6 +272,7 @@
- #endif /* !__FreeBSD__ */
+--- rxtx.orig/src/RawImp.c	2011-02-03 23:59:29.786021390 -0500
++++ rxtx/src/RawImp.c	2011-02-03 23:59:33.755767848 -0500
+@@ -278,6 +278,7 @@
+ #endif /* !__FreeBSD_kernel__ */
  #if defined(__linux__) 
  	/* Lets let people who upgraded kernels know they may have problems */
 +	/*
  	if (uname (&name) == -1)
  	{
  		fprintf(stderr,"RXTX WARNING:  cannot get system name\n");
-@@ -282,6 +283,7 @@
+@@ -288,6 +289,7 @@
  		fprintf(stderr, "\n\n\nRXTX WARNING:  This library was compiled to run with OS release %s and you are currently running OS release %s.  In some cases this can be a problem.  Try recompiling RXTX if you notice strange behavior.  If you just compiled RXTX make sure /usr/include/linux is a symbolic link to the include files that came with the kernel source and not an older copy.\n\n\npress enter to continue\n",UTS_RELEASE,name.release);
  		getchar();
  	}
@@ -65,8 +65,8 @@ Index: rxtx/src/RawImp.c
  }
 Index: rxtx/src/SerialImp.c
 ===================================================================
---- rxtx.orig/src/SerialImp.c	2010-06-03 23:39:27.056242516 -0400
-+++ rxtx/src/SerialImp.c	2010-06-25 09:05:27.893687878 -0400
+--- rxtx.orig/src/SerialImp.c	2011-02-03 23:59:19.676667064 -0500
++++ rxtx/src/SerialImp.c	2011-02-03 23:59:33.755767848 -0500
 @@ -320,6 +320,7 @@
  #endif /* DEBUG_TIMING */
  #if defined(DEBUG) && defined(__linux__)
@@ -85,10 +85,10 @@ Index: rxtx/src/SerialImp.c
  }
 Index: rxtx/src/I2CImp.c
 ===================================================================
---- rxtx.orig/src/I2CImp.c	2010-06-03 23:39:27.106240743 -0400
-+++ rxtx/src/I2CImp.c	2010-06-25 09:05:27.893687878 -0400
+--- rxtx.orig/src/I2CImp.c	2011-02-03 23:59:19.676667064 -0500
++++ rxtx/src/I2CImp.c	2011-02-03 23:59:33.755767848 -0500
 @@ -127,6 +127,7 @@
- #endif /* !__FreeBSD__ */
+ #endif /* !__FreeBSD_kernel__ */
  #if defined(__linux__) 
  	/* Lets let people who upgraded kernels know they may have problems */
 +	/*
@@ -105,10 +105,10 @@ Index: rxtx/src/I2CImp.c
  }
 Index: rxtx/src/SerialImp.cpp
 ===================================================================
---- rxtx.orig/src/SerialImp.cpp	2010-06-03 23:39:27.166240572 -0400
-+++ rxtx/src/SerialImp.cpp	2010-06-25 09:05:27.903692271 -0400
+--- rxtx.orig/src/SerialImp.cpp	2011-02-03 23:59:19.676667064 -0500
++++ rxtx/src/SerialImp.cpp	2011-02-03 23:59:33.755767848 -0500
 @@ -142,6 +142,7 @@
- #endif /* !__FreeBSD__ */
+ #endif /* !__FreeBSD_kernel__ */
  #ifdef DEBUG
  	/* Lets let people who upgraded kernels know they may have problems */
 +	/*
