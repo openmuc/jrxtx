@@ -2,7 +2,7 @@ Source: rxtx
 Section: java
 Priority: optional
 Maintainer: Debian Java maintainers <pkg-java-maintainers@lists.alioth.debian.org>
-Uploaders: Mario Joussen <joussen@debian.org>, Scott Howard <showard314@gmail.com>
+Uploaders: Mario Joussen <joussen@debian.org>, Scott Howard <showard@debian.org>
 DM-Upload-Allowed: yes
 Build-Depends: debhelper (>= 8), libtool, javahelper, default-jdk
 Standards-Version: 3.9.1

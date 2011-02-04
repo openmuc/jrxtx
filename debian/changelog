@@ -1,4 +1,4 @@
-rxtx (2.2pre2-4) UNRELEASED; urgency=low
+rxtx (2.2pre2-4) experimental; urgency=low
 
   * Updated debian/copyright.
   * debian/compat is now 8
@@ -11,7 +11,7 @@ rxtx (2.2pre2-4) UNRELEASED; urgency=low
   * debian/patches/zsystem_exception.patch
     - Print error if initialization fails (Closes: #472053) 
 
- -- Scott Howard <showard@debian.org>  Thu, 03 Feb 2011 20:53:47 -0500
+ -- Scott Howard <showard@debian.org>  Thu, 03 Feb 2011 21:05:47 -0500
 
 rxtx (2.2pre2-3) experimental; urgency=low
 
