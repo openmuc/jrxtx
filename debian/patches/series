@@ -1,3 +1,4 @@
+zsystem_init_exception.patch
 kfreebsd_port.patch
 debian_porting.patch
 ttyACM_port.patch

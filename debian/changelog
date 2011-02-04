@@ -8,8 +8,10 @@ rxtx (2.2pre2-4) UNRELEASED; urgency=low
   * debian/patches/kreebsd_porting.patch
     - Fixed a FTBFS from not defining __FreeBSD_kernel__
       (Closes: #585089) 
+  * debian/patches/zsystem_exception.patch
+    - Print error if initialization fails (Closes: #472053) 
 
- -- Scott Howard <showard@debian.org>  Thu, 03 Feb 2011 20:44:34 -0500
+ -- Scott Howard <showard@debian.org>  Thu, 03 Feb 2011 20:53:47 -0500
 
 rxtx (2.2pre2-3) experimental; urgency=low
 
