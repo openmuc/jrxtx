@@ -4,16 +4,18 @@ Author: Scott Howard <showard@debian.org>
 
 Index: rxtx/src/RawImp.c
 ===================================================================
---- rxtx.orig/src/RawImp.c	2011-02-03 19:07:35.837792150 -0500
-+++ rxtx/src/RawImp.c	2011-02-03 19:07:53.036705859 -0500
-@@ -101,7 +101,13 @@
+--- rxtx.orig/src/RawImp.c	2011-02-04 00:04:39.586239588 -0500
++++ rxtx/src/RawImp.c	2011-02-04 00:07:11.036572259 -0500
+@@ -101,7 +101,15 @@
  #endif
  #ifndef __APPLE__  /* dima */
  #ifndef PPC
 +#ifndef __sparc__
 +#ifndef __hppa__
 +#ifndef __mips__
++#ifndef __s390__
  #include <sys/io.h>
++#endif /* __s390__ */
 +#endif /* __mips__ */
 +#endif /* __hppa__ */
 +#endif /* __sparc__ */
