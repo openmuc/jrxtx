@@ -1,0 +1,17 @@
+Description: libc_r is not available, use libpthread
+Bug: http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=585089
+Author: Scott Howard <showard@debian.org>
+
+Index: rxtx/configure.in
+===================================================================
+--- rxtx.orig/configure.in	2011-02-06 11:13:16.151426139 -0500
++++ rxtx/configure.in	2011-02-06 11:13:58.820020857 -0500
+@@ -575,7 +575,7 @@
+ ;;
+ 
+ *BSD)
+-	LDFLAGS=$LDFLAGS" -lc_r"
++	LDFLAGS=$LDFLAGS" -lpthread"
+ 	JHOME=$JPATH/"lib"
+ 	CFLAGS=$CFLAGS" -D_NO_POSIX=1 -D_NO_XOPEN4=1"
+ 	TARGETLIB="\$(target_triplet)/librxtxSerial.la \

@@ -1,3 +1,10 @@
+rxtx (2.2pre2-6) UNRELEASED; urgency=low
+
+  * debian/patches/kfreebsd_libpthread.patch
+    - libc_r is not available, use libpthread
+
+ -- Scott Howard <showard@debian.org>  Sun, 06 Feb 2011 11:15:08 -0500
+
 rxtx (2.2pre2-5) experimental; urgency=low
 
   * debian/patches/kreebsd_porting.patch
