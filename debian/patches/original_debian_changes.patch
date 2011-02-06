@@ -1,32 +1,10 @@
 Description: Removes makefile install of RXTXcomm.jar, silences an unnecessary compiling error
 Origin: Mario Joussen <joussen@debian.org>, edited by Scott Howard <showard314@gmail.com> <2010-06-03>
 
-Index: rxtx/Makefile.in
-===================================================================
---- rxtx.orig/Makefile.in	2011-02-03 23:59:43.185165613 -0500
-+++ rxtx/Makefile.in	2011-02-04 00:07:28.475459240 -0500
-@@ -625,7 +625,6 @@
- 			echo $$i; \
- 		fi; \
- 	done` $(RXTX_PATH)
--	$(INSTALL_PROGRAM) $(JARTARGET) $(JHOME)/
- 
- clean-generic:
- 	rm -rf $(DEST) $(TOP)/$(CLASSTOP)
-@@ -635,7 +634,8 @@
- 
- #  create the javadoc files.
- docs: $(CLASSES)
--	$(JAVADOC) $(javafiles)
-+	mkdir api
-+	cd api && $(JAVADOC) $(javafiles)
- 
- ################  WIN32 CrossCompiling from here down #######################
- 
 Index: rxtx/src/RS485Imp.c
 ===================================================================
---- rxtx.orig/src/RS485Imp.c	2011-02-04 00:07:28.395464345 -0500
-+++ rxtx/src/RS485Imp.c	2011-02-04 00:07:28.475459240 -0500
+--- rxtx.orig/src/RS485Imp.c	2011-02-06 12:48:09.014571293 -0500
++++ rxtx/src/RS485Imp.c	2011-02-06 12:48:09.074567537 -0500
 @@ -127,6 +127,7 @@
  #endif /* !__FreeBSD_kernel__ */
  #if defined(__linux__) 
@@ -45,8 +23,8 @@ Index: rxtx/src/RS485Imp.c
  }
 Index: rxtx/src/RawImp.c
 ===================================================================
---- rxtx.orig/src/RawImp.c	2011-02-04 00:07:28.435461792 -0500
-+++ rxtx/src/RawImp.c	2011-02-04 00:07:28.475459240 -0500
+--- rxtx.orig/src/RawImp.c	2011-02-06 12:48:09.034570041 -0500
++++ rxtx/src/RawImp.c	2011-02-06 12:48:09.074567537 -0500
 @@ -280,6 +280,7 @@
  #endif /* !__FreeBSD_kernel__ */
  #if defined(__linux__) 
@@ -65,8 +43,8 @@ Index: rxtx/src/RawImp.c
  }
 Index: rxtx/src/SerialImp.c
 ===================================================================
---- rxtx.orig/src/SerialImp.c	2011-02-04 00:07:28.405463706 -0500
-+++ rxtx/src/SerialImp.c	2011-02-04 00:07:28.485458602 -0500
+--- rxtx.orig/src/SerialImp.c	2011-02-06 12:48:09.014571293 -0500
++++ rxtx/src/SerialImp.c	2011-02-06 12:48:09.074567537 -0500
 @@ -320,6 +320,7 @@
  #endif /* DEBUG_TIMING */
  #if defined(DEBUG) && defined(__linux__)
@@ -85,8 +63,8 @@ Index: rxtx/src/SerialImp.c
  }
 Index: rxtx/src/I2CImp.c
 ===================================================================
---- rxtx.orig/src/I2CImp.c	2011-02-04 00:07:28.405463706 -0500
-+++ rxtx/src/I2CImp.c	2011-02-04 00:07:28.485458602 -0500
+--- rxtx.orig/src/I2CImp.c	2011-02-06 12:48:09.014571293 -0500
++++ rxtx/src/I2CImp.c	2011-02-06 12:48:09.074567537 -0500
 @@ -127,6 +127,7 @@
  #endif /* !__FreeBSD_kernel__ */
  #if defined(__linux__) 
@@ -105,8 +83,8 @@ Index: rxtx/src/I2CImp.c
  }
 Index: rxtx/src/SerialImp.cpp
 ===================================================================
---- rxtx.orig/src/SerialImp.cpp	2011-02-04 00:07:28.405463706 -0500
-+++ rxtx/src/SerialImp.cpp	2011-02-04 00:07:28.485458602 -0500
+--- rxtx.orig/src/SerialImp.cpp	2011-02-06 12:48:09.014571293 -0500
++++ rxtx/src/SerialImp.cpp	2011-02-06 12:48:09.074567537 -0500
 @@ -142,6 +142,7 @@
  #endif /* !__FreeBSD_kernel__ */
  #ifdef DEBUG
@@ -123,3 +101,25 @@ Index: rxtx/src/SerialImp.cpp
  #endif /* DEBUG */
  #endif /* __BEOS__ */
  #endif /* WIN32 */
+Index: rxtx/Makefile.am
+===================================================================
+--- rxtx.orig/Makefile.am	2011-02-06 12:47:42.176251117 -0500
++++ rxtx/Makefile.am	2011-02-06 12:49:00.791328665 -0500
+@@ -127,7 +127,6 @@
+ 			echo $$i; \
+ 		fi; \
+ 	done` $(RXTX_PATH)
+-	$(INSTALL_PROGRAM) $(JARTARGET) $(JHOME)/
+ 
+ clean-generic:
+ 	rm -rf $(DEST) $(TOP)/$(CLASSTOP)
+@@ -137,7 +136,8 @@
+ 
+ #  create the javadoc files.
+ docs: $(CLASSES)
+-	$(JAVADOC) $(javafiles)
++	mkdir api
++	cd api && $(JAVADOC) $(javafiles)
+ 
+ ################  WIN32 CrossCompiling from here down #######################
+ 

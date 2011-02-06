@@ -1,6 +1,6 @@
 #!/usr/bin/make -f
 %:
-	dh $@ --with javahelper
+	dh $@ --with autotools-dev --with autoreconf --with javahelper
 
 override_dh_auto_install:
 	$(MAKE) install RXTX_PATH=$(CURDIR)/debian/librxtx-java/usr/lib/jni \

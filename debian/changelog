@@ -1,3 +1,10 @@
+rxtx (2.2pre2-7) unstable; urgency=low
+
+  * Continued poritng effor: added --with autotools-dev 
+    --with autoreconf to debian/rules
+
+ -- Scott Howard <showard@debian.org>  Sun, 06 Feb 2011 12:56:21 -0500
+
 rxtx (2.2pre2-6) unstable; urgency=low
 
   * debian/patches/kfreebsd_libpthread.patch
