@@ -1,3 +1,9 @@
+rxtx (2.2pre2-8) UNRELEASED; urgency=low
+
+  * Updated kfreebsd_port.patch to follow FHS
+
+ -- Scott Howard <showard@debian.org>  Wed, 23 Feb 2011 22:58:57 -0500
+
 rxtx (2.2pre2-7) unstable; urgency=low
 
   * Continued poritng effor: added --with autotools-dev 
