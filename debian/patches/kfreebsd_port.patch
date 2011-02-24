@@ -1,4 +1,4 @@
-Description: Defines FreeBSD for kFreeBSD systems
+Description: Defines FreeBSD for kFreeBSD systems, also makes sure kfreeBSD is set to use FHS
 #grep -r -H "__FreeBSD" . -m 1 --exclude=*.patch --exclude-dir=.git | cut -d: -f1 | xargs sed -i s/__FreeBSD__/__FreeBSD_kernel__/
 Bug: http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=585089
 Author: Scott Howard <showard@debian.org>

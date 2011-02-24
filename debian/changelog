@@ -4,8 +4,9 @@ rxtx (2.2pre2-8) UNRELEASED; urgency=low
   * replaced debian_porting.patch with sys_io_h_check.patch to use
     AC_CHECK_HEADERS to determine if sys/io.h is on a system. Thanks
     to Nobuhiro Iwamatsu. (Closes: #609152)
+  * port_to_hurd.patch defines that HURD uses the FHS.
 
- -- Scott Howard <showard@debian.org>  Wed, 23 Feb 2011 23:23:26 -0500
+ -- Scott Howard <showard@debian.org>  Wed, 23 Feb 2011 23:28:09 -0500
 
 rxtx (2.2pre2-7) unstable; urgency=low
 
