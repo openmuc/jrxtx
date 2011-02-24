@@ -1,6 +1,6 @@
 zsystem_init_exception.patch
 kfreebsd_port.patch
-debian_porting.patch
 ttyACM_port.patch
 original_debian_changes.patch
 kfreebsd_libpthread.patch
+sys_io_h_check.patch

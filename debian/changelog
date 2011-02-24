@@ -1,8 +1,11 @@
 rxtx (2.2pre2-8) UNRELEASED; urgency=low
 
   * Updated kfreebsd_port.patch to follow FHS
+  * replaced debian_porting.patch with sys_io_h_check.patch to use
+    AC_CHECK_HEADERS to determine if sys/io.h is on a system. Thanks
+    to Nobuhiro Iwamatsu. (Closes: #609152)
 
- -- Scott Howard <showard@debian.org>  Wed, 23 Feb 2011 22:58:57 -0500
+ -- Scott Howard <showard@debian.org>  Wed, 23 Feb 2011 23:23:26 -0500
 
 rxtx (2.2pre2-7) unstable; urgency=low
 
