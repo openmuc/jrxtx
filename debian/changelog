@@ -1,3 +1,9 @@
+rxtx (2.2pre2-9) unstable; urgency=low
+
+  * debian/rules: dh_install -X.la for removal of *.la from libraries
+
+ -- Scott Howard <showard@debian.org>  Tue, 04 Oct 2011 18:24:09 -0400
+
 rxtx (2.2pre2-8) UNRELEASED; urgency=low
 
   * Updated kfreebsd_port.patch to follow FHS
