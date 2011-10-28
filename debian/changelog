@@ -1,3 +1,11 @@
+rxtx (2.2pre2-10) UNRELEASED; urgency=low
+
+  * debian/patches/multiple_property_dirs.patch
+    - handles the case where the "java.ext.dirs" system property contains
+      more than one directory. (Closes: #646069) Thanks Philip Ashmore.
+
+ -- Scott Howard <showard@debian.org>  Fri, 28 Oct 2011 13:07:30 -0400
+
 rxtx (2.2pre2-9) unstable; urgency=low
 
   * debian/rules: dh_install -X.la for removal of *.la from libraries

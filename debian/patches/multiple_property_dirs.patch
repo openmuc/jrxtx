@@ -1,0 +1,168 @@
+Description: Handles the case when "java.ext.dirs" system property contains
+ more than one directory.
+Author: Philip Ashmore <contact@philipashmore.com>
+Bug: http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=646069
+Index: rxtx/src/gnu/io/RXTXCommDriver.java
+===================================================================
+--- rxtx.orig/src/gnu/io/RXTXCommDriver.java	2011-10-28 13:02:43.046717064 -0400
++++ rxtx/src/gnu/io/RXTXCommDriver.java	2011-10-28 13:02:43.186717068 -0400
+@@ -356,7 +356,7 @@
+ 	 First try to register ports specified in the properties
+ 	 file.  If that doesn't exist, then scan for ports.
+ 	*/
+-		for (int PortType=CommPortIdentifier.PORT_SERIAL;PortType<=CommPortIdentifier.PORT_PARALLEL;PortType++) {
++		for (int PortType=CommPortIdentifier.PORT_SERIAL; PortType<=CommPortIdentifier.PORT_PARALLEL; PortType++) {
+ 			if (!registerSpecifiedPorts(PortType)) {
+ 				if (!registerKnownPorts(PortType)) {
+ 					registerScannedPorts(PortType);
+@@ -375,10 +375,18 @@
+ 		while (tok.hasMoreElements())
+ 		{
+ 			String PortName = tok.nextToken();
+-
+-			if (testRead(PortName, PortType))
++			if(debug)
++				System.out.println("Trying " + PortName + ".");
++			if (testRead(PortName, PortType)) {
+ 				CommPortIdentifier.addPortName(PortName,
+ 					PortType, this);
++				if(debug)
++					System.out.println("Success: Read from " + PortName + ".");
++			}else{
++				if(debug)
++					System.out.println("Fail: Cannot read from " + PortName
++						+ ".");
++			}
+ 		}
+ 	}
+ 
+@@ -402,26 +410,39 @@
+ 	private boolean registerSpecifiedPorts(int PortType)
+ 	{
+ 		String val = null;
+-		Properties origp = System.getProperties();//save system properties
+-
+-		try
+-		    {
++		Properties origp = System.getProperties(); // save system properties
+ 
+-		     String ext_dir=System.getProperty("java.ext.dirs")+System.getProperty("file.separator");
+-		     FileInputStream rxtx_prop=new FileInputStream(ext_dir+"gnu.io.rxtx.properties");
+-		     Properties p=new Properties();
+-		     p.load(rxtx_prop);
+-		     System.setProperties(p);
+-		     for (Iterator it = p.keySet().iterator(); it.hasNext();) {
+-		          String key = (String) it.next();
+-		          System.setProperty(key, p.getProperty(key));
+-		     }
+-		    }catch(Exception e){
+-			if (debug){
+-			    System.out.println("The file: gnu.io.rxtx.properties doesn't exists.");
+-			    System.out.println(e.toString());
+-			    }//end if
++		String [] ext_dirs = System.getProperty("java.ext.dirs").split(":");
++		String fs = System.getProperty("file.separator");
++		for (int n = 0; n < ext_dirs.length; ++n) {
++			String ext_file = "?";
++			try{
++				ext_file = ext_dirs[n] + fs + "gnu.io.rxtx.properties";
++				FileInputStream rxtx_prop = new FileInputStream(ext_file);
++				Properties p=new Properties();
++				p.load(rxtx_prop);
++				System.setProperties(p);
++				for (Iterator it = p.keySet().iterator(); it.hasNext();) {
++					String key = (String) it.next();
++					String value = p.getProperty(key);
++					if(debug) {
++						System.out.println(key + " -> " + value);
++					}
++					System.setProperty(key, value);
++				}
++			}catch(Exception e){
++				if (debug){
++					System.out.println("The file \"" + ext_file
++						+ "\" doesn't exist.");
++					System.out.println(e.toString());
++				}//end if
++				continue;
+ 			}//end catch
++			if (debug){
++				System.out.println("Read properties from \"" + ext_file
++					+ "\".");
++			}//end if
++		}//end for
+ 
+ 		if (debug)
+ 			System.out.println("checking for system-known ports of type "+PortType);
+Index: rxtx/src/SerialImp.c
+===================================================================
+--- rxtx.orig/src/SerialImp.c	2011-10-28 13:02:43.078717065 -0400
++++ rxtx/src/SerialImp.c	2011-10-28 13:02:43.190717067 -0400
+@@ -4359,7 +4359,11 @@
+ 
+ 	if( fd < 0 )
+ 	{
+-		report_verbose( "testRead() open failed\n" );
++		report_verbose( "testRead() open \"" );
++		report_verbose( name );
++		report_verbose( "\" failed: " );
++		report_verbose( strerror(errno) );
++		report_verbose( "\n" );
+ 		ret = JNI_FALSE;
+ 		goto END;
+ 	}
+@@ -5095,7 +5099,7 @@
+    exceptions:  none
+    comments:
+ ----------------------------------------------------------*/
+-void report_warning(char *msg)
++void report_warning(const char *msg)
+ {
+ #ifndef DEBUG_MW
+ 	fprintf(stderr, msg);
+@@ -5113,7 +5117,7 @@
+    exceptions:  none
+    comments:
+ ----------------------------------------------------------*/
+-void report_verbose(char *msg)
++void report_verbose(const char *msg)
+ {
+ #ifdef DEBUG_VERBOSE
+ #ifdef DEBUG_MW
+@@ -5132,7 +5136,7 @@
+    exceptions:  none
+    comments:
+ ----------------------------------------------------------*/
+-void report_error(char *msg)
++void report_error(const char *msg)
+ {
+ #ifndef DEBUG_MW
+ 	fprintf(stderr, msg);
+@@ -5150,7 +5154,7 @@
+    exceptions:  none
+    comments:
+ ----------------------------------------------------------*/
+-void report(char *msg)
++void report(const char *msg)
+ {
+ #ifdef DEBUG
+ #	ifndef DEBUG_MW
+Index: rxtx/src/SerialImp.h
+===================================================================
+--- rxtx.orig/src/SerialImp.h	2011-10-28 13:02:43.162717067 -0400
++++ rxtx/src/SerialImp.h	2011-10-28 13:02:43.194717067 -0400
+@@ -467,10 +467,10 @@
+ jboolean is_interrupted( struct event_info_struct * );
+ int send_event(struct event_info_struct *, jint, int );
+ void dump_termios(char *,struct termios *);
+-void report_verbose(char *);
+-void report_error(char *);
+-void report_warning(char *);
+-void report(char *);
++void report_verbose(const char *);
++void report_error(const char *);
++void report_warning(const char *);
++void report(const char *);
+ void throw_java_exception( JNIEnv *, char *, char *, char * );
+ int lock_device( const char * );
+ void unlock_device( const char * );
