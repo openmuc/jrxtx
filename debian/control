@@ -11,7 +11,6 @@ Homepage: http://www.rxtx.org
 Vcs-Git: git://git.debian.org/pkg-java/rxtx.git
 Vcs-Browser: http://git.debian.org/?p=pkg-java/rxtx.git
 
-
 Package: librxtx-java
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, ${java:Depends}
@@ -19,18 +18,18 @@ Recommends: ${java:Recommends}
 Provides: lib-rxtx-java
 Conflicts: lib-rxtx-java
 Description: Full Java CommAPI implementation
- RXTX is a full implementation of the Java CommAPI from Sun. It contains
- native libraries providing serial and parallel communication for the
- Java Development Toolkit.
+ RXTX is a full implementation of the Java CommAPI from Sun. It
+ contains  native libraries providing serial and parallel
+ communication for the Java Development Toolkit.
 
 Package: librxtx-java-dbg
 Architecture: any
 Section: debug
-Priority:extra
+Priority: extra
 Depends: ${shlibs:Depends}, ${misc:Depends}, librxtx-java (= ${binary:Version})
 Description: Full Java CommAPI implementation, Debugging Symbols
- RXTX is a full implementation of the Java CommAPI from Sun. It contains
- native libraries providing serial and parallel communication for the
- Java Development Toolkit.
+ RXTX is a full implementation of the Java CommAPI from Sun. It
+ contains  native libraries providing serial and parallel
+ communication for the Java Development Toolkit.
  .
  This package contains the debugging symbols for librxtx-java.

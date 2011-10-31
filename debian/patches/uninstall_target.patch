@@ -1,0 +1,18 @@
+Description: adds uninstall target to Makefile
+Author: Scott Howard <showard@debian.org>
+Bug: http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=646069
+Index: rxtx/Makefile.am
+===================================================================
+--- rxtx.orig/Makefile.am	2011-10-31 02:43:21.532963961 -0400
++++ rxtx/Makefile.am	2011-10-31 02:46:03.348967808 -0400
+@@ -129,6 +129,10 @@
+ 	done` $(RXTX_PATH)
+ 	$(INSTALL_PROGRAM) $(JARTARGET) $(JHOME)/
+ 
++uninstall:
++	cd $(RXTX_PATH) && $(RM) librxtx*
++	$(RM) $(JHOME)/$(JARTARGET)
++
+ clean-generic:
+ 	rm -rf $(DEST) $(TOP)/$(CLASSTOP)
+ 	-test -z "$(CLEANFILES)" || rm -f $(CLEANFILES)

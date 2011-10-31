@@ -6,3 +6,4 @@ kfreebsd_libpthread.patch
 sys_io_h_check.patch
 port_to_hurd.patch
 multiple_property_dirs.patch
+uninstall_target.patch
