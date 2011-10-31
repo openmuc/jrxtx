@@ -1,4 +1,4 @@
-rxtx (2.2pre2-10) UNRELEASED; urgency=low
+rxtx (2.2pre2-10) unstable; urgency=low
 
   * debian/patches/multiple_property_dirs.patch
     - handles the case where the "java.ext.dirs" system property contains
@@ -6,7 +6,7 @@ rxtx (2.2pre2-10) UNRELEASED; urgency=low
   * Added librxtx-java-dbg package and added uninstall target
     (Closes: #646356)
 
- -- Scott Howard <showard@debian.org>  Mon, 31 Oct 2011 02:00:03 -0400
+ -- Scott Howard <showard@debian.org>  Mon, 31 Oct 2011 03:04:52 -0400
 
 rxtx (2.2pre2-9) unstable; urgency=low
 
