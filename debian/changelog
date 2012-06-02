@@ -1,3 +1,14 @@
+rxtx (2.2pre2-11) unstable; urgency=low
+
+  * debian/patches/MonitorThread-daemon.patch
+    - Mark threads created by RXTX as daemon so JVM can shut down
+      gracefully. Thanks to Christopher Wellons (Closes: #674975)
+  * debian/patches/fhs_lock_buffer_overflow_fix.patch 
+    - Prevents java from failing with buffer overflow when a locked serial
+      debice is opened. Thanks to Sergio Talens-Oliag (Closes: #673778)
+
+ -- Scott Howard <showard@debian.org>  Sat, 02 Jun 2012 10:13:50 -0400
+
 rxtx (2.2pre2-10) unstable; urgency=low
 
   * debian/patches/multiple_property_dirs.patch

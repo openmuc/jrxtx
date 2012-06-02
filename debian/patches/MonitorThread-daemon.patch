@@ -1,0 +1,65 @@
+Desciption: Threads created in Java by RXTX are not marked as daemon.
+Bug: http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=674975
+Author: Christopher Wellons <mosquitopsu@gmail.com>
+--- a/src/gnu/io/I2C.java
++++ b/src/gnu/io/I2C.java
+@@ -468,7 +468,9 @@
+ 		private boolean BI=false;
+ 		private boolean Data=false;
+ 		private boolean Output=false;
+-		MonitorThread() { }
++		MonitorThread() {
++			setDaemon(true);
++		}
+ 		public void run() {
+ 			eventLoop();
+ 		}
+--- a/src/gnu/io/LPRPort.java
++++ b/src/gnu/io/LPRPort.java
+@@ -366,7 +366,9 @@
+ {
+ 	private boolean monError = false;
+ 	private boolean monBuffer = false;
+-		MonitorThread() { }
++		MonitorThread() {
++			setDaemon(true);
++		}
+ 		public void run()
+ 		{
+ 			eventLoop();
+--- a/src/gnu/io/RS485.java
++++ b/src/gnu/io/RS485.java
+@@ -465,7 +465,9 @@
+ 		private boolean BI=false;
+ 		private boolean Data=false;
+ 		private boolean Output=false;
+-		MonitorThread() { }
++		MonitorThread() {
++			setDaemon(true);
++		}
+ 		public void run() {
+ 			eventLoop();
+ 		}
+--- a/src/gnu/io/RXTXPort.java
++++ b/src/gnu/io/RXTXPort.java
+@@ -1629,6 +1629,7 @@
+ 
+ 		MonitorThread() 
+ 		{
++			setDaemon(true);
+ 			if (debug)
+ 				z.reportln( "RXTXPort:MontitorThread:MonitorThread()"); 
+ 		}
+--- a/src/gnu/io/Raw.java
++++ b/src/gnu/io/Raw.java
+@@ -466,7 +466,9 @@
+ 		private boolean BI=false;
+ 		private boolean Data=false;
+ 		private boolean Output=false;
+-		MonitorThread() { }
++		MonitorThread() {
++			setDaemon(true);
++		}
+ 		public void run() {
+ 			eventLoop();
+ 		}
