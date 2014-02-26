@@ -9,3 +9,4 @@ multiple_property_dirs.patch
 uninstall_target.patch
 fhs_lock_buffer_overflow_fix.patch
 MonitorThread-daemon.patch
+usb_38400.patch
