@@ -5,7 +5,7 @@ Bug-Debian: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=731151
 
 --- a/src/SerialImp.c
 +++ b/src/SerialImp.c
-@@ -5821,7 +5821,7 @@ int is_device_locked( const char *port_f
+@@ -5827,7 +5827,7 @@
  		LOCKDIR, NULL
  	};
  	const char *lockprefixes[] = { "LCK..", "lk..", "LK.", NULL };
@@ -14,7 +14,7 @@ Bug-Debian: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=731151
  	int i = 0, j, k, fd , pid;
  	struct stat buf, buf2, lockbuf;
  
-@@ -5862,19 +5862,22 @@ int is_device_locked( const char *port_f
+@@ -5868,19 +5868,22 @@
  			while ( lockprefixes[k] )
  			{
  				/* FHS style */
@@ -40,7 +40,7 @@ Bug-Debian: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=731151
  					lockdirs[i],
  					lockprefixes[k],
  					(int) major( buf.st_dev ),
-@@ -5883,11 +5886,14 @@ int is_device_locked( const char *port_f
+@@ -5889,11 +5892,14 @@
  				);
  				if( stat( file, &buf ) == 0 )
  				{
@@ -56,7 +56,7 @@ Bug-Debian: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=731151
  				k++;
  			}
  		}
-@@ -5911,7 +5917,7 @@ int is_device_locked( const char *port_f
+@@ -5917,7 +5923,7 @@
  #endif /* __unixware__ */
  		p--;
  	}
@@ -65,7 +65,7 @@ Bug-Debian: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=731151
  #else
  	/*  UUCP standard locks */
  	if ( stat( port_filename, &buf ) != 0 )
-@@ -5919,7 +5925,7 @@ int is_device_locked( const char *port_f
+@@ -5925,7 +5931,7 @@
  		report( "RXTX is_device_locked() could not find device.\n" );
  			return 1;
  	}
@@ -74,7 +74,7 @@ Bug-Debian: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=731151
  		LOCKDIR,
  		(int) major( buf.st_dev ),
   		(int) major( buf.st_rdev ),
-@@ -5940,21 +5946,25 @@ int is_device_locked( const char *port_f
+@@ -5946,21 +5952,25 @@
  
  		if( kill( (pid_t) pid, 0 ) && errno==ESRCH )
  		{
@@ -104,7 +104,7 @@ Bug-Debian: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=731151
  #endif /* WIN32 */
 --- a/src/lfd/lockdaemon.c
 +++ b/src/lfd/lockdaemon.c
-@@ -120,8 +120,8 @@ int fhs_lock( const char *filename, int
+@@ -120,8 +120,8 @@
  	 *
  	 */
  	int fd,j;
@@ -115,7 +115,7 @@ Bug-Debian: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=731151
  
  	j = strlen( filename );
  	p = ( char * ) filename + j;
-@@ -136,24 +136,28 @@ int fhs_lock( const char *filename, int
+@@ -136,24 +136,28 @@
  #endif /* __unixware__ */
  		p--;
  	}
@@ -129,7 +129,7 @@ Bug-Debian: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=731151
  	fd = open( file, O_CREAT | O_WRONLY | O_EXCL, 0444 );
  	if( fd < 0 )
  	{
--		sprintf( message,
+-		snprintf( message, 79,
 +		asprintf( &message,
  			"RXTX fhs_lock() Error: creating lock file: %s: %s\n",
  			file, strerror(errno) );
@@ -147,7 +147,7 @@ Bug-Debian: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=731151
  	write( fd, lockinfo, 11 );
  	close( fd );
  	return 0;
-@@ -563,7 +567,7 @@ int is_device_locked( const char *port_f
+@@ -563,7 +567,7 @@
  		LOCKDIR, NULL
  	};
  	const char *lockprefixes[] = { "LCK..", "lk..", "LK.", NULL }; 
@@ -156,7 +156,7 @@ Bug-Debian: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=731151
  	int i = 0, j, k, fd , pid;
  	struct stat buf;
  	struct stat buf2;
-@@ -602,19 +606,22 @@ int is_device_locked( const char *port_f
+@@ -602,19 +606,22 @@
  			while ( lockprefixes[k] )
  			{
  				/* FHS style */
@@ -182,7 +182,7 @@ Bug-Debian: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=731151
  					lockdirs[i],
  					lockprefixes[k],
  					(int) major( buf.st_dev ),
-@@ -623,11 +630,14 @@ int is_device_locked( const char *port_f
+@@ -623,11 +630,14 @@
  				);
  				if( stat( file, &buf ) == 0 )
  				{
@@ -198,7 +198,7 @@ Bug-Debian: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=731151
  				k++;
  			}
  		}
-@@ -651,10 +661,10 @@ int is_device_locked( const char *port_f
+@@ -651,10 +661,10 @@
  #endif /* __unixware__ */
  		p--;
  	}
@@ -211,7 +211,7 @@ Bug-Debian: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=731151
  		LOCKDIR,
  		(int) major( buf.st_dev ),
   		(int) major( buf.st_rdev ),
-@@ -672,32 +682,39 @@ int is_device_locked( const char *port_f
+@@ -672,32 +682,39 @@
  		/* FIXME null terminiate pid_buffer? need to check in Solaris */
  		close( fd );
  		sscanf( pid_buffer, "%d", &pid );
@@ -257,7 +257,7 @@ Bug-Debian: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=731151
  int init( void )
 --- a/src/lfd/lockdaemon.c.noinetd
 +++ b/src/lfd/lockdaemon.c.noinetd
-@@ -119,8 +119,8 @@ int fhs_lock( const char *filename, int
+@@ -119,8 +119,8 @@
  	 *
  	 */
  	int fd,j;
@@ -268,7 +268,7 @@ Bug-Debian: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=731151
  
  	j = strlen( filename );
  	p = ( char * ) filename + j;
-@@ -135,24 +135,28 @@ int fhs_lock( const char *filename, int
+@@ -135,24 +135,28 @@
  #endif /* __unixware__ */
  		p--;
  	}
@@ -282,7 +282,7 @@ Bug-Debian: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=731151
  	fd = open( file, O_CREAT | O_WRONLY | O_EXCL, 0444 );
  	if( fd < 0 )
  	{
--		sprintf( message,
+-		snprintf( message, 79,
 +		asprintf( &message,
  			"RXTX fhs_lock() Error: creating lock file: %s: %s\n",
  			file, strerror(errno) );
@@ -300,7 +300,7 @@ Bug-Debian: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=731151
  	write( fd, lockinfo, 11 );
  	close( fd );
  	return 0;
-@@ -556,7 +560,7 @@ int is_device_locked( const char *port_f
+@@ -556,7 +560,7 @@
  		LOCKDIR, NULL
  	};
  	const char *lockprefixes[] = { "LCK..", "lk..", "LK.", NULL }; 
@@ -309,7 +309,7 @@ Bug-Debian: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=731151
  	int i = 0, j, k, fd , pid;
  	struct stat buf;
  	struct stat buf2;
-@@ -595,19 +599,22 @@ int is_device_locked( const char *port_f
+@@ -595,19 +599,22 @@
  			while ( lockprefixes[k] )
  			{
  				/* FHS style */
@@ -335,7 +335,7 @@ Bug-Debian: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=731151
  					lockdirs[i],
  					lockprefixes[k],
  					(int) major( buf.st_dev ),
-@@ -616,11 +623,14 @@ int is_device_locked( const char *port_f
+@@ -616,11 +623,14 @@
  				);
  				if( stat( file, &buf ) == 0 )
  				{
@@ -351,7 +351,7 @@ Bug-Debian: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=731151
  				k++;
  			}
  		}
-@@ -644,7 +654,7 @@ int is_device_locked( const char *port_f
+@@ -644,7 +654,7 @@
  #endif /* __unixware__ */
  		p--;
  	}
@@ -360,7 +360,7 @@ Bug-Debian: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=731151
  #else 
  	/*  UUCP standard locks */
  	if ( stat( port_filename, &buf ) != 0 )
-@@ -656,7 +666,7 @@ int is_device_locked( const char *port_f
+@@ -656,7 +666,7 @@
  		syslog( LOG_INFO, message );
  		return 1;
  	}
@@ -369,7 +369,7 @@ Bug-Debian: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=731151
  		LOCKDIR,
  		(int) major( buf.st_dev ),
   		(int) major( buf.st_rdev ),
-@@ -677,10 +687,11 @@ int is_device_locked( const char *port_f
+@@ -677,10 +687,11 @@
  
  		if( kill( (pid_t) pid, 0 ) && errno==ESRCH )
  		{
@@ -382,7 +382,7 @@ Bug-Debian: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=731151
  			if( unlink( file ) != 0 )
  			{
  				snprintf( message, 80, "RXTX Error:  Unable to \
-@@ -688,10 +699,13 @@ int is_device_locked( const char *port_f
+@@ -688,10 +699,13 @@
  					file
  				);
  				syslog( LOG_INFO, message );
