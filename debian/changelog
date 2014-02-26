@@ -1,3 +1,14 @@
+rxtx (2.2pre2-12) UNRELEASED; urgency=medium
+
+  * Team upload.
+  * Apply patch for USB serial adapters at 38400 (Closes: #740098)
+    - Thank you to Jan Niehusmann for the analysis and patch.
+  * Remove DMUA field from debian/control.
+  * Bump DH dependency from 8 to 9.
+  * Bump Standards-Version to 3.9.5.
+
+ -- tony mancill <tmancill@debian.org>  Tue, 25 Feb 2014 20:46:17 -0800
+
 rxtx (2.2pre2-11) unstable; urgency=low
 
   * debian/patches/MonitorThread-daemon.patch
