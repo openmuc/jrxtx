@@ -11,3 +11,4 @@ fhs_lock_buffer_overflow_fix.patch
 MonitorThread-daemon.patch
 usb_38400.patch
 fix_snprintf.patch
+format_security.patch
