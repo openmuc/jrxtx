@@ -2,13 +2,14 @@ Source: rxtx
 Section: java
 Priority: optional
 Maintainer: Debian Java maintainers <pkg-java-maintainers@lists.alioth.debian.org>
-Uploaders: Scott Howard <showard@debian.org>
+Uploaders: Scott Howard <showard@debian.org>,
+ tony mancill <tmancill@debian.org>
 Build-Depends: debhelper (>= 9), libtool, javahelper, default-jdk,
  dh-autoreconf, autotools-dev
 Standards-Version: 3.9.5
-Homepage: http://www.rxtx.org
-Vcs-Git: git://git.debian.org/pkg-java/rxtx.git
-Vcs-Browser: http://git.debian.org/?p=pkg-java/rxtx.git
+Homepage: https://github.com/rxtx/rxtx
+Vcs-Git: git://anonscm.debian.org/pkg-java/rxtx.git
+Vcs-Browser: http://anonscm.debian.org/gitweb/?p=pkg-java/rxtx.git
 
 Package: librxtx-java
 Architecture: any
