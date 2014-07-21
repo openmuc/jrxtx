@@ -1,3 +1,16 @@
+rxtx (2.2pre2-13) unstable; urgency=medium
+
+  * Team upload.
+  * debian/copyright:
+    - Correct Format and remove broken Source link.
+    - Update Upstream-Source and contact email address in copyright
+  * debian/control:
+    - Update upstream in debian/control.
+    - Update Vcs links to use canonical URLs.
+    - Add tmancill@debian.org to Uploaders.
+
+ -- tony mancill <tmancill@debian.org>  Sun, 20 Jul 2014 20:40:59 -0700
+
 rxtx (2.2pre2-12) unstable; urgency=medium
 
   * Team upload.
