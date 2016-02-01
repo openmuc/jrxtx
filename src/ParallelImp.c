@@ -920,7 +920,7 @@ void throw_java_exception_system_msg( JNIEnv *env, char *exc, char *foo )
 void report_error(char *msg)
 {
 #ifndef DEBUG_MW
-	fprintf(stderr, msg);
+	fprintf(stderr, "%s", msg);
 #else
 	mexWarnMsgTxt( msg );
 #endif /* DEBUG_MW */
@@ -938,7 +938,7 @@ void report_error(char *msg)
 void report(char *msg)
 {
 #ifdef DEBUG
-        fprintf(stderr, msg);
+        fprintf(stderr, "%s", msg);
 #endif /* DEBUG */
 }
 
