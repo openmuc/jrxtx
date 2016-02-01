@@ -382,7 +382,7 @@ int configure_port( int fd )
 	ttyset.c_cc[ VMIN ] = 0;
 	ttyset.c_cc[ VTIME ] = 0;
 
-#ifdef __FreeBSD__
+#ifdef __FreeBSD_kernel__
 	if( cfsetspeed( &ttyset, B9600 ) < 0 ) goto fail;
 #else
 	if( cfsetispeed( &ttyset, B9600 ) < 0 ) goto fail;
@@ -686,13 +686,13 @@ int set_port_params(
 		return(1);
 	}
 
-#ifdef __FreeBSD__
+#ifdef __FreeBSD_kernel__
 	if( cfsetspeed( &ttyset, cspeed ) < 0 )
 	{
 		report( "set_port_params: Cannot Set Speed\n" );
 		return( 1 );
 	}
-#endif  /* __FreeBSD__ */
+#endif  /* __FreeBSD_kernel__ */
 	if( !cspeed )
 	{
 		/* hang up the modem aka drop DTR  */
@@ -4257,7 +4257,7 @@ jboolean  gnu::io::RXTXCommDriver::isPortPrefixValid(
 		stat(teststring,&mystat);
 #endif /* __sun__ */
 /* XXX the following hoses freebsd when it tries to open the port later on */
-#ifndef __FreeBSD__
+#ifndef __FreeBSD_kernel__
 		if(S_ISCHR(mystat.st_mode)){
 			fd=::OPEN(teststring,O_RDONLY|O_NONBLOCK);
 			if (fd>0){

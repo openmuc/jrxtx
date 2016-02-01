@@ -135,11 +135,11 @@ JNIEXPORT void JNICALL RXTXPort(Initialize)(
 	   threads, because it slows things down.  Go figure. */
 
 	/* POSIX signal handling functions */
-#if !defined(__FreeBSD___)
+#if !defined(__FreeBSD_kernel___)
 	struct sigaction handler;
 	sigaction( SIGIO, NULL, &handler );
 	if( !handler.sa_handler ) signal( SIGIO, SIG_IGN );
-#endif /* !__FreeBSD__ */
+#endif /* !__FreeBSD_kernel__ */
 #ifdef DEBUG
 	/* Lets let people who upgraded kernels know they may have problems */
 	if (uname (&name) == -1)

@@ -97,7 +97,7 @@
 
 /* glue for unsupported linux speeds see also win32termios.h */
 
-#if !defined(__APPLE__) && !defined(__FreeBSD__) /* dima */
+#if !defined(__APPLE__) && !defined(__FreeBSD_kernel__) /* dima */
 /* this is now handled in SerialImp.c
 #define B14400		1010001
 #define B28800		1010002
@@ -165,7 +165,7 @@ struct event_info_struct
 #	define LOCKFILEPREFIX "LK."
 #	define UUCP
 #endif /* __sgi__ || sgi */
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD_kernel__)
 #	define DEVICEDIR "/dev/"
 #	define LOCKDIR "/var/spool/uucp"
 #	define LOCKFILEPREFIX "LK."
@@ -176,7 +176,7 @@ struct event_info_struct
 #	define LOCKDIR "/var/spool/uucp"
 #	define LOCKFILEPREFIX "LK."
 #	define UUCP
-#endif /* __FreeBSD__ */
+#endif /* __FreeBSD_kernel__ */
 #if defined(__NetBSD__)
 #	define DEVICEDIR "/dev/"
 #	define LOCKDIR "/usr/spool/uucp"

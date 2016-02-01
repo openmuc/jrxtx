@@ -265,11 +265,11 @@ JNIEXPORT void JNICALL Java_gnu_io_RawPort_Initialize(
 	   threads, because it slows things down.  Go figure. */
 
 	/* POSIX signal handling functions */
-#if !defined(__FreeBSD___)
+#if !defined(__FreeBSD_kernel___)
 	struct sigaction handler;
 	sigaction( SIGIO, NULL, &handler );
 	if( !handler.sa_handler ) signal( SIGIO, SIG_IGN );
-#endif /* !__FreeBSD__ */
+#endif /* !__FreeBSD_kernel__ */
 #if defined(__linux__) 
 	/* Lets let people who upgraded kernels know they may have problems */
 	if (uname (&name) == -1)
@@ -307,7 +307,7 @@ JNIEXPORT void JNICALL Java_gnu_io_RawPort_nativeSetRawPortParams(
 	if( !translate_data_bits( env, (int *)&(ttyset.c_cflag), dataBits ) ) return; /* dima c_flag darwin unsigned long */
 	if( !translate_stop_bits( env, (int *)&(ttyset.c_cflag), stopBits ) ) return; /* dima c_flag darwin unsigned long */
 	if( !translate_parity( env, (int *)&(ttyset.c_cflag), parity ) ) return;/* dima c_flag darwin unsigned long */
-#ifdef __FreeBSD__
+#ifdef __FreeBSD_kernel__
 	if( cfsetspeed( &ttyset, cspeed ) < 0 ) goto fail;
 #else
 	if( cfsetispeed( &ttyset, cspeed ) < 0 ) goto fail;
@@ -1289,7 +1289,7 @@ JNIEXPORT jboolean  JNICALL Java_gnu_io_RXTXCommDriver_IsDeviceGood(JNIEnv *env,
 		return(JNI_FALSE);
 	}
 #endif
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD_kernel__)
 	if(!strcmp(name,"tty0")|| !strcmp(name,"ttyd")||
 		!strcmp(name,"ttyq")|| !strcmp(name,"ttym")||
 		!strcmp(name,"ttyf")|| !strcmp(name,"ttyS")||

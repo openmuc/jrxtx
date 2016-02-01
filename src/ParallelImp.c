@@ -111,7 +111,7 @@
 #if defined(__linux__)
 #	include <linux/lp.h>
 #endif
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD_kernel__)
 /* #	include <machine/lpt.h> ? is this changed or wrong */
 #	include <dev/ppbus/lpt.h>
 #endif
@@ -265,7 +265,7 @@ JNIEXPORT jboolean JNICALL LPRPort(isPrinterBusy)(JNIEnv *env,
 #if defined(__linux__)
 	return( status & LP_BUSY ? JNI_TRUE : JNI_FALSE );
 #endif
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD_kernel__)
 	return( status & EBUSY ? JNI_TRUE : JNI_FALSE );
 #endif
 	return(JNI_FALSE);
@@ -341,7 +341,7 @@ JNIEXPORT jboolean JNICALL LPRPort(isPrinterTimedOut)(JNIEnv *env,
 	ioctl(fd, LPGETSTATUS, &status);
 	return( status & LP_BUSY ? JNI_TRUE : JNI_FALSE );
 #endif
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD_kernel__)
 	printf("ParallelImp.c LPGETSTATUS not defined\n");
 	/*
 	return( status & EBUSY ? JNI_TRUE : JNI_FALSE );

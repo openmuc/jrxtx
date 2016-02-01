@@ -97,7 +97,7 @@
 
 /* glue for unsupported linux speeds see also win32termios.h */
 
-#if !defined(__APPLE__) && !defined(__FreeBSD__) /* dima */
+#if !defined(__APPLE__) && !defined(__FreeBSD_kernel__) /* dima */
 /* this is now handled in SerialImp.c
 #define B14400		1010001
 #define B28800		1010002
@@ -147,7 +147,7 @@ struct event_info_struct
 };
 
 /*  Ports known on the OS */
-#if defined(__linux__)
+#if defined(__linux__) || defined(__FreeBSD_kernel__)
 /*
 	This is a small hack to get mark and space parity working on older systems
 	https://bugzilla.redhat.com/bugzilla/show_bug.cgi?id=147533
