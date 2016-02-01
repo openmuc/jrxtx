@@ -144,7 +144,7 @@ int fhs_lock( const char *filename, int pid )
 	fd = open( file, O_CREAT | O_WRONLY | O_EXCL, 0444 );
 	if( fd < 0 )
 	{
-		sprintf( message,
+		snprintf( message, 79,
 			"RXTX fhs_lock() Error: creating lock file: %s: %s\n",
 			file, strerror(errno) );
 		syslog( LOG_INFO, message );

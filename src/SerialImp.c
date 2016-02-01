@@ -5301,7 +5301,7 @@ int lib_lock_dev_lock( const char *filename, int pid )
 	}
 	if ( dev_lock( filename ) )
 	{
-		sprintf( message,
+		snprintf( message, 79,
 			"RXTX fhs_lock() Error: creating lock file for: %s: %s\n",
 			filename, strerror(errno) );
 		report_error( message );
@@ -5361,7 +5361,7 @@ int fhs_lock( const char *filename, int pid )
 	fd = open( file, O_CREAT | O_WRONLY | O_EXCL, 0444 );
 	if( fd < 0 )
 	{
-		sprintf( message,
+		snprintf( message, 79,
 			"RXTX fhs_lock() Error: creating lock file: %s: %s\n",
 			file, strerror(errno) );
 		report_error( message );
