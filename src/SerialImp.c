@@ -320,6 +320,7 @@ JNIEXPORT void JNICALL RXTXPort(Initialize)(
 #endif /* DEBUG_TIMING */
 #if defined(DEBUG) && defined(__linux__)
 	/* Lets let people who upgraded kernels know they may have problems */
+	/*
 	if (uname (&name) == -1)
 	{
 		report( "RXTX WARNING:  cannot get system name\n" );
@@ -333,6 +334,7 @@ JNIEXPORT void JNICALL RXTXPort(Initialize)(
 		report( message );
 		getchar();
 	}
+	*/
 	LEAVE( "RXTXPort:Initialize" );
 #endif /* DEBUG && __linux__ */
 }
