@@ -86,7 +86,9 @@ final public class RXTXPort extends SerialPort
 	{
 		try {
 			z = new Zystem();
-		} catch ( Exception e ) {}
+		} catch ( Exception e ) {
+			throw new Error(e.toString());
+		}
 
 		if(debug ) 
 			z.reportln( "RXTXPort {}");
