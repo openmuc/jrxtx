@@ -120,8 +120,8 @@ int fhs_lock( const char *filename, int pid )
 	 *
 	 */
 	int fd,j;
-	char lockinfo[12], message[80];
-	char file[80], *p;
+	char lockinfo[12];
+	char *file, *p, *message;
 
 	j = strlen( filename );
 	p = ( char * ) filename + j;
@@ -136,24 +136,28 @@ int fhs_lock( const char *filename, int pid )
 #endif /* __unixware__ */
 		p--;
 	}
-	sprintf( file, "%s/LCK..%s", LOCKDIR, p );
 	if ( check_lock_status( filename ) )
 	{
 		/* syslog( LOG_INFO, "fhs_lock() lockstatus fail\n" ); */
 		return 1;
 	}
+	asprintf( &file, "%s/LCK..%s", LOCKDIR, p );
 	fd = open( file, O_CREAT | O_WRONLY | O_EXCL, 0444 );
 	if( fd < 0 )
 	{
-		snprintf( message, 79,
+		asprintf( &message,
 			"RXTX fhs_lock() Error: creating lock file: %s: %s\n",
 			file, strerror(errno) );
 		syslog( LOG_INFO, message );
+		free(message);
+		free(file);
 		return 1;
 	}
 	sprintf( lockinfo, "%10d\n", pid );
-	sprintf( message, "fhs_lock: creating lockfile: %s\n", lockinfo );
+	//asprintf( &message, "fhs_lock: creating lockfile: %s\n", lockinfo );
 	//syslog( LOG_INFO, message );
+	//free(message);
+	free(file);
 	write( fd, lockinfo, 11 );
 	close( fd );
 	return 0;
@@ -563,7 +567,7 @@ int is_device_locked( const char *port_filename )
 		LOCKDIR, NULL
 	};
 	const char *lockprefixes[] = { "LCK..", "lk..", "LK.", NULL }; 
-	char *p, file[80], pid_buffer[20], message[80];
+	char *p, *file, pid_buffer[20], *message;
 	int i = 0, j, k, fd , pid;
 	struct stat buf;
 	struct stat buf2;
@@ -602,19 +606,22 @@ int is_device_locked( const char *port_filename )
 			while ( lockprefixes[k] )
 			{
 				/* FHS style */
-				sprintf( file, "%s/%s%s", lockdirs[i],
+				asprintf( &file, "%s/%s%s", lockdirs[i],
 					lockprefixes[k], p );
 				if( stat( file, &buf ) == 0 )
 				{
-					sprintf( message, UNEXPECTED_LOCK_FILE,
+					asprintf( &message, UNEXPECTED_LOCK_FILE,
 						file );
 					syslog( LOG_INFO, message );
+					free( message );
+					free( file );
 					return 1;
 				}
+				free( file );
 
 				/* UUCP style */
 				stat(port_filename , &buf );
-				sprintf( file, "%s/%s%03d.%03d.%03d",
+				asprintf( &file, "%s/%s%03d.%03d.%03d",
 					lockdirs[i],
 					lockprefixes[k],
 					(int) major( buf.st_dev ),
@@ -623,11 +630,14 @@ int is_device_locked( const char *port_filename )
 				);
 				if( stat( file, &buf ) == 0 )
 				{
-					sprintf( message, UNEXPECTED_LOCK_FILE,
+					asprintf( &message, UNEXPECTED_LOCK_FILE,
 						file );
 					syslog( LOG_INFO, message );
+					free( message );
+					free( file );
 					return 1;
 				}
+				free( file );
 				k++;
 			}
 		}
@@ -651,10 +661,10 @@ int is_device_locked( const char *port_filename )
 #endif /* __unixware__ */
 		p--;
 	}
-	sprintf( file, "%s/%s%s", LOCKDIR, LOCKFILEPREFIX, p );
+	asprintf( &file, "%s/%s%s", LOCKDIR, LOCKFILEPREFIX, p );
 #else 
 	/*  UUCP standard locks */
-	sprintf( file, "%s/LK.%03d.%03d.%03d",
+	asprintf( &file, "%s/LK.%03d.%03d.%03d",
 		LOCKDIR,
 		(int) major( buf.st_dev ),
  		(int) major( buf.st_rdev ),
@@ -672,32 +682,39 @@ int is_device_locked( const char *port_filename )
 		/* FIXME null terminiate pid_buffer? need to check in Solaris */
 		close( fd );
 		sscanf( pid_buffer, "%d", &pid );
-		sprintf( message, "found lock for %s with pid %i\n", file, pid );
+		/* asprintf( &message, "found lock for %s with pid %i\n", file, pid ); */
 		/* syslog( LOG_INFO, message ); */
+		/* free( message ); */
 
 		if( kill( (pid_t) pid, 0 ) && errno==ESRCH )
 		{
-			sprintf( message,
+			asprintf( &message,
 				"RXTX Warning:  Removing stale lock file. %s\n",
 				file );
 			syslog( LOG_INFO, message );
+			free( message );
 			if( unlink( file ) != 0 )
 			{
-				snprintf( message, 80, "RXTX Error:  Unable to \
+				asprintf( &message, "RXTX Error:  Unable to \
 					remove stale lock file: %s\n",
 					file
 				);
 				syslog( LOG_INFO, message );
+				free( message );
+				free( file );
 				return 0;
 			}
 		}
 		else
 		{
-			sprintf( message, "could not kill %i\n", pid );
+			/* asprintf( &message, "could not kill %i\n", pid ); */
 			/* syslog( LOG_INFO, message ); */
+			/* free( message ); */
+			free( file );
 			return 1;
 		}
 	}
+	free( file );
 	return 0;
 }
 int init( void )

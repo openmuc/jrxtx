@@ -5815,7 +5815,7 @@ int is_device_locked( const char *port_filename )
 		LOCKDIR, NULL
 	};
 	const char *lockprefixes[] = { "LCK..", "lk..", "LK.", NULL };
-	char *p, file[80], pid_buffer[20], message[80];
+	char *p, *file, pid_buffer[20], *message;
 	int i = 0, j, k, fd , pid;
 	struct stat buf, buf2, lockbuf;
 
@@ -5856,19 +5856,22 @@ int is_device_locked( const char *port_filename )
 			while ( lockprefixes[k] )
 			{
 				/* FHS style */
-				sprintf( file, "%s/%s%s", lockdirs[i],
+				asprintf( &file, "%s/%s%s", lockdirs[i],
 					lockprefixes[k], p );
 				if( stat( file, &buf ) == 0 )
 				{
-					sprintf( message, UNEXPECTED_LOCK_FILE,
+					asprintf( &message, UNEXPECTED_LOCK_FILE,
 						file );
 					report_warning( message );
+					free( message );
+					free( file );
 					return 1;
 				}
+				free( file );
 
 				/* UUCP style */
 				stat(port_filename , &buf );
-				sprintf( file, "%s/%s%03d.%03d.%03d",
+				asprintf( &file, "%s/%s%03d.%03d.%03d",
 					lockdirs[i],
 					lockprefixes[k],
 					(int) major( buf.st_dev ),
@@ -5877,11 +5880,14 @@ int is_device_locked( const char *port_filename )
 				);
 				if( stat( file, &buf ) == 0 )
 				{
-					sprintf( message, UNEXPECTED_LOCK_FILE,
+					asprintf( &message, UNEXPECTED_LOCK_FILE,
 						file );
 					report_warning( message );
+					free( message );
+					free( file );
 					return 1;
 				}
+				free( file );
 				k++;
 			}
 		}
@@ -5905,7 +5911,7 @@ int is_device_locked( const char *port_filename )
 #endif /* __unixware__ */
 		p--;
 	}
-	sprintf( file, "%s/%s%s", LOCKDIR, LOCKFILEPREFIX, p );
+	asprintf( &file, "%s/%s%s", LOCKDIR, LOCKFILEPREFIX, p );
 #else
 	/*  UUCP standard locks */
 	if ( stat( port_filename, &buf ) != 0 )
@@ -5913,7 +5919,7 @@ int is_device_locked( const char *port_filename )
 		report( "RXTX is_device_locked() could not find device.\n" );
 			return 1;
 	}
-	sprintf( file, "%s/LK.%03d.%03d.%03d",
+	asprintf( &file, "%s/LK.%03d.%03d.%03d",
 		LOCKDIR,
 		(int) major( buf.st_dev ),
  		(int) major( buf.st_rdev ),
@@ -5934,21 +5940,25 @@ int is_device_locked( const char *port_filename )
 
 		if( kill( (pid_t) pid, 0 ) && errno==ESRCH )
 		{
-			sprintf( message,
+			asprintf( &message,
 				"RXTX Warning:  Removing stale lock file. %s\n",
 				file );
 			report_warning( message );
+			free( message );
 			if( unlink( file ) != 0 )
 			{
-				snprintf( message, 80, "RXTX Error:  Unable to \
+				asprintf( &message, "RXTX Error:  Unable to \
 					remove stale lock file: %s\n",
 					file
 				);
 				report_warning( message );
+				free( message );
+				free( file );
 				return 1;
 			}
 		}
 	}
+	free(file);
 	return 0;
 }
 #endif /* WIN32 */
