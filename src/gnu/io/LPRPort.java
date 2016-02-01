@@ -366,7 +366,9 @@ class MonitorThread extends Thread
 {
 	private boolean monError = false;
 	private boolean monBuffer = false;
-		MonitorThread() { }
+		MonitorThread() {
+			setDaemon(true);
+		}
 		public void run()
 		{
 			eventLoop();

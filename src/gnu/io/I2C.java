@@ -468,7 +468,9 @@ final class I2C  extends  I2CPort {
 		private boolean BI=false;
 		private boolean Data=false;
 		private boolean Output=false;
-		MonitorThread() { }
+		MonitorThread() {
+			setDaemon(true);
+		}
 		public void run() {
 			eventLoop();
 		}

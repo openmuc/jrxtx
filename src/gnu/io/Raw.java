@@ -466,7 +466,9 @@ final class Raw  extends  RawPort {
 		private boolean BI=false;
 		private boolean Data=false;
 		private boolean Output=false;
-		MonitorThread() { }
+		MonitorThread() {
+			setDaemon(true);
+		}
 		public void run() {
 			eventLoop();
 		}

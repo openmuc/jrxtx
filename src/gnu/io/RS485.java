@@ -465,7 +465,9 @@ final class RS485  extends  RS485Port {
 		private boolean BI=false;
 		private boolean Data=false;
 		private boolean Output=false;
-		MonitorThread() { }
+		MonitorThread() {
+			setDaemon(true);
+		}
 		public void run() {
 			eventLoop();
 		}
