@@ -356,7 +356,7 @@ public class RXTXCommDriver implements CommDriver
 	 First try to register ports specified in the properties
 	 file.  If that doesn't exist, then scan for ports.
 	*/
-		for (int PortType=CommPortIdentifier.PORT_SERIAL;PortType<=CommPortIdentifier.PORT_PARALLEL;PortType++) {
+		for (int PortType=CommPortIdentifier.PORT_SERIAL; PortType<=CommPortIdentifier.PORT_PARALLEL; PortType++) {
 			if (!registerSpecifiedPorts(PortType)) {
 				if (!registerKnownPorts(PortType)) {
 					registerScannedPorts(PortType);
@@ -375,10 +375,18 @@ public class RXTXCommDriver implements CommDriver
 		while (tok.hasMoreElements())
 		{
 			String PortName = tok.nextToken();
-
-			if (testRead(PortName, PortType))
+			if(debug)
+				System.out.println("Trying " + PortName + ".");
+			if (testRead(PortName, PortType)) {
 				CommPortIdentifier.addPortName(PortName,
 					PortType, this);
+				if(debug)
+					System.out.println("Success: Read from " + PortName + ".");
+			}else{
+				if(debug)
+					System.out.println("Fail: Cannot read from " + PortName
+						+ ".");
+			}
 		}
 	}
 
@@ -402,26 +410,39 @@ public class RXTXCommDriver implements CommDriver
 	private boolean registerSpecifiedPorts(int PortType)
 	{
 		String val = null;
-		Properties origp = System.getProperties();//save system properties
+		Properties origp = System.getProperties(); // save system properties
 
-		try
-		    {
-
-		     String ext_dir=System.getProperty("java.ext.dirs")+System.getProperty("file.separator");
-		     FileInputStream rxtx_prop=new FileInputStream(ext_dir+"gnu.io.rxtx.properties");
-		     Properties p=new Properties();
-		     p.load(rxtx_prop);
-		     System.setProperties(p);
-		     for (Iterator it = p.keySet().iterator(); it.hasNext();) {
-		          String key = (String) it.next();
-		          System.setProperty(key, p.getProperty(key));
-		     }
-		    }catch(Exception e){
-			if (debug){
-			    System.out.println("The file: gnu.io.rxtx.properties doesn't exists.");
-			    System.out.println(e.toString());
-			    }//end if
+		String [] ext_dirs = System.getProperty("java.ext.dirs").split(":");
+		String fs = System.getProperty("file.separator");
+		for (int n = 0; n < ext_dirs.length; ++n) {
+			String ext_file = "?";
+			try{
+				ext_file = ext_dirs[n] + fs + "gnu.io.rxtx.properties";
+				FileInputStream rxtx_prop = new FileInputStream(ext_file);
+				Properties p=new Properties();
+				p.load(rxtx_prop);
+				System.setProperties(p);
+				for (Iterator it = p.keySet().iterator(); it.hasNext();) {
+					String key = (String) it.next();
+					String value = p.getProperty(key);
+					if(debug) {
+						System.out.println(key + " -> " + value);
+					}
+					System.setProperty(key, value);
+				}
+			}catch(Exception e){
+				if (debug){
+					System.out.println("The file \"" + ext_file
+						+ "\" doesn't exist.");
+					System.out.println(e.toString());
+				}//end if
+				continue;
 			}//end catch
+			if (debug){
+				System.out.println("Read properties from \"" + ext_file
+					+ "\".");
+			}//end if
+		}//end for
 
 		if (debug)
 			System.out.println("checking for system-known ports of type "+PortType);
