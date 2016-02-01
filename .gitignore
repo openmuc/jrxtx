@@ -1,1 +1,6 @@
-.pc
+.classpath
+.gradle/
+.project
+.settings/
+build
+bin
