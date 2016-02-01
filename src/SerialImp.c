@@ -872,10 +872,14 @@ int set_port_params( JNIEnv *env, int fd, int cspeed, int dataBits,
 	   out and select baud rates 38400 then 28800 then 38400, you will get
 	   a final baud rate of 28800 because you did not update the divisor.
 
+	   However, if the serial port doesn't support TIOCGSERIAL or custom speeds,
+	   don't fail: In this case, just use B38400 and assume that there is no way
+	   to set a custom speed on this port.
+
 	   See the next ifdef below for the divisor.
 	*/
 #if defined(TIOCGSERIAL)
-	if ( cspeed == B38400 )
+	if ( cspeed == B38400 && ioctl( fd, TIOCGSERIAL, &sstruct ) == 0 )
 		cspeed = 38400;
 #endif /* TIOCGSERIAL */
 	if(     cfsetispeed( &ttyset, cspeed ) < 0 ||
@@ -905,10 +909,9 @@ int set_port_params( JNIEnv *env, int fd, int cspeed, int dataBits,
 			return(1);
 		}
 		sstruct.custom_divisor = ( sstruct.baud_base/cspeed );
-		cspeed = B38400;
 #endif /* TIOCGSERIAL */
-		if(     cfsetispeed( &ttyset, cspeed ) < 0 ||
-			cfsetospeed( &ttyset, cspeed ) < 0 )
+		if(     cfsetispeed( &ttyset, B38400 ) < 0 ||
+			cfsetospeed( &ttyset, B38400 ) < 0 )
 		{
 			/* OK, we tried everything */
 			report( "nativeSetSerialPortParams: Cannot Set Speed\n" );
@@ -916,8 +919,11 @@ int set_port_params( JNIEnv *env, int fd, int cspeed, int dataBits,
 		}
 #if defined(TIOCSSERIAL)
 		/*  It is assumed Win32 does this for us */
+		/*  Ignore errors if the target speed is 38400: In this case,
+		 *  just assume TIOCSSERIAL is not supported and custom speeds are
+		 *  not available. */
 		if (	sstruct.baud_base < 1 ||
-		ioctl( fd, TIOCSSERIAL, &sstruct ) < 0 )
+		ioctl( fd, TIOCSSERIAL, &sstruct ) < 0 && cspeed != 38400 )
 		{
 			return( 1 );
 		}
