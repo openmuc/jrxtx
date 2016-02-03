@@ -1,7 +1,27 @@
-This is AUTHORS Sun Nov 18 09:29:52 MST 2007
+/*
+ * Copyright 1997-2009 by Trent Jarvi and others.
+ * Copyright 2016 Fraunhofer ISE
+ *
+ * This file is part of jRxTx.
+ * jRxTx is a fork of RXTX originally maintained by Trent Jarvi.
+ *
+ * jRxTx is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 2.1 of the License, or
+ * (at your option) any later version.
+ *
+ * jRxTx is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with jRxTx.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
 
-This package is not the result of one persons time.  Recognition is given
-to the following people for their assistance.
+
+Among others the following people have contributed to jRxTx and RXTX:
 
 Martin Oberhuber <martin.oberhuber@windriver.com> Has submitted several fixes for rxtx integration into Eclipse.
 
@@ -117,4 +137,4 @@ Martin Pool <mbp@linuxcare.com>
 
    Added support for explicitly-specified lists of ports
 
-Maintainer:  Trent Jarvi  taj@www.linux.org.uk.
+Original maintainer:  Trent Jarvi  taj@www.linux.org.uk.
