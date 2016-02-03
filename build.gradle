@@ -1,42 +1,16 @@
 
-def projectName = 'jrxtx'
-def projectNameLowerCase = 'jrxtx'
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'osgi'
 
-configure(allprojects) {
+version = '0.0.1-SNAPSHOT'
+group = 'org.openmuc'
 
-  apply plugin: 'java'
-  apply plugin: 'eclipse'
-  apply plugin: 'osgi'
+sourceCompatibility = 1.5
+targetCompatibility = 1.5
 
-  version = '0.0.1-SNAPSHOT'
-  group = 'org.openmuc'
-
-  sourceCompatibility = 7
-  targetCompatibility = 7
+repositories { mavenCentral() }
   
-  repositories { mavenCentral() }
-  
-  sourceSets {
-    sample
-    itest {
-      compileClasspath += sourceSets.main.runtimeClasspath
-    }
-  }
-
-  dependencies {
-    testCompile group: 'junit', name: 'junit', version: '4.12'
-    itestCompile group: 'junit', name: 'junit', version: '4.12'
-  }
-
-}
-  
-dependencies {
-  testCompile 'org.mockito:mockito-core:1.10.19'
-  testCompile 'org.powermock:powermock-api-mockito:1.6.2' 
-  testCompile 'org.powermock:powermock-module-junit4:1.6.2' 
-}
-
-
 task sourcesJar(type: Jar, dependsOn: classes) {
   classifier = 'sources'
   from sourceSets.main.allSource
