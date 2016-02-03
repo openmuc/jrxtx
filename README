@@ -20,7 +20,7 @@
  *
  */
 
-jRxTx is a fork of RXTX which was origininally maintained by Trent
+jRxTx is a fork of RXTX which was originally maintained by Trent
 Jarvi but was discontinued. The starting point of development was RXTX
 v2.2-pre2 from 2009 + all patches by the Debian RXTX package
 maintainers.
