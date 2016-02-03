@@ -27,7 +27,7 @@
 |   any confusion about linking to RXTX.   We want to allow in part what
 |   section 5, paragraph 2 of the LGPL does not permit in the special
 |   case of linking over a controlled interface.  The intent is to add a
-|   Java Specification Request or standards body defined interface in the 
+|   Java Specification Request or standards body defined interface in the
 |   future as another exception but one is not currently available.
 |
 |   http://www.fsf.org/licenses/gpl-faq.html#LinkingOverControlledInterface
@@ -55,64 +55,74 @@
 |   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 |   All trademarks belong to their respective owners.
 --------------------------------------------------------------------------*/
-package  gnu.io;
+package gnu.io;
 
 import java.util.Enumeration;
 
 /**
-* @author Trent Jarvi
-* @version %I%, %G%
-* @since JDK1.0
-*/
+ * @author Trent Jarvi
+ * @version %I%, %G%
+ * @since JDK1.0
+ */
 
-
-class CommPortEnumerator implements Enumeration
-{
+class CommPortEnumerator implements Enumeration {
 	private CommPortIdentifier index;
 	private final static boolean debug = false;
-	static
-	{
-		if (debug)
-			System.out.println("CommPortEnumerator:{}");
-	}
 
-	CommPortEnumerator()
-	{
-	}
-/*------------------------------------------------------------------------------
-        nextElement()
-        accept:
-        perform:
-        return:
-        exceptions:
-        comments:
-------------------------------------------------------------------------------*/
-	public Object nextElement()
-	{
-		if(debug) System.out.println("CommPortEnumerator:nextElement()");
-		synchronized (CommPortIdentifier.Sync)
-		{
-			if(index != null) index = index.next;
-			else index=CommPortIdentifier.CommPortIndex;
-			return(index);
+	static {
+		if (debug) {
+			System.out.println("CommPortEnumerator:{}");
 		}
 	}
-/*------------------------------------------------------------------------------
-        hasMoreElements()
-        accept:
-        perform:
-        return:
-        exceptions:
-        comments:
-------------------------------------------------------------------------------*/
-	public boolean hasMoreElements()
-	{
-		if(debug) System.out.println("CommPortEnumerator:hasMoreElements() " + CommPortIdentifier.CommPortIndex == null ? false : true );
-		synchronized (CommPortIdentifier.Sync)
-		{
-			if(index != null) return index.next == null ? false : true;
-			else return CommPortIdentifier.CommPortIndex == null ?
-				false : true;
+
+	CommPortEnumerator() {
+	}
+
+	/*------------------------------------------------------------------------------
+	    nextElement()
+	    accept:
+	    perform:
+	    return:
+	    exceptions:
+	    comments:
+	------------------------------------------------------------------------------*/
+	@Override
+	public Object nextElement() {
+		if (debug) {
+			System.out.println("CommPortEnumerator:nextElement()");
+		}
+		synchronized (CommPortIdentifier.Sync) {
+			if (index != null) {
+				index = index.next;
+			}
+			else {
+				index = CommPortIdentifier.CommPortIndex;
+			}
+			return (index);
+		}
+	}
+
+	/*------------------------------------------------------------------------------
+	    hasMoreElements()
+	    accept:
+	    perform:
+	    return:
+	    exceptions:
+	    comments:
+	------------------------------------------------------------------------------*/
+	@Override
+	public boolean hasMoreElements() {
+		if (debug) {
+			System.out.println(
+					"CommPortEnumerator:hasMoreElements() " + CommPortIdentifier.CommPortIndex == null ? false : true);
+		}
+		synchronized (CommPortIdentifier.Sync) {
+			if (index != null) {
+				return index.next == null ? false : true;
+			}
+			else {
+				return CommPortIdentifier.CommPortIndex == null ? false : true;
+			}
 		}
 	}
 }

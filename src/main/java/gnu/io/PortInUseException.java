@@ -27,7 +27,7 @@
 |   any confusion about linking to RXTX.   We want to allow in part what
 |   section 5, paragraph 2 of the LGPL does not permit in the special
 |   case of linking over a controlled interface.  The intent is to add a
-|   Java Specification Request or standards body defined interface in the 
+|   Java Specification Request or standards body defined interface in the
 |   future as another exception but one is not currently available.
 |
 |   http://www.fsf.org/licenses/gpl-faq.html#LinkingOverControlledInterface
@@ -56,35 +56,33 @@
 |   All trademarks belong to their respective owners.
 --------------------------------------------------------------------------*/
 package gnu.io;
-import java.util.*;
 
 /**
-* The port requested is currently in use
-* @author Trent Jarvi
-* @version %I%, %G%
-* @since JDK1.0
-*/
+ * The port requested is currently in use
+ * 
+ * @author Trent Jarvi
+ * @version %I%, %G%
+ * @since JDK1.0
+ */
 
-
-public class PortInUseException extends Exception
-{
-/**
-the owner of the port requested.
-*/
+public class PortInUseException extends Exception {
+	/**
+	 * the owner of the port requested.
+	 */
 	public String currentOwner;
-/**
-* create a instance of the Exception and store the current owner
-*
-* @param str	detailed information about the current owner
-*/
-	PortInUseException( String str )
-	{
-		super( str );
-		currentOwner=str;
+
+	/**
+	 * create a instance of the Exception and store the current owner
+	 *
+	 * @param str
+	 *            detailed information about the current owner
+	 */
+	PortInUseException(String str) {
+		super(str);
+		currentOwner = str;
 	}
-	public PortInUseException()
-	{
+
+	public PortInUseException() {
 		super();
 	}
 }
-

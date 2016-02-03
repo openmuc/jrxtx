@@ -27,7 +27,7 @@
 |   any confusion about linking to RXTX.   We want to allow in part what
 |   section 5, paragraph 2 of the LGPL does not permit in the special
 |   case of linking over a controlled interface.  The intent is to add a
-|   Java Specification Request or standards body defined interface in the 
+|   Java Specification Request or standards body defined interface in the
 |   future as another exception but one is not currently available.
 |
 |   http://www.fsf.org/licenses/gpl-faq.html#LinkingOverControlledInterface
@@ -56,43 +56,40 @@
 |   All trademarks belong to their respective owners.
 --------------------------------------------------------------------------*/
 package gnu.io;
-import java.util.*;
+
+import java.util.EventObject;
 
 /**
-* @author Trent Jarvi
-* @version %I%, %G%
-* @since JDK1.0
-*/
+ * @author Trent Jarvi
+ * @version %I%, %G%
+ * @since JDK1.0
+ */
 
-public class ParallelPortEvent extends EventObject
-{
-	static public final int  PAR_EV_ERROR   =1;
-	static public final int  PAR_EV_BUFFER  =2;
+public class ParallelPortEvent extends EventObject {
+	static public final int PAR_EV_ERROR = 1;
+	static public final int PAR_EV_BUFFER = 2;
 
+	private final boolean OldValue;
+	private final boolean NewValue;
+	private final int eventType;
+	/* public int eventType =0; depricated */
 
-	private boolean OldValue;
-	private boolean NewValue;
-	private int eventType;
-	/*public int eventType           =0; depricated */
-
-	public ParallelPortEvent(ParallelPort srcport, int eventtype, 
-		boolean oldvalue, boolean newvalue)
-	{
-		super( srcport );	
-		OldValue=oldvalue;
-		NewValue=newvalue;
-		eventType=eventtype;
+	public ParallelPortEvent(ParallelPort srcport, int eventtype, boolean oldvalue, boolean newvalue) {
+		super(srcport);
+		OldValue = oldvalue;
+		NewValue = newvalue;
+		eventType = eventtype;
 	}
-	public int getEventType()
-	{
-		return(eventType);
+
+	public int getEventType() {
+		return (eventType);
 	}
-	public boolean getNewValue()
-	{
-		return( NewValue );
+
+	public boolean getNewValue() {
+		return (NewValue);
 	}
-	public boolean getOldValue()
-	{
-		return( OldValue );
+
+	public boolean getOldValue() {
+		return (OldValue);
 	}
 }

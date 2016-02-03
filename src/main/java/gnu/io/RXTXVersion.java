@@ -27,7 +27,7 @@
 |   any confusion about linking to RXTX.   We want to allow in part what
 |   section 5, paragraph 2 of the LGPL does not permit in the special
 |   case of linking over a controlled interface.  The intent is to add a
-|   Java Specification Request or standards body defined interface in the 
+|   Java Specification Request or standards body defined interface in the
 |   future as another exception but one is not currently available.
 |
 |   http://www.fsf.org/licenses/gpl-faq.html#LinkingOverControlledInterface
@@ -58,34 +58,34 @@
 package gnu.io;
 
 /**
-A class to keep the current version in
-*/
+ * A class to keep the current version in
+ */
 
-public class RXTXVersion
-{
-/*------------------------------------------------------------------------------
-	RXTXVersion  
-	accept:       -
-	perform:      Set Version.
-	return:       -
-	exceptions:   Throwable
-	comments:     
-		      See INSTALL for details.
-------------------------------------------------------------------------------*/
+public class RXTXVersion {
+	/*------------------------------------------------------------------------------
+		RXTXVersion  
+		accept:       -
+		perform:      Set Version.
+		return:       -
+		exceptions:   Throwable
+		comments:     
+			      See INSTALL for details.
+	------------------------------------------------------------------------------*/
 	private static String Version;
 
 	static {
-		System.loadLibrary( "rxtxSerial" );
+		System.loadLibrary("rxtxSerial");
 		Version = "RXTX-2.2pre2";
 	}
+
 	/**
-	*  static method to return the current version of RXTX
-	*  unique to RXTX.
-	*  @return a string representing the version  "RXTX-1.4-9"
-	*/
-	public static String getVersion()
-	{
-		return(Version);
+	 * static method to return the current version of RXTX unique to RXTX.
+	 * 
+	 * @return a string representing the version "RXTX-1.4-9"
+	 */
+	public static String getVersion() {
+		return (Version);
 	}
+
 	public static native String nativeGetVersion();
 }
