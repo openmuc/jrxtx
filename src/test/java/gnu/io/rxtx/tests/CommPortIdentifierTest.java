@@ -57,13 +57,12 @@
 --------------------------------------------------------------------------*/
 package gnu.io.rxtx.tests;
 
-import gnu.io.CommPortIdentifier;
-import gnu.io.NoSuchPortException;
-
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 
+import gnu.io.CommPortIdentifier;
+import gnu.io.NoSuchPortException;
 import junit.framework.TestCase;
 
 public class CommPortIdentifierTest extends TestCase {
@@ -72,9 +71,10 @@ public class CommPortIdentifierTest extends TestCase {
 		super(testName);
 	}
 
-	public List getPortIdentifiers() {
-		Enumeration e = CommPortIdentifier.getPortIdentifiers();
-		List l = new ArrayList();
+	public List<CommPortIdentifier> getPortIdentifiers() {
+		Enumeration<CommPortIdentifier> e = CommPortIdentifier.getPortIdentifiers();
+		List<CommPortIdentifier> l = new ArrayList<CommPortIdentifier>();
+
 		while (e.hasMoreElements()) {
 			l.add(e.nextElement());
 		}
@@ -82,14 +82,14 @@ public class CommPortIdentifierTest extends TestCase {
 	}
 
 	public void testGetPortIdentifiers() throws Exception {
-		List l = getPortIdentifiers();
+		List<CommPortIdentifier> l = getPortIdentifiers();
 		assertFalse("has ports", l.isEmpty());
 	}
 
 	public void testGetPortIdentifier() throws Exception {
-		List l = getPortIdentifiers();
-		CommPortIdentifier first = (CommPortIdentifier) l.get(0);
-		CommPortIdentifier last = (CommPortIdentifier) l.get(l.size() - 1);
+		List<CommPortIdentifier> l = getPortIdentifiers();
+		CommPortIdentifier first = l.get(0);
+		CommPortIdentifier last = l.get(l.size() - 1);
 		// first find by name
 		CommPortIdentifier p = CommPortIdentifier.getPortIdentifier(first.getName());
 		assertEquals("first found", p, first);

@@ -112,7 +112,6 @@ class Configure extends Frame {
 		p1 = new Panel();
 		p1.setLayout(new GridLayout(16, 4));
 		ActionListener l = new ActionListener() {
-			@Override
 			public void actionPerformed(ActionEvent e) {
 				{
 					String res = e.getActionCommand();
@@ -132,7 +131,6 @@ class Configure extends Frame {
 		p2.add(new Label("Port Name:"));
 		TextField tf = new TextField(devPath, 8);
 		tf.addActionListener(new ActionListener() {
-			@Override
 			public void actionPerformed(ActionEvent e) {
 				addCheckBoxes(e.getActionCommand());
 				f.setVisible(true);
@@ -145,7 +143,6 @@ class Configure extends Frame {
 		for (int j = 0, i = 4; i < 129; i *= 2, j++) {
 			b[j] = new Button("1-" + i);
 			b[j].addActionListener(new ActionListener() {
-				@Override
 				public void actionPerformed(ActionEvent e) {
 					int k = Integer.parseInt(e.getActionCommand().substring(2));
 					for (int x = 0; x < k; x++) {

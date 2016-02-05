@@ -24,7 +24,7 @@ package gnu.io;
 
 import java.util.Enumeration;
 
-class CommPortEnumerator implements Enumeration {
+class CommPortEnumerator implements Enumeration<CommPortIdentifier> {
 	private CommPortIdentifier index;
 	private final static boolean debug = false;
 
@@ -45,19 +45,18 @@ class CommPortEnumerator implements Enumeration {
 	    exceptions:
 	    comments:
 	------------------------------------------------------------------------------*/
-	@Override
-	public Object nextElement() {
+	public CommPortIdentifier nextElement() {
 		if (debug) {
 			System.out.println("CommPortEnumerator:nextElement()");
 		}
-		synchronized (CommPortIdentifier.Sync) {
+		synchronized (CommPortIdentifier.sync) {
 			if (index != null) {
 				index = index.next;
 			}
 			else {
 				index = CommPortIdentifier.CommPortIndex;
 			}
-			return (index);
+			return index;
 		}
 	}
 
@@ -69,13 +68,12 @@ class CommPortEnumerator implements Enumeration {
 	    exceptions:
 	    comments:
 	------------------------------------------------------------------------------*/
-	@Override
 	public boolean hasMoreElements() {
 		if (debug) {
 			System.out.println(
 					"CommPortEnumerator:hasMoreElements() " + CommPortIdentifier.CommPortIndex == null ? false : true);
 		}
-		synchronized (CommPortIdentifier.Sync) {
+		synchronized (CommPortIdentifier.sync) {
 			if (index != null) {
 				return index.next == null ? false : true;
 			}

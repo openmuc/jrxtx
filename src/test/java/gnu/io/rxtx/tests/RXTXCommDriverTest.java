@@ -57,17 +57,15 @@
 --------------------------------------------------------------------------*/
 package gnu.io.rxtx.tests;
 
-import gnu.io.CommPortIdentifier;
-
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 
+import gnu.io.CommPortIdentifier;
 import junit.framework.TestCase;
 
 /**
- * Main class bundling all single specialized test suites into a
- * overall complete one.
+ * Main class bundling all single specialized test suites into a overall complete one.
  */
 public class RXTXCommDriverTest extends TestCase {
 
@@ -79,27 +77,28 @@ public class RXTXCommDriverTest extends TestCase {
 		super(testName);
 	}
 
+	@Override
 	public void setUp() {
 		fPathSep = System.getProperty("path.separator", ":");
 		fOldPropSerial = System.getProperty("gnu.io.rxtx.SerialPorts");
 		fOldPropParallel = System.getProperty("gnu.io.rxtx.ParallelPorts");
 	}
 
+	@Override
 	public void tearDown() {
 		System.setProperty("gnu.io.rxtx.SerialPorts", fOldPropSerial == null ? "" : fOldPropSerial);
 		System.setProperty("gnu.io.rxtx.ParallelPorts", fOldPropParallel == null ? "" : fOldPropParallel);
 	}
 
 	/**
-	 * Check that ports can be specified (i.e. removed) by means of a Java
-	 * Property
+	 * Check that ports can be specified (i.e. removed) by means of a Java Property
 	 */
 	public void testRegisterSpecifiedPorts() throws Exception {
 		// First, find all serial ports
-		List serialPorts = new ArrayList();
-		Enumeration e = CommPortIdentifier.getPortIdentifiers();
+		List<String> serialPorts = new ArrayList<String>();
+		Enumeration<CommPortIdentifier> e = CommPortIdentifier.getPortIdentifiers();
 		while (e.hasMoreElements()) {
-			CommPortIdentifier port = (CommPortIdentifier) e.nextElement();
+			CommPortIdentifier port = e.nextElement();
 			if (port.getPortType() == CommPortIdentifier.PORT_SERIAL) {
 				serialPorts.add(port.getName());
 			}
@@ -115,7 +114,7 @@ public class RXTXCommDriverTest extends TestCase {
 		e = CommPortIdentifier.getPortIdentifiers();
 		int nNew = 0;
 		while (e.hasMoreElements()) {
-			CommPortIdentifier port = (CommPortIdentifier) e.nextElement();
+			CommPortIdentifier port = e.nextElement();
 			if (port.getPortType() == CommPortIdentifier.PORT_SERIAL) {
 				nNew++;
 				assertTrue("hasPort", serialPorts.contains(port.getName()));

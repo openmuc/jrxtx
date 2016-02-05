@@ -26,7 +26,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-public abstract class CommPort extends Object {
+public abstract class CommPort {
 	protected String name;
 	private final static boolean debug = false;
 

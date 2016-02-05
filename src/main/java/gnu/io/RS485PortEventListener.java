@@ -27,5 +27,5 @@ import java.util.EventListener;
 /* Non functional contact tjarvi@qbang.org for details */
 
 public interface RS485PortEventListener extends EventListener {
-	public abstract void RS485Event(RS485PortEvent ev);
+	void RS485Event(RS485PortEvent ev);
 }

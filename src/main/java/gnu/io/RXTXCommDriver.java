@@ -38,9 +38,9 @@ import java.util.StringTokenizer;
  */
 public class RXTXCommDriver implements CommDriver {
 
-	private final static boolean debug = false;
-	private final static boolean devel = false;
-	private final static boolean noVersionOutput = "true".equals(System.getProperty("gnu.io.rxtx.NoVersionOutput"));
+	private static final boolean debug = false;
+	private static final boolean devel = false;
+	private static final boolean noVersionOutput = "true".equals(System.getProperty("gnu.io.rxtx.NoVersionOutput"));
 
 	static {
 		if (debug) {
@@ -254,7 +254,6 @@ public class RXTXCommDriver implements CommDriver {
 	/**
 	 * Determine the OS and where the OS has the devices located
 	 */
-	@Override
 	public void initialize() {
 
 		if (debug) {
@@ -672,7 +671,6 @@ public class RXTXCommDriver implements CommDriver {
 	 *         string that was registered earlier using the CommPortIdentifier.addPortName() method. getCommPort()
 	 *         returns an object that extends either SerialPort or ParallelPort.
 	 */
-	@Override
 	public CommPort getCommPort(String PortName, int PortType) {
 		if (debug) {
 			System.out.println("RXTXCommDriver:getCommPort(" + PortName + "," + PortType + ")");
@@ -706,4 +704,5 @@ public class RXTXCommDriver implements CommDriver {
 	public void Report(String arg) {
 		System.out.println(arg);
 	}
+
 }
