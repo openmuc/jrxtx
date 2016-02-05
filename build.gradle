@@ -25,6 +25,26 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
   from javadoc.destinationDir
 }
 
+task javah(dependsOn: compileJava) << {
+    def Nclasses = [	
+    	'gnu.io.CommPortIdentifier', 
+    	'gnu.io.LPRPort', 
+    	'gnu.io.RXTXCommDriver', 
+    	'gnu.io.RXTXPort'
+    ];
+    
+    for (Nclass in Nclasses) {
+	    def classpath = sourceSets.main.output.classesDir
+	    def nativeIncludes = 'src/native/include'
+	    
+		logger.info('Generating header for ' + Nclass)
+		exec {
+			executable "javah"
+			args "-d", "$nativeIncludes", "-classpath", "$classpath" , Nclass
+		}
+    }
+}
+
 artifacts {
   archives sourcesJar
   archives javadocJar
