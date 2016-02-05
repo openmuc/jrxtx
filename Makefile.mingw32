@@ -111,7 +111,7 @@ DLLWRAP=dllwrap
 CLASSPATH=-classpath ".;C:\jdk13\lib\RXTXcomm.jar;c:\BlackBox.jar;$(JDKHOME)\lib\classes.zip;$(JDKHOME)\jre\lib\rt.jar"
 JAVAH=$(JDKHOME)\bin\javah
 JAR=$(JDKHOME)\bin\jar 
-JAVAC=$(JDKHOME)\bin\javac -source 1.2 -target 1.2 -g
+JAVAC=$(JDKHOME)\bin\javac -source 1.5 -target 1.5 -g
 #JAVAC=$(JDKHOME)\bin\javac -g
 JAVA=$(JDKHOME)\bin\java -ea -esa
 
@@ -129,8 +129,8 @@ LIBS=-L . -L $(LIBDIR) -LC:/tmp/rxtx5/build -luser32 -lgdi32 -lcomdlg32 -lkernel
 # path to the java native interface headers (directory with jni.h)
 JDKINCLUDE=$(JDKHOME)/include
 MINGINCLUDE=$(MINGHOME)/include
-JAVAFILES = $(wildcard $(SRC)/gnu/io/*.java)
-TESTFILES = $(wildcard $(SRC)/../tests/gnu/io/rxtx/tests/*.java)
+JAVAFILES = $(wildcard $(SRC)/main/java/gnu/io/*.java)
+TESTFILES = $(wildcard $(SRC)/test/java/gnu/io/rxtx/tests/*.java)
 CFILES=$(wildcard $(SRC)/*.c) $(wildcard $(SRC)/*.cc)
 TARGETLIBS= rxtxSerial.dll rxtxParallel.dll
 #TARGETLIBS= rxtxSerial.dll rxtxParallel.dll rxtxZystem.dll

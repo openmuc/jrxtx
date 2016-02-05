@@ -47,7 +47,7 @@ COMMINSTALL="$(JAVA_HOME)\jre\lib\ext"
 LIBINSTALL="$(JAVA_HOME)\jre\bin"
 JUNIT_JAR=D:\Apps\junit3.8.2\junit.jar
 
-JAVAC = $(JAVA_HOME)\bin\javac -source 1.2 -target 1.2
+JAVAC = $(JAVA_HOME)\bin\javac -source 1.5 -target 1.5
 JAR = $(JAVA_HOME)\bin\jar
 JAVAH = $(JAVA_HOME)\bin\javah
 JAVA = $(JAVA_HOME)\bin\java
@@ -105,7 +105,7 @@ gnu_io_RXTXPort.h gnu_io_CommPortIdentifier.h gnu_io_LPRPort.h gnu_io_RXTXVersio
 	$(JAVAH) -jni gnu.io.RXTXPort gnu.io.CommPortIdentifier gnu.io.LPRPort gnu.io.RXTXVersion
 
 RXTXcomm.jar:
-	$(JAVAC) -d . ..\src\gnu\io\*.java
+	$(JAVAC) -d . ..\src\main\java\gnu\io\*.java
 	$(JAR) -cf RXTXcomm.jar gnu
 
 config.h: Makefile
@@ -117,9 +117,9 @@ config.h: Makefile
 	echo #undef HAVE_TERMIOS_H >> config.h
 	echo #undef HAVE_SYS_TIME_H >> config.h
 
-testcp\stamp: RXTXcomm.jar ..\tests\gnu\io\rxtx\tests\*.java
+testcp\stamp: RXTXcomm.jar test\java\gnu\io\rxtx\tests\*.java
 	-mkdir testcp
-	$(JAVAC) -classpath RXTXcomm.jar;$(JUNIT_JAR) -d testcp ..\tests\gnu\io\rxtx\tests\*.java
+	$(JAVAC) -classpath RXTXcomm.jar;$(JUNIT_JAR) -d testcp test\java\gnu\io\rxtx\tests\*.java
 	echo > testcp\stamp
 
 tests: all testcp\stamp

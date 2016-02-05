@@ -73,9 +73,9 @@ LIBTOOL_INST=$(GLIBTOOL) --mode=install $(INSTALL_PROGRAM)
 SPATH = $(abs_srcdir)/src
 DEST=$(target_triplet)
 ####################### rules
-CLASSES = $(patsubst $(SPATH)/gnu/io/%.java,$(TOP)/$(CLASSDEST)/%.class,$(wildcard $(SPATH)/gnu/io/*.java))
-javafiles = $(wildcard $(SPATH)/gnu/io/*.java)
-javahfiles = $(patsubst $(SPATH)/gnu/io/%.java,%,$(wildcard $(SPATH)/gnu/io/*.java))
+CLASSES = $(patsubst $(SPATH)/main/java/gnu/io/%.java,$(TOP)/$(CLASSDEST)/%.class,$(wildcard $(SPATH)/main/java/gnu/io/*.java))
+javafiles = $(wildcard $(SPATH)/main/java/gnu/io/*.java)
+javahfiles = $(patsubst $(SPATH)/main/java/gnu/io/%.java,%,$(wildcard $(SPATH)/main/java/gnu/io/*.java))
 
 #######################
 CLEANFILES = $(TOP)/*.class $(TOP)/$(CLASSDEST)/*.class $(TOP)/$(JARTARGET)
@@ -112,7 +112,7 @@ $(CLASSES): $(javafiles) $(TOP)/Makefile
 	$(JAVAH_FIX)
 	$(JAVAC) $(javafiles)
 	$(JAVAH) `(for i in $(javahfiles);do \
-		if grep > /dev/null native.*\( $(SPATH)/gnu/io/$$i.java; then \
+		if grep > /dev/null native.*\( $(SPATH)/main/java/gnu/io/$$i.java; then \
 			echo $(CLASSDIR).$$i; \
 		fi; \
 	done)`

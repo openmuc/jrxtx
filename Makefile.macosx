@@ -201,9 +201,9 @@ LINK = $(TOP)/libtool --mode=link $(CC) $(CFLAGS) $(LDFLAGS) -version-info 1:0:1
 SPATH = $(srcdir)/src
 DEST = $(target_alias)
 ####################### rules
-CLASSES = $(patsubst $(SPATH)/%.java,$(TOP)/$(CLASSDEST)/%.class,$(wildcard $(SPATH)/*.java))
-javafiles = $(wildcard $(SPATH)/*.java)
-javahfiles = $(patsubst $(SPATH)/%.java,%,$(wildcard $(SPATH)/*.java))
+CLASSES = $(patsubst $(SPATH)/main/java/%.java,$(TOP)/$(CLASSDEST)/%.class,$(wildcard $(SPATH)/main/java/*.java))
+javafiles = $(wildcard $(SPATH)/main/java/*.java)
+javahfiles = $(patsubst $(SPATH)/main/java/%.java,%,$(wildcard $(SPATH)/main/java/*.java))
 #######################
 CLEANFILES = $(TOP)/*.class $(TOP)/$(CLASSDEST)/*.class $(TOP)/$(JARTARGET)
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -447,7 +447,7 @@ $(CLASSES): $(javafiles) $(TOP)/Makefile
 	$(JAVAH_FIX)
 	$(JAVAC) $(javafiles)
 	@$(JAVAH) `(for i in $(javahfiles);do \
-		if grep -q native.*\( $(SPATH)/$$i.java; then \
+		if grep -q native.*\( $(SPATH)/main/java/$$i.java; then \
 			echo $(CLASSDIR).$$i; \
 		fi; \
 	done)`
