@@ -109,14 +109,7 @@ $(target_triplet)/librxtx%.@LIB_EXTENSION@: $(SPATH)/%Imp.c $(CLASSES) $(SPATH)/
 #  compile src/RXTXPort.java and similar files into classes
 #  then create the .jar file
 $(CLASSES): $(javafiles) $(TOP)/Makefile
-	$(JAVAH_FIX)
-	$(JAVAC) $(javafiles)
-	$(JAVAH) `(for i in $(javahfiles);do \
-		if grep > /dev/null native.*\( $(SPATH)/main/java/gnu/io/$$i.java; then \
-			echo $(CLASSDIR).$$i; \
-		fi; \
-	done)`
-	$(JAR) cf $(JARTARGET) $(CLASSTOP)/*
+	gradle -p ../ javah
 
 #  install librxtxSerial.so into the proper directory and copy $(JARTARGET) to its
 #  proper location
