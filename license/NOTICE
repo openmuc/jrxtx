@@ -21,8 +21,18 @@
  *
  */
 
-
 Among others the following people have contributed to jRxTx and RXTX:
+
+Albrecht Schall <albrecht.schall@ise.fraunhofer.de>
+Stefan Feuerhahn <stefan.feuerhahn@ise.fraunhofer.de>
+
+Debian maintainers:
+
+1999, Christian Leutloff <leutloff@debian.org>
+2010, Scott Howard <showard314@gmail.com>
+2014, tony mancill <tmancill@debian.org>
+
+Original maintainer of RXTX: Trent Jarvi  taj@www.linux.org.uk.
 
 Martin Oberhuber <martin.oberhuber@windriver.com> Has submitted several fixes for rxtx integration into Eclipse.
 
@@ -138,4 +148,3 @@ Martin Pool <mbp@linuxcare.com>
 
    Added support for explicitly-specified lists of ports
 
-Original maintainer:  Trent Jarvi  taj@www.linux.org.uk.
