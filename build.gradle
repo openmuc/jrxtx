@@ -27,10 +27,16 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
 
 task javah(dependsOn: compileJava) << {
     def Nclasses = [	
-    	'gnu.io.CommPortIdentifier', 
-    	'gnu.io.LPRPort', 
-    	'gnu.io.RXTXCommDriver', 
-    	'gnu.io.RXTXPort'
+    	'gnu.io.RXTXCommDriver',
+		'gnu.io.CommPortIdentifier',
+		'gnu.io.RXTXVersion',
+		'gnu.io.I2C',
+		'gnu.io.LPRPort',
+		'gnu.io.RXTXPort',
+		'gnu.io.Zystem',
+		'gnu.io.Raw',
+		'gnu.io.RS485',
+		'gnu.io.ParallelPort'
     ];
     
     for (Nclass in Nclasses) {
