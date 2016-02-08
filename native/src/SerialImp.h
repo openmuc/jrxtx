@@ -237,7 +237,7 @@ correctly, and give you those changes at a later date.
 Jonathan
 
 FIXME  The lock type could be passed with -DOLDUUCP or -DUUCP based on
-os.name in configure.in or perhaps system defines could determine the lock
+os.name in configure.ac or perhaps system defines could determine the lock
 type.
 
 Trent

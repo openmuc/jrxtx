@@ -55,7 +55,7 @@
 #   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #   All trademarks belong to their respective owners.
 ############################################################################
-AC_INIT(../src/SerialImp.c)
+AC_INIT(src/SerialImp.c)
 AM_CONFIG_HEADER(config.h)
 AC_CANONICAL_SYSTEM
 AC_MSG_WARN(Trying libtool.  If the following fails install libtool)
