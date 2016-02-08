@@ -1,3 +1,0 @@
-#The library is installed into /usr/lib/jni, per Debian java policy. postrm and postinst calls are being added by debhelper
-librxtx-java: postinst-has-useless-call-to-ldconfig
-librxtx-java: postrm-has-useless-call-to-ldconfig
