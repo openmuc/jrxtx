@@ -31,7 +31,7 @@ is provided "as is" and without any express or implied warranties.
 #include <unistd.h>
 #include <sys/types.h>
 #include <stdlib.h>
-#include "gnu_io_CommPortIdentifier.h"
+#include "../include/gnu_io_CommPortIdentifier.h"
 
 #define COMM_LEN 16
 #define PROC_BASE  "/proc"

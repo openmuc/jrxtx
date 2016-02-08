@@ -59,7 +59,7 @@
 #include "I2C.h" /* dima */
 #else /* dima */
 #include "config.h"
-#include "gnu_io_I2C.h"
+#include "include/gnu_io_I2C.h"
 #endif /* dima */
 #include <time.h>
 #include <unistd.h>

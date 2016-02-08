@@ -59,7 +59,7 @@
 #include "RS485.h"
 #else /* dima */
 #include "config.h"
-#include "gnu_io_RS485.h"
+#include "include/gnu_io_RS485.h"
 #endif /* dima */
 #include <time.h>
 #include <unistd.h>

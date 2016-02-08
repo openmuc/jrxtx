@@ -61,7 +61,7 @@
 #ifndef WIN32
 #	include "config.h"
 #endif
-#include "gnu_io_RXTXPort.h"
+#include "include/gnu_io_RXTXPort.h"
 #endif /* dima */
 #ifdef __LCC__ /* windows lcc compiler for fd_set. probably wrong */
 #   include<winsock.h>

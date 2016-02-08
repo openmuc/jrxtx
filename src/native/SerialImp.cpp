@@ -56,7 +56,7 @@
 |   All trademarks belong to their respective owners.
 --------------------------------------------------------------------------*/
 #include "config.h"
-#include "gnu_io_RXTXPort.h"
+#include "include/gnu_io_RXTXPort.h"
 #include <time.h>
 #include <unistd.h>
 #include <stdio.h>

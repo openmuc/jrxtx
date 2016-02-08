@@ -75,7 +75,7 @@
 #endif
 /* work around for libc5 */
 /*#include <typedefs_md.h>*/
-#include "gnu_io_LPRPort.h"
+#include "include/gnu_io_LPRPort.h"
 #endif /* dima */
 #include <time.h>
 #include <stdio.h>

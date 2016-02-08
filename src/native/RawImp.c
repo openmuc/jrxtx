@@ -67,7 +67,7 @@
 #include "Raw.h"
 #else /* dima */
 #include "config.h"
-#include "gnu_io_Raw.h"
+#include "include/gnu_io_Raw.h"
 #endif /* dima */
 #include <time.h>
 #include <unistd.h>
