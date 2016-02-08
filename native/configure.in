@@ -55,7 +55,7 @@
 #   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #   All trademarks belong to their respective owners.
 ############################################################################
-AC_INIT(src/SerialImp.c)
+AC_INIT(../src/SerialImp.c)
 AM_CONFIG_HEADER(config.h)
 AC_CANONICAL_SYSTEM
 AC_MSG_WARN(Trying libtool.  If the following fails install libtool)
@@ -473,7 +473,7 @@ if test "$CC" = "gcc" || test "$CC"="egcs"; then
 	Tran*)
 		find_java_native_include jni.h
 		JAVAH="\$(JPATH)/bin/kaffeh -classpath \$(CLASSPATH) -d \$(DEST) -jni"
-		JAVAC="\$(JPATH)/bin/javac -classpath \$(CLASSPATH) -d \$(TOP)/ -O -source 1.5-target 1.5"
+		JAVAC="\$(JPATH)/bin/javac -classpath \$(CLASSPATH) -d \$(TOP)/ -O -source 1.5 -target 1.5"
 		JAR="\$(JPATH)/bin/jar"
 		JAVADOC="\$(JPATH)/bin/javadoc -classpath \$(CLASSPATH)"
 		CFLAGS=$CFLAGS" -D_BSD_SOURCE"
