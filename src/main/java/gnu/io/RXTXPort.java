@@ -70,7 +70,7 @@ public class RXTXPort extends SerialPort {
 
 	private SerialPortEventListener serialPortEventListener;
 
-	private MonitorThread dataMonitorThread;
+	private MonitorThread monThread;
 
 	boolean MonitorThreadLock = true;
 
@@ -92,8 +92,8 @@ public class RXTXPort extends SerialPort {
 		this.name = name;
 
 		MonitorThreadLock = true;
-		dataMonitorThread = new MonitorThread();
-		dataMonitorThread.start();
+		monThread = new MonitorThread();
+		monThread.start();
 		waitForTheNativeCodeSilly();
 		MonitorThreadAlive = true;
 	}
@@ -355,7 +355,7 @@ public class RXTXPort extends SerialPort {
 	private native void nativeClose(String name);
 
 	public boolean checkMonitorThread() {
-		if (dataMonitorThread != null) {
+		if (monThread != null) {
 			return monThreadisInterrupted;
 		}
 		return (true);
@@ -368,58 +368,58 @@ public class RXTXPort extends SerialPort {
 	 */
 	public boolean sendEvent(int event, boolean state) {
 
-		if (fileDescriptor == 0 || serialPortEventListener == null || dataMonitorThread == null) {
+		if (fileDescriptor == 0 || serialPortEventListener == null || monThread == null) {
 			return (true);
 		}
 
 		switch (event) {
 		case SerialPortEvent.DATA_AVAILABLE:
-			if (dataMonitorThread.Data) {
+			if (monThread.Data) {
 				break;
 			}
 			return (false);
 		case SerialPortEvent.OUTPUT_BUFFER_EMPTY:
-			if (dataMonitorThread.Output) {
+			if (monThread.Output) {
 				break;
 			}
 			return (false);
 		case SerialPortEvent.CTS:
-			if (dataMonitorThread.CTS) {
+			if (monThread.CTS) {
 				break;
 			}
 			return (false);
 		case SerialPortEvent.DSR:
-			if (dataMonitorThread.DSR) {
+			if (monThread.DSR) {
 				break;
 			}
 			return (false);
 		case SerialPortEvent.RI:
-			if (dataMonitorThread.RI) {
+			if (monThread.RI) {
 				break;
 			}
 			return (false);
 		case SerialPortEvent.CD:
-			if (dataMonitorThread.CD) {
+			if (monThread.CD) {
 				break;
 			}
 			return (false);
 		case SerialPortEvent.OE:
-			if (dataMonitorThread.OE) {
+			if (monThread.OE) {
 				break;
 			}
 			return (false);
 		case SerialPortEvent.PE:
-			if (dataMonitorThread.PE) {
+			if (monThread.PE) {
 				break;
 			}
 			return (false);
 		case SerialPortEvent.FE:
-			if (dataMonitorThread.FE) {
+			if (monThread.FE) {
 				break;
 			}
 			return (false);
 		case SerialPortEvent.BI:
-			if (dataMonitorThread.BI) {
+			if (monThread.BI) {
 				break;
 			}
 			return (false);
@@ -437,7 +437,7 @@ public class RXTXPort extends SerialPort {
 			serialPortEventListener.serialEvent(e);
 		}
 
-		if (fileDescriptor == 0 || serialPortEventListener == null || dataMonitorThread == null) {
+		if (fileDescriptor == 0 || serialPortEventListener == null || monThread == null) {
 			return true;
 		}
 		else {
@@ -457,8 +457,8 @@ public class RXTXPort extends SerialPort {
 		serialPortEventListener = lsnr;
 		if (!MonitorThreadAlive) {
 			MonitorThreadLock = true;
-			dataMonitorThread = new MonitorThread();
-			dataMonitorThread.start();
+			monThread = new MonitorThread();
+			monThread.start();
 			waitForTheNativeCodeSilly();
 			MonitorThreadAlive = true;
 		}
@@ -472,11 +472,11 @@ public class RXTXPort extends SerialPort {
 		waitForTheNativeCodeSilly();
 		// if( monThread != null && monThread.isAlive() )
 		if (monThreadisInterrupted == true) {
-			dataMonitorThread = null;
+			monThread = null;
 			serialPortEventListener = null;
 			return;
 		}
-		else if (dataMonitorThread != null && dataMonitorThread.isAlive()) {
+		else if (monThread != null && monThread.isAlive()) {
 			monThreadisInterrupted = true;
 			/*
 			 * Notify all threads in this PID that something is up They will call back to see if its their thread using
@@ -487,7 +487,7 @@ public class RXTXPort extends SerialPort {
 			try {
 
 				// wait a reasonable moment for the death of the monitor thread
-				dataMonitorThread.join(3000);
+				monThread.join(3000);
 			} catch (InterruptedException ex) {
 				// somebody called interrupt() on us (ie wants us to abort)
 				// we dont propagate InterruptedExceptions so lets re-set the flag
@@ -496,7 +496,7 @@ public class RXTXPort extends SerialPort {
 			}
 
 		}
-		dataMonitorThread = null;
+		monThread = null;
 		serialPortEventListener = null;
 		MonitorThreadLock = false;
 		MonitorThreadAlive = false;
@@ -528,7 +528,7 @@ public class RXTXPort extends SerialPort {
 
 		MonitorThreadLock = true;
 		nativeSetEventFlag(fileDescriptor, SerialPortEvent.DATA_AVAILABLE, enable);
-		dataMonitorThread.Data = enable;
+		monThread.Data = enable;
 		MonitorThreadLock = false;
 	}
 
@@ -537,7 +537,7 @@ public class RXTXPort extends SerialPort {
 		waitForTheNativeCodeSilly();
 		MonitorThreadLock = true;
 		nativeSetEventFlag(fileDescriptor, SerialPortEvent.OUTPUT_BUFFER_EMPTY, enable);
-		dataMonitorThread.Output = enable;
+		monThread.Output = enable;
 		MonitorThreadLock = false;
 	}
 
@@ -546,7 +546,7 @@ public class RXTXPort extends SerialPort {
 		waitForTheNativeCodeSilly();
 		MonitorThreadLock = true;
 		nativeSetEventFlag(fileDescriptor, SerialPortEvent.CTS, enable);
-		dataMonitorThread.CTS = enable;
+		monThread.CTS = enable;
 		MonitorThreadLock = false;
 	}
 
@@ -555,7 +555,7 @@ public class RXTXPort extends SerialPort {
 		waitForTheNativeCodeSilly();
 		MonitorThreadLock = true;
 		nativeSetEventFlag(fileDescriptor, SerialPortEvent.DSR, enable);
-		dataMonitorThread.DSR = enable;
+		monThread.DSR = enable;
 		MonitorThreadLock = false;
 	}
 
@@ -564,7 +564,7 @@ public class RXTXPort extends SerialPort {
 		waitForTheNativeCodeSilly();
 		MonitorThreadLock = true;
 		nativeSetEventFlag(fileDescriptor, SerialPortEvent.RI, enable);
-		dataMonitorThread.RI = enable;
+		monThread.RI = enable;
 		MonitorThreadLock = false;
 	}
 
@@ -573,7 +573,7 @@ public class RXTXPort extends SerialPort {
 		waitForTheNativeCodeSilly();
 		MonitorThreadLock = true;
 		nativeSetEventFlag(fileDescriptor, SerialPortEvent.CD, enable);
-		dataMonitorThread.CD = enable;
+		monThread.CD = enable;
 		MonitorThreadLock = false;
 	}
 
@@ -582,7 +582,7 @@ public class RXTXPort extends SerialPort {
 		waitForTheNativeCodeSilly();
 		MonitorThreadLock = true;
 		nativeSetEventFlag(fileDescriptor, SerialPortEvent.OE, enable);
-		dataMonitorThread.OE = enable;
+		monThread.OE = enable;
 		MonitorThreadLock = false;
 	}
 
@@ -591,7 +591,7 @@ public class RXTXPort extends SerialPort {
 		waitForTheNativeCodeSilly();
 		MonitorThreadLock = true;
 		nativeSetEventFlag(fileDescriptor, SerialPortEvent.PE, enable);
-		dataMonitorThread.PE = enable;
+		monThread.PE = enable;
 		MonitorThreadLock = false;
 	}
 
@@ -600,7 +600,7 @@ public class RXTXPort extends SerialPort {
 		waitForTheNativeCodeSilly();
 		MonitorThreadLock = true;
 		nativeSetEventFlag(fileDescriptor, SerialPortEvent.FE, enable);
-		dataMonitorThread.FE = enable;
+		monThread.FE = enable;
 		MonitorThreadLock = false;
 	}
 
@@ -609,7 +609,7 @@ public class RXTXPort extends SerialPort {
 		waitForTheNativeCodeSilly();
 		MonitorThreadLock = true;
 		nativeSetEventFlag(fileDescriptor, SerialPortEvent.BI, enable);
-		dataMonitorThread.BI = enable;
+		monThread.BI = enable;
 		MonitorThreadLock = false;
 	}
 
