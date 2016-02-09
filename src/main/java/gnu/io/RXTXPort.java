@@ -32,8 +32,7 @@ import java.util.TooManyListenersException;
  * 
  * @see gnu.io.SerialPort
  */
-
-final public class RXTXPort extends SerialPort {
+public final class RXTXPort extends SerialPort {
 	/*
 	 * I had a report that some JRE's complain when MonitorThread tries to access private variables
 	 */
@@ -612,12 +611,7 @@ final public class RXTXPort extends SerialPort {
 			SPEventListener.serialEvent(e);
 		}
 
-		if (fd == 0 || SPEventListener == null || monThread == null) {
-			return (true);
-		}
-		else {
-			return (false);
-		}
+		return fd == 0 || SPEventListener == null || monThread == null ? (true) : (false);
 	}
 
 	/**
@@ -712,7 +706,6 @@ final public class RXTXPort extends SerialPort {
 
 	@Override
 	public void notifyOnDataAvailable(boolean enable) {
-
 		waitForTheNativeCodeSilly();
 
 		MonitorThreadLock = true;
@@ -884,7 +877,7 @@ final public class RXTXPort extends SerialPort {
 	}
 
 	/** Inner class for SerialOutputStream */
-	class SerialOutputStream extends OutputStream {
+	private class SerialOutputStream extends OutputStream {
 		/**
 		 * @param b
 		 * @throws IOException
@@ -894,7 +887,7 @@ final public class RXTXPort extends SerialPort {
 			if (speed == 0) {
 				return;
 			}
-			if (monThreadisInterrupted == true) {
+			if (monThreadisInterrupted) {
 				return;
 			}
 			synchronized (IOLockedMutex) {
@@ -922,7 +915,7 @@ final public class RXTXPort extends SerialPort {
 			if (speed == 0) {
 				return;
 			}
-			if (monThreadisInterrupted == true) {
+			if (monThreadisInterrupted) {
 				return;
 			}
 			if (fd == 0) {
@@ -963,7 +956,7 @@ final public class RXTXPort extends SerialPort {
 			if (fd == 0) {
 				throw new IOException();
 			}
-			if (monThreadisInterrupted == true) {
+			if (monThreadisInterrupted) {
 				return;
 			}
 			synchronized (IOLockedMutex) {
@@ -989,7 +982,7 @@ final public class RXTXPort extends SerialPort {
 			if (fd == 0) {
 				throw new IOException();
 			}
-			if (monThreadisInterrupted == true) {
+			if (monThreadisInterrupted) {
 				return;
 			}
 			synchronized (IOLockedMutex) {
@@ -1012,7 +1005,7 @@ final public class RXTXPort extends SerialPort {
 	}
 
 	/** Inner class for SerialInputStream */
-	class SerialInputStream extends InputStream {
+	private class SerialInputStream extends InputStream {
 		/**
 		 * @return int the int read
 		 * @throws IOException
@@ -1059,9 +1052,10 @@ final public class RXTXPort extends SerialPort {
 		public synchronized int read(byte b[]) throws IOException {
 			int result;
 
-			if (monThreadisInterrupted == true) {
+			if (monThreadisInterrupted) {
 				return (0);
 			}
+
 			synchronized (IOLockedMutex) {
 				IOLocked++;
 			}
@@ -1249,7 +1243,7 @@ final public class RXTXPort extends SerialPort {
 		 */
 		@Override
 		public synchronized int available() throws IOException {
-			if (monThreadisInterrupted == true) {
+			if (monThreadisInterrupted) {
 				return (0);
 			}
 			synchronized (IOLockedMutex) {
@@ -1465,7 +1459,6 @@ final public class RXTXPort extends SerialPort {
 	 * @throws UnsupportedCommOperationException;
 	 *
 	 */
-
 	public static boolean staticSetDSR(String port, boolean flag) throws UnsupportedCommOperationException {
 		return (nativeStaticSetDSR(port, flag));
 	}
@@ -1480,7 +1473,6 @@ final public class RXTXPort extends SerialPort {
 	 * @throws UnsupportedCommOperationException;
 	 *
 	 */
-
 	public static boolean staticSetDTR(String port, boolean flag) throws UnsupportedCommOperationException {
 		return (nativeStaticSetDTR(port, flag));
 	}
@@ -1495,7 +1487,6 @@ final public class RXTXPort extends SerialPort {
 	 * @throws UnsupportedCommOperationException;
 	 *
 	 */
-
 	public static boolean staticSetRTS(String port, boolean flag) throws UnsupportedCommOperationException {
 		return (nativeStaticSetRTS(port, flag));
 	}
@@ -1510,7 +1501,6 @@ final public class RXTXPort extends SerialPort {
 	 * @throws UnsupportedCommOperationException;
 	 *
 	 */
-
 	public static boolean staticIsRTS(String port) throws UnsupportedCommOperationException {
 		return (nativeStaticIsRTS(port));
 	}
@@ -1525,7 +1515,6 @@ final public class RXTXPort extends SerialPort {
 	 * @throws UnsupportedCommOperationException;
 	 *
 	 */
-
 	public static boolean staticIsCD(String port) throws UnsupportedCommOperationException {
 		return (nativeStaticIsCD(port));
 	}
@@ -1540,7 +1529,6 @@ final public class RXTXPort extends SerialPort {
 	 * @throws UnsupportedCommOperationException;
 	 *
 	 */
-
 	public static boolean staticIsCTS(String port) throws UnsupportedCommOperationException {
 		return (nativeStaticIsCTS(port));
 	}
@@ -1555,7 +1543,6 @@ final public class RXTXPort extends SerialPort {
 	 * @throws UnsupportedCommOperationException;
 	 *
 	 */
-
 	public static boolean staticIsDSR(String port) throws UnsupportedCommOperationException {
 		return (nativeStaticIsDSR(port));
 	}
@@ -1570,7 +1557,6 @@ final public class RXTXPort extends SerialPort {
 	 * @throws UnsupportedCommOperationException;
 	 *
 	 */
-
 	public static boolean staticIsDTR(String port) throws UnsupportedCommOperationException {
 		return (nativeStaticIsDTR(port));
 	}
@@ -1585,7 +1571,6 @@ final public class RXTXPort extends SerialPort {
 	 * @throws UnsupportedCommOperationException;
 	 *
 	 */
-
 	public static boolean staticIsRI(String port) throws UnsupportedCommOperationException {
 		return (nativeStaticIsRI(port));
 	}
@@ -1598,7 +1583,6 @@ final public class RXTXPort extends SerialPort {
 	 *
 	 *             Anyone know how to do this in Unix?
 	 */
-
 	@Override
 	public byte getParityErrorChar() throws UnsupportedCommOperationException {
 		byte ret;
@@ -1616,7 +1600,6 @@ final public class RXTXPort extends SerialPort {
 	 *
 	 *             Anyone know how to do this in Unix?
 	 */
-
 	@Override
 	public boolean setParityErrorChar(byte b) throws UnsupportedCommOperationException {
 		return (nativeSetParityErrorChar(b));
@@ -1630,7 +1613,6 @@ final public class RXTXPort extends SerialPort {
 	 *
 	 *             Anyone know how to do this in Unix?
 	 */
-
 	@Override
 	public byte getEndOfInputChar() throws UnsupportedCommOperationException {
 		byte ret;
@@ -1715,7 +1697,6 @@ final public class RXTXPort extends SerialPort {
 	 * @throws UnsupportedCommOperationException,
 	 *             IOException
 	 */
-
 	@Override
 	public boolean setDivisor(int Divisor) throws UnsupportedCommOperationException, IOException {
 		return nativeSetDivisor(Divisor);
@@ -1728,7 +1709,6 @@ final public class RXTXPort extends SerialPort {
 	 * @throws UnsupportedCommOperationException,
 	 *             IOException
 	 */
-
 	@Override
 	public int getDivisor() throws UnsupportedCommOperationException, IOException {
 		return nativeGetDivisor();
@@ -1750,7 +1730,6 @@ final public class RXTXPort extends SerialPort {
 	 * 
 	 * @throws UnsupportedCommOperationException
 	 */
-
 	@Override
 	public boolean getLowLatency() throws UnsupportedCommOperationException {
 		return nativeGetLowLatency();
@@ -1761,7 +1740,6 @@ final public class RXTXPort extends SerialPort {
 	 * 
 	 * @throws UnsupportedCommOperationException
 	 */
-
 	@Override
 	public boolean setCallOutHangup(boolean NoHup) throws UnsupportedCommOperationException {
 		return nativeSetCallOutHangup(NoHup);
@@ -1772,7 +1750,6 @@ final public class RXTXPort extends SerialPort {
 	 * 
 	 * @throws UnsupportedCommOperationException
 	 */
-
 	@Override
 	public boolean getCallOutHangup() throws UnsupportedCommOperationException {
 		return nativeGetCallOutHangup();
@@ -1783,7 +1760,6 @@ final public class RXTXPort extends SerialPort {
 	 * 
 	 * @throws UnsupportedCommOperationException
 	 */
-
 	public boolean clearCommInput() throws UnsupportedCommOperationException {
 		return nativeClearCommInput();
 	}
