@@ -27,7 +27,7 @@ AUTOMAKE_OPTIONS = foreign
 INCLUDES= -I$(TOP) -I$(DEST) -I. $(JAVAINCLUDE) $(JAVANATINC)
 
 # linking java-jdk headers to lib
-AM_LDFLAGS = -l$(JAVANATINC)
+AM_LDFLAGS = -l$(JAVANATINC) -l$(JAVANATINC)
 
 ####################### tools
 LIBTOOLC=$(GLIBTOOL) --mode=compile $(CC) $(INCLUDES) $(CPPFLAGS) $(CFLAGS) $(VERBOSE_IOEXCEPTIONS) -c
