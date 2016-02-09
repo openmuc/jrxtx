@@ -59,7 +59,7 @@ fi
 #    echo
 #fi
 
-for j in `find $srcdir -name configure.in -print`
+for j in `find $srcdir -name configure.ac -print`
 do 
     i=`dirname $j`
     if test -f $i/NO-AUTO-GEN; then

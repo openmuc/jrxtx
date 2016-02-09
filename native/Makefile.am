@@ -61,24 +61,13 @@ VPATH = @srcdir@
 
 AUTOMAKE_OPTIONS = foreign
 INCLUDES= -I$(TOP) -I$(DEST) -I. $(JAVAINCLUDE) $(JAVANATINC)
-####################### vars for rxtx-1.4->1.5 transition
-JARTARGET=RXTXcomm.jar
-CLASSDIR=gnu.io
-CLASSTOP=gnu
-CLASSDEST=gnu/io
+
 ####################### tools
 LIBTOOLC=$(GLIBTOOL) --mode=compile $(CC) $(INCLUDES) $(CPPFLAGS) $(CFLAGS) $(VERBOSE_IOEXCEPTIONS) -c
 LIBTOOL_INST=$(GLIBTOOL) --mode=install $(INSTALL_PROGRAM)
 ####################### dirs
 SPATH = $(abs_srcdir)/src
 DEST=$(target_triplet)
-####################### rules
-CLASSES = $(patsubst $(SPATH)/main/java/gnu/io/%.java,$(TOP)/$(CLASSDEST)/%.class,$(wildcard $(SPATH)/main/java/gnu/io/*.java))
-javafiles = $(wildcard $(SPATH)/main/java/gnu/io/*.java)
-javahfiles = $(patsubst $(SPATH)/main/java/gnu/io/%.java,%,$(wildcard $(SPATH)/main/java/gnu/io/*.java))
-
-#######################
-CLEANFILES = $(TOP)/*.class $(TOP)/$(CLASSDEST)/*.class $(TOP)/$(JARTARGET)
 
 # for SCO builds everything else is currently using lib%.la below
 # I'm thinking about taking libtool out completely.  See also Mac OS X builds.
@@ -87,8 +76,8 @@ $(target_triplet)/lib%.so: $(SPATH)/%Imp.@EXTENSION@ $(CLASSES)
 	$(LINK) -G -o lib$*.so $(TOP)/$(DEST)/$*Imp.o
 
 #  compile src/SerialImp.c and similar files into libraries.
-#  LIBTOOL_FIX handles problems encountered on some OS's.  See configure.in
-#  If a LIBTOOL_FIX is added be sure to provide a trailing ';' in configure.in
+#  LIBTOOL_FIX handles problems encountered on some OS's.  See configure.ac
+#  If a LIBTOOL_FIX is added be sure to provide a trailing ';' in configure.ac
 
 $(target_triplet)/librxtx%.@LIB_EXTENSION@: $(SPATH)/%Imp.c $(CLASSES) $(SPATH)/%Imp.h
 	(								\
@@ -108,8 +97,8 @@ $(target_triplet)/librxtx%.@LIB_EXTENSION@: $(SPATH)/%Imp.c $(CLASSES) $(SPATH)/
 
 #  compile src/RXTXPort.java and similar files into classes
 #  then create the .jar file
-$(CLASSES): $(javafiles) $(TOP)/Makefile
-	gradle -p ../ javah
+#$(CLASSES): $(javafiles) $(TOP)/Makefile
+#	gradle -p ../ javah
 
 #  install librxtxSerial.so into the proper directory and copy $(JARTARGET) to its
 #  proper location
@@ -131,11 +120,6 @@ clean-generic:
 	-test -z "$(CLEANFILES)" || rm -f $(CLEANFILES)
 
 all: $(TARGETLIB)
-
-#  create the javadoc files.
-docs: $(CLASSES)
-	mkdir api
-	cd api && $(JAVADOC) $(javafiles)
 
 ################  WIN32 CrossCompiling from here down #######################
 

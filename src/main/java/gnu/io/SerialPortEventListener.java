@@ -24,12 +24,6 @@ package gnu.io;
 
 import java.util.EventListener;
 
-/**
- * @author Trent Jarvi
- * @version %I%, %G%
- * @since JDK1.0
- */
-
 public interface SerialPortEventListener extends EventListener {
 	void serialEvent(SerialPortEvent ev);
 }
