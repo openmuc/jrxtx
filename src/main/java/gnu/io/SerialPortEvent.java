@@ -24,12 +24,6 @@ package gnu.io;
 
 import java.util.EventObject;
 
-/**
- * @author Trent Jarvi
- * @version %I%, %G%
- * @since JDK1.0
- */
-
 public class SerialPortEvent extends EventObject {
 	public static final int DATA_AVAILABLE = 1;
 	public static final int OUTPUT_BUFFER_EMPTY = 2;

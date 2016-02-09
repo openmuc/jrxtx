@@ -25,12 +25,6 @@ package gnu.io;
 import java.io.IOException;
 import java.util.TooManyListenersException;
 
-/**
- * @author Trent Jarvi
- * @version %I%, %G%
- * @since JDK1.0
- */
-
 public abstract class SerialPort extends CommPort {
 	public static final int DATABITS_5 = 5;
 	public static final int DATABITS_6 = 6;
