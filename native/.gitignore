@@ -19,3 +19,4 @@ config.status
 librxtxSerial.la
 libtool
 stamp-h1
+stamp-h1.in
