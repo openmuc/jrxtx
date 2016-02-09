@@ -185,34 +185,35 @@ AC_ARG_ENABLE(universallib,
 )
 AC_PATH_PROG(XCODE_SELECT,xcode-select,no)
 
-find_java_native_include()
-{
-JAVANATINC="-I\$(JAVAINCLUDEDIR)/`cd $JAVAINCLUDEDIR; find . -name $1|sed s#$1##|head -n1`"
-if [ test `cd $JAVAINCLUDEDIR; find . -name $1|wc -l` != "1" ]; then
-	echo 1>&2
-	echo WARNING:  configure is having a hard time determining which  1>&2
-	echo directory contains the file $1.  Edit Makefile and fix the  1>&2
-	echo variable JAVANATINC to point to the correct directory. 1>&2
-	echo 1>&2
-	echo The following options are available: 1>&2
-	find $JAVAINCLUDEDIR -name $1|sed s#jni_md\.h## 1>&2
-	echo 1>&2
-	echo If there are more than one option available the first was selected.  1>&2
-	echo 1>&2
-fi
+find_java_native_include() {
+	JAVANATINC="-I\$(JAVAINCLUDEDIR)/`cd $JAVAINCLUDEDIR; find . -name $1|sed s#$1##|head -n1`"
+	
+	if [ test `cd $JAVAINCLUDEDIR; find . -name $1|wc -l` != "1" ]; then
+		echo 1>&2
+		echo WARNING:  configure is having a hard time determining which  1>&2
+		echo directory contains the file $1.  Edit Makefile and fix the  1>&2
+		echo variable JAVANATINC to point to the correct directory. 1>&2
+		echo 1>&2
+		echo The following options are available: 1>&2
+		find $JAVAINCLUDEDIR -name $1|sed s#jni_md\.h## 1>&2
+		echo 1>&2
+		echo If there are more than one option available the first was selected.  1>&2
+		echo 1>&2
+	fi
 }
+
+
 build_conftest()
 {
 cat > conftest.java << EOF
 /* this may be usefull for getting around java cobwebs during build */
-public class conftest 
-{
-	public static void main(String[[]] args) 
-	{
+public class conftest {
+	public static void main(String[[]] args) {
 		System.out.println(System.getProperty(args[[0]]));
 	}
 }
 EOF
+
 CLASSPATH=.:$CLASSPATH
 if test x$JAVA_HOME = x; then
 	javac -classpath .:$CLASSPATH: conftest.java
@@ -446,8 +447,12 @@ EOF
 #	sudo niutil -destroyval / /groups/uucp users `sudo id -p | grep 'login' | sed 's/login.//'`
 #	sudo niutil -appendprop / /groups/uucp users `sudo id -p | grep 'login' | sed 's/login.//'`
 #}
-fix_comm_jar()
-{
+
+print_info() {
+	echo "INFO: $1"
+}
+
+fix_comm_jar() {
 	if [ test -f $1 ];then
 		echo "------------------------------------------------------" 1>&2
 		echo "WARNING:  A comm.jar file is already installed" 1>&2
@@ -458,6 +463,8 @@ fix_comm_jar()
 		echo "------------------------------------------------------" 1>&2
 	fi;
 }
+
+# determin java include directory
 [ case $OS_NAME in
 	Mac\ OS\ X)
         JAVAINCLUDEDIR=$JPATH/../../../Headers
@@ -467,158 +474,50 @@ fix_comm_jar()
         ;;
 esac ]
 
+print_info "Java header include directroy: \"$JAVAINCLUDEDIR\""
+
 JAVAINCLUDE="-I\$(JAVAINCLUDEDIR)"
 if test "$CC" = "gcc" || test "$CC"="egcs"; then
-	case $JAVA_VENDOR in
-	Tran*)
-		find_java_native_include jni.h
-		JAVAH="\$(JPATH)/bin/kaffeh -classpath \$(CLASSPATH) -d \$(DEST) -jni"
-		JAVAC="\$(JPATH)/bin/javac -classpath \$(CLASSPATH) -d \$(TOP)/ -O -source 1.5 -target 1.5"
-		JAR="\$(JPATH)/bin/jar"
-		JAVADOC="\$(JPATH)/bin/javadoc -classpath \$(CLASSPATH)"
-		CFLAGS=$CFLAGS" -D_BSD_SOURCE"
-		JAVAINCLUDE=""
-		JAVAH_FIX="if test ! -d \$(target_triplet);then  mkdir \$(target_triplet);fi;"
-		JHOME=$JPATH"/share/kaffe/"
-		RXTX_PATH=$JPATH"/lib/kaffe/"
-		;;
-	*)
-		find_java_native_include jni_md.h
-		JAVAH="\$(JPATH)/bin/javah -classpath \$(CLASSPATH) -d \$(DEST) -jni"
-		JAVAC="\$(JPATH)/bin/javac -classpath \$(CLASSPATH) -d \$(TOP)/ -O -source 1.5 -target 1.5"
-		JAR="\$(JPATH)/bin/jar"
-		JAVADOC="\$(JPATH)/bin/javadoc"
-		CFLAGS=$CFLAGS" -D_BSD_SOURCE"
-		;;
-	esac
-fi
-if [ test -d $JPATH/share/kaffe/ ]
-	then fix_comm_jar $JPATH/share/kaffe/comm.jar
-elif [ test -d $JPATH/jre/lib/ext ]
-	then fix_comm_jar $JPATH/jre/lib/ext/comm.jar
-elif [ test -d $JPATH/lib/ext ]
-	then fix_comm_jar $JPATH/lib/ext/comm.jar
-elif [ test -d $JPATH/lib ] 
-	then fix_comm_jar $JPATH/lib/comm.jar
+	find_java_native_include jni_md.h
+	
+	CFLAGS=$CFLAGS" -D_BSD_SOURCE"
 fi
 
-#  http://www.tolstoy.com/samizdat/sysprops.html
+if [ test -d $JPATH/jre/lib/ext ]; then 
+	fix_comm_jar $JPATH/jre/lib/ext/comm.jar
+	
+elif [ test -d $JPATH/lib/ext ]; then 
+	fix_comm_jar $JPATH/lib/ext/comm.jar
+	
+elif [ test -d $JPATH/lib ]; then 
+	fix_comm_jar $JPATH/lib/comm.jar
+fi
 
+
+print_info "You're running on a $OS_NAME system"
 [ case $OS_NAME in 
 Linux)
 	LDFLAGS=$LDFLAGS" -lpthread"
 	#check_kernel_headers
 	check_java_headers
 	CFLAGS=$CFLAGS" -D__need_timespec"
-	case $JAVA_VERSION in
-
-	1.1*) 
-		CLASSPATH=".:\$(TOP):\$(TOP)/src:"` \
-			if [ -d $JPATH/share/kaffe/ ]; then
-				find $JPATH/share/kaffe/ -name [cK]lasses.[jz][ai][rp]
-			elif [ -d $JPATH/lib/ ]; then
-				find $JPATH/lib/ -name [cK]lasses.[jz][ai][rp]
-			fi`":"`
-			if [ -d $JPATH/share/kaffe/ ]; then
-				find $JPATH/share/kaffe/ -name RXTXcomm.jar
-			elif [ -d $JPATH/lib/ ]; then
-				find $JPATH/lib/ -name RXTXcomm.jar
-			fi`
-
-		if test x"$RXTX_PATH" = x;then
-			#  We are not using Kaffe
-			#fix_parameters $JPATH/lib/javax.comm.properties
-			check_prefix
-			RXTX_PATH="\$(prefix)/lib/"
-			JAVAH_FIX="if [ ! -d com ]; then if [ ! -f \$(JPATH)/lib/comm.jar ]; then echo \"Please install comm.jar from CommAPI in \$(JPATH)/java/lib/ 1>&2\"; else mkdir -p com/sun/comm;\$(JAR) -xf \$(JPATH)/lib/comm.jar;  fi; fi;";
-		else
-			# Kaffe
-			CLASSPATH=$CLASSPATH:`find $JHOME -name RXTXcomm.jar`	
-			echo "Warning!  Kaffe's comm.jar does not support rxtx"
-			echo "See INSTALL for details"
-		fi;
-		if test x"$JHOME" = x;then
-			JHOME=$JPATH/"lib"
-		fi
-	;;
-	*) 
-		#fix_parameters $JPATH/jre/lib/javax.comm.properties
-		CLASSPATH=".:\$(TOP):\$(TOP)/src:"`find $JPATH/ -name RXTXcomm.jar |head -n1`
-		JHOME=$JPATH"/jre/lib/ext"
-		RXTX_PATH="\$(JPATH)/jre/lib/\$(OS_ARCH)"
-	;;
-	esac 
-
+	
+	#fix_parameters $JPATH/jre/lib/javax.comm.properties
+	CLASSPATH=".:\$(TOP):\$(TOP)/src:"`find $JPATH/ -name RXTXcomm.jar |head -n1`
+	RXTX_PATH="\$(JPATH)/jre/lib/\$(OS_ARCH)"
+	
 	# Cross Compilers
-		#echo ----------------------------
-		#echo $target_os
-		#echo ----------------------------
 	case $target_os in 
 	linux*)
-	;;
-	beos*)
-		TARGETLIB="\$(target_triplet)/librxtxSerial.la"
-		EXTENSION="cpp"
-		LDFLAGS=$LDFLAGS" -ldevice"
-		#echo ----------------------------
-		#echo $target_os
-		#echo ----------------------------
 	;;
 	freebsd*)
 	;;
 	solaris*)
 		TARGETLIB="\$(target_triplet)/librxtxSerial.la"
-		#echo ----------------------------
-		#echo $target_os
-		#echo ----------------------------
 	;;
 	esac
-;;
-
-*BSD)
-	LDFLAGS=$LDFLAGS" -lpthread"
-	JHOME=$JPATH/"lib"
-	CFLAGS=$CFLAGS" -D_NO_POSIX=1 -D_NO_XOPEN4=1"
-	TARGETLIB="\$(target_triplet)/librxtxSerial.la \
-			\$(target_triplet)/librxtxParallel.la"
-	case $JAVA_VERSION in
-	1.1*) 
-		check_prefix
-		#fix_parameters $JPATH/lib/javax.comm.properties
-		CLASSPATH=".:\$(TOP):\$(TOP)/src:"` \
-			if [ -d $JPATH/share/kaffe/ ]; then
-				find $JPATH/share/kaffe/ -name [cK]lasses.[jz][ai][rp]
-			elif [ -d $JPATH/lib/ ]; then
-				find $JPATH/lib/ -name [cK]lasses.[jz][ai][rp]
-			fi`":"`
-			if [ -d $JPATH/share/kaffe/ ]; then
-				find $JPATH/share/kaffe/ -name RXTXcomm.jar
-			elif [ -d $JPATH/lib/ ]; then
-				find $JPATH/lib/ -name RXTXcomm.jar
-			fi`
-
-		if test x"$RXTX_PATH" = x;then
-			#  We are not using Kaffe
-			#fix_parameters $JPATH/lib/javax.comm.properties
-			check_prefix
-			RXTX_PATH="\$(prefix)/lib/"
-			JAVAH_FIX="if [ ! -d com ]; then if [ ! -f \$(JPATH)/lib/comm.jar ]; then echo \"Please install comm.jar from CommAPI in \$(JPATH)/java/lib/ 1>&2\"; else mkdir -p com/sun/comm;\$(JAR) -xf \$(JPATH)/lib/comm.jar;  fi; fi;";
-		else
-			# Kaffe
-			CLASSPATH=$CLASSPATH:`find $JHOME -name RXTXcomm.jar`	
-			echo "Warning!  Kaffe's comm.jar does not support rxtx"
-			echo "See INSTALL for details"
-		fi;
-		RXTX_PATH="\$(prefix)/lib"
-		JHOME=$JPATH/"lib"
-	;;
-	*) 
-		#fix_parameters $JPATH/jre/lib/javax.comm.properties
-		CLASSPATH=".:\$(TOP):\$(TOP)/src:"`find $JPATH/ -name RXTXcomm.jar |head -n1`
-		RXTX_PATH="\$(JPATH)/jre/lib/\$(OS_ARCH)"
-		JHOME=$JPATH/"jre/lib/ext"
-	;;
-	esac
+	
+	print_info "Target libs are $TARGETLIB"
 ;;
 
 Irix*)
@@ -693,52 +592,24 @@ HP-UX)
 	esac
 ;;
 
-BeOS)
-	echo WARNING: BeOS support is in RXTX-1.5
-	JHOME=$JPATH"/share/kaffe"
-	RXTX_PATH="\$(JPATH)/lib/"
-	CFLAGS=$CFLAGS" -D_NO_POSIX=1 -D_NO_XOPEN4=1"
-	CLASSPATH=".:\$(TOP):\$(TOP)/../src:\$(JPATH)/share/kaffe/Klasses.jar:\$(JPATH)/lib/RXTXcomm.jar:$CLASSPATH"
-	TARGETLIB="\$(target_triplet)/librxtxSerial.la"
-	EXTENSION="cpp"
-	LDFLAGS=$LDFLAGS" -ldevice"
-#  sigh, from ltconfig 
-#  beos*)
-#     if $LD --help 2>&1 | egrep ': supported targets:.* elf' > /dev/null; then
-#       allow_undefined_flag=unsupported
-#       # Joseph Beckenbach <jrb3@best.com> says some releases of gcc
-#       # support --undefined.  This deserves some investigation.  FIXME
-
-	LIBTOOL_FIX="sed s/deplibs_check_method=\\\"unknown\\\"/deplibs_check_method=\\\"pass_all\\\"/1 libtool > libtool.tmp; sed s/allow_undefined_flag=\\\"unsupported\\\"/allow_undefined_flag=\\\"supported\\\"/1 libtool.tmp > libtool;rm libtool.tmp;"
-
-
-;;
-
 WIN32)
-	case $JAVA_VERSION in
-	1.1*)
-		CLASSPATH=".:\$(TOP):\$(TOP)/src:\$(JPATH)/lib/classes.zip:\$(JPATH)/lib/RXTXcomm.jar:$CLASSPATH"
-		RXTX_PATH="\$(prefix)/lib/"
-		JHOME=$JPATH/"lib"
-	;;
-	*)
-		CLASSPATH=".:\$(TOP):\$(TOP)/src:`find $JPATH/ -name RXTXcomm.jar |head -n1`:$CLASSPATH"
-		JHOME=$JPATH"/jre/lib/ext"
-	;;
-	esac
+	CLASSPATH=".:\$(TOP):\$(TOP)/src:`find $JPATH/ -name RXTXcomm.jar |head -n1`:$CLASSPATH"
+	JHOME=$JPATH"/jre/lib/ext"
+	
 	if test x$WIN32INCLUDE = x; then
-	echo "We need to know what directory the windows java include files"
-	echo "are located in.  Please enter the directory now."
-	echo
-	echo "example /home/jarvi/win32java/include"
-	echo
-	read REPLY
-	WINDOWS_JAVA_INCLUDE="-I$REPLY -I$REPLY/win32"
+		echo "We need to know what directory the windows java include files"
+		echo "are located in.  Please enter the directory now."
+		echo
+		echo "example /home/jarvi/win32java/include"
+		echo
+		read REPLY
+		WINDOWS_JAVA_INCLUDE="-I$REPLY -I$REPLY/win32"
 	else
-	WINDOWS_JAVA_INCLUDE="-I$WIN32INCLUDE -I$WIN32INCLUDE/win32"
+		WINDOWS_JAVA_INCLUDE="-I$WIN32INCLUDE -I$WIN32INCLUDE/win32"
 	fi
+	
 	TARGETLIB="\$(target_triplet)/rxtxSerial.dll \$(target_triplet)/rxtxParallel.dll"
-	echo  "$WINDOWS_JAVA_INCLUDE" 
+	print_info "Java include: $WINDOWS_JAVA_INCLUDE" 
 ;;
 
 Mac\ OS\ X)

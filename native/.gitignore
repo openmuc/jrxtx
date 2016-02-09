@@ -1,10 +1,21 @@
 Makefile.in
 
+.libs/
+.autotools
+.cproject
+Makefile
+
 aclocal.m4
 autom4te.cache/
 compile
 config.h.in~
 config.h.in
-configure
 ltmain.sh
 
+
+config.h
+config.log
+config.status
+librxtxSerial.la
+libtool
+stamp-h1
