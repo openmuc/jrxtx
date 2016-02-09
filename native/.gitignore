@@ -1,5 +1,3 @@
-Makefile.in
-
 .libs/
 .autotools
 .cproject
@@ -9,8 +7,6 @@ aclocal.m4
 autom4te.cache/
 compile
 config.h.in~
-config.h.in
-ltmain.sh
 
 
 config.h
