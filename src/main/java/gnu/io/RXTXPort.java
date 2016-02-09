@@ -41,17 +41,17 @@ public class RXTXPort extends SerialPort {
 	private int IOLocked = 0;
 	private Object IOLockedMutex = new Object();
 
-	private int fileDescriptor = 0;
+	private int fd = 0;
 	private boolean MonitorThreadAlive = false;
 
 	private int dataBits = DATABITS_8;
-	private int baudRate = 9600;
+	private int speed = 9600;
 	private int stopBits = SerialPort.STOPBITS_1;
 	private int parity = SerialPort.PARITY_NONE;
 	private int flowmode = SerialPort.FLOWCONTROL_NONE;
 
 	private int timeout = -1;
-	private int receiveThreshold = 0;
+	private int threshold = 0;
 
 	/**
 	 * a pointer to the event info structure used to share information between threads so write threads can send output
@@ -88,7 +88,7 @@ public class RXTXPort extends SerialPort {
 	 * @see gnu.io.SerialPort
 	 */
 	public RXTXPort(String name) throws PortInUseException {
-		fileDescriptor = open(name);
+		fd = open(name);
 		this.name = name;
 
 		MonitorThreadLock = true;
@@ -148,7 +148,7 @@ public class RXTXPort extends SerialPort {
 		if (nativeSetSerialPortParams(baudRate, dataBits, stopBits, parity)) {
 			throw new UnsupportedCommOperationException("Invalid Parameter");
 		}
-		this.baudRate = baudRate;
+		this.speed = baudRate;
 		if (stopBits == STOPBITS_1_5) {
 			this.dataBits = DATABITS_5;
 		}
@@ -161,7 +161,7 @@ public class RXTXPort extends SerialPort {
 
 	@Override
 	public int getBaudRate() {
-		return baudRate;
+		return speed;
 	}
 
 	@Override
@@ -220,14 +220,14 @@ public class RXTXPort extends SerialPort {
 	@Override
 	public void disableReceiveTimeout() {
 		timeout = -1;
-		NativeEnableReceiveTimeoutThreshold(timeout, receiveThreshold, InputBuffer);
+		NativeEnableReceiveTimeoutThreshold(timeout, threshold, InputBuffer);
 	}
 
 	@Override
 	public void enableReceiveTimeout(int time) {
 		if (time >= 0) {
 			timeout = time;
-			NativeEnableReceiveTimeoutThreshold(time, receiveThreshold, InputBuffer);
+			NativeEnableReceiveTimeoutThreshold(time, threshold, InputBuffer);
 		}
 		else {
 			throw new IllegalArgumentException("Unexpected negative timeout value");
@@ -247,8 +247,8 @@ public class RXTXPort extends SerialPort {
 	@Override
 	public void enableReceiveThreshold(int threshold) {
 		if (threshold >= 0) {
-			receiveThreshold = threshold;
-			NativeEnableReceiveTimeoutThreshold(timeout, receiveThreshold, InputBuffer);
+			this.threshold = threshold;
+			NativeEnableReceiveTimeoutThreshold(timeout, threshold, InputBuffer);
 		}
 		else {
 			throw new IllegalArgumentException("Unexpected negative threshold value");
@@ -262,12 +262,12 @@ public class RXTXPort extends SerialPort {
 
 	@Override
 	public int getReceiveThreshold() {
-		return receiveThreshold;
+		return threshold;
 	}
 
 	@Override
 	public boolean isReceiveThresholdEnabled() {
-		return (receiveThreshold > 0);
+		return (threshold > 0);
 	}
 
 	@Override
@@ -368,7 +368,7 @@ public class RXTXPort extends SerialPort {
 	 */
 	public boolean sendEvent(int event, boolean state) {
 
-		if (fileDescriptor == 0 || serialPortEventListener == null || monThread == null) {
+		if (fd == 0 || serialPortEventListener == null || monThread == null) {
 			return (true);
 		}
 
@@ -437,7 +437,7 @@ public class RXTXPort extends SerialPort {
 			serialPortEventListener.serialEvent(e);
 		}
 
-		return fileDescriptor == 0 || serialPortEventListener == null || monThread == null;
+		return fd == 0 || serialPortEventListener == null || monThread == null;
 	}
 
 	@Override
@@ -522,7 +522,7 @@ public class RXTXPort extends SerialPort {
 		waitForTheNativeCodeSilly();
 
 		MonitorThreadLock = true;
-		nativeSetEventFlag(fileDescriptor, SerialPortEvent.DATA_AVAILABLE, enable);
+		nativeSetEventFlag(fd, SerialPortEvent.DATA_AVAILABLE, enable);
 		monThread.Data = enable;
 		MonitorThreadLock = false;
 	}
@@ -531,7 +531,7 @@ public class RXTXPort extends SerialPort {
 	public void notifyOnOutputEmpty(boolean enable) {
 		waitForTheNativeCodeSilly();
 		MonitorThreadLock = true;
-		nativeSetEventFlag(fileDescriptor, SerialPortEvent.OUTPUT_BUFFER_EMPTY, enable);
+		nativeSetEventFlag(fd, SerialPortEvent.OUTPUT_BUFFER_EMPTY, enable);
 		monThread.Output = enable;
 		MonitorThreadLock = false;
 	}
@@ -540,7 +540,7 @@ public class RXTXPort extends SerialPort {
 	public void notifyOnCTS(boolean enable) {
 		waitForTheNativeCodeSilly();
 		MonitorThreadLock = true;
-		nativeSetEventFlag(fileDescriptor, SerialPortEvent.CTS, enable);
+		nativeSetEventFlag(fd, SerialPortEvent.CTS, enable);
 		monThread.CTS = enable;
 		MonitorThreadLock = false;
 	}
@@ -549,7 +549,7 @@ public class RXTXPort extends SerialPort {
 	public void notifyOnDSR(boolean enable) {
 		waitForTheNativeCodeSilly();
 		MonitorThreadLock = true;
-		nativeSetEventFlag(fileDescriptor, SerialPortEvent.DSR, enable);
+		nativeSetEventFlag(fd, SerialPortEvent.DSR, enable);
 		monThread.DSR = enable;
 		MonitorThreadLock = false;
 	}
@@ -558,7 +558,7 @@ public class RXTXPort extends SerialPort {
 	public void notifyOnRingIndicator(boolean enable) {
 		waitForTheNativeCodeSilly();
 		MonitorThreadLock = true;
-		nativeSetEventFlag(fileDescriptor, SerialPortEvent.RI, enable);
+		nativeSetEventFlag(fd, SerialPortEvent.RI, enable);
 		monThread.RI = enable;
 		MonitorThreadLock = false;
 	}
@@ -567,7 +567,7 @@ public class RXTXPort extends SerialPort {
 	public void notifyOnCarrierDetect(boolean enable) {
 		waitForTheNativeCodeSilly();
 		MonitorThreadLock = true;
-		nativeSetEventFlag(fileDescriptor, SerialPortEvent.CD, enable);
+		nativeSetEventFlag(fd, SerialPortEvent.CD, enable);
 		monThread.CD = enable;
 		MonitorThreadLock = false;
 	}
@@ -576,7 +576,7 @@ public class RXTXPort extends SerialPort {
 	public void notifyOnOverrunError(boolean enable) {
 		waitForTheNativeCodeSilly();
 		MonitorThreadLock = true;
-		nativeSetEventFlag(fileDescriptor, SerialPortEvent.OE, enable);
+		nativeSetEventFlag(fd, SerialPortEvent.OE, enable);
 		monThread.OE = enable;
 		MonitorThreadLock = false;
 	}
@@ -585,7 +585,7 @@ public class RXTXPort extends SerialPort {
 	public void notifyOnParityError(boolean enable) {
 		waitForTheNativeCodeSilly();
 		MonitorThreadLock = true;
-		nativeSetEventFlag(fileDescriptor, SerialPortEvent.PE, enable);
+		nativeSetEventFlag(fd, SerialPortEvent.PE, enable);
 		monThread.PE = enable;
 		MonitorThreadLock = false;
 	}
@@ -594,7 +594,7 @@ public class RXTXPort extends SerialPort {
 	public void notifyOnFramingError(boolean enable) {
 		waitForTheNativeCodeSilly();
 		MonitorThreadLock = true;
-		nativeSetEventFlag(fileDescriptor, SerialPortEvent.FE, enable);
+		nativeSetEventFlag(fd, SerialPortEvent.FE, enable);
 		monThread.FE = enable;
 		MonitorThreadLock = false;
 	}
@@ -603,7 +603,7 @@ public class RXTXPort extends SerialPort {
 	public void notifyOnBreakInterrupt(boolean enable) {
 		waitForTheNativeCodeSilly();
 		MonitorThreadLock = true;
-		nativeSetEventFlag(fileDescriptor, SerialPortEvent.BI, enable);
+		nativeSetEventFlag(fd, SerialPortEvent.BI, enable);
 		monThread.BI = enable;
 		MonitorThreadLock = false;
 	}
@@ -633,7 +633,7 @@ public class RXTXPort extends SerialPort {
 			closeLock = true;
 		}
 
-		if (fileDescriptor <= 0) {
+		if (fd <= 0) {
 			return;
 		}
 		setDTR(false);
@@ -645,14 +645,14 @@ public class RXTXPort extends SerialPort {
 		nativeClose(this.name);
 
 		super.close();
-		fileDescriptor = 0;
+		fd = 0;
 		closeLock = false;
 	}
 
 	/** Finalize the port */
 	@Override
 	protected void finalize() {
-		if (fileDescriptor > 0) {
+		if (fd > 0) {
 			close();
 		}
 	}
@@ -665,7 +665,7 @@ public class RXTXPort extends SerialPort {
 		 */
 		@Override
 		public void write(int b) throws IOException {
-			if (baudRate == 0) {
+			if (speed == 0) {
 				return;
 			}
 			if (monThreadisInterrupted) {
@@ -676,7 +676,7 @@ public class RXTXPort extends SerialPort {
 			}
 			try {
 				waitForTheNativeCodeSilly();
-				if (fileDescriptor == 0) {
+				if (fd == 0) {
 					throw new IOException();
 				}
 				writeByte(b, monThreadisInterrupted);
@@ -693,13 +693,13 @@ public class RXTXPort extends SerialPort {
 		 */
 		@Override
 		public void write(byte b[]) throws IOException {
-			if (baudRate == 0) {
+			if (speed == 0) {
 				return;
 			}
 			if (monThreadisInterrupted) {
 				return;
 			}
-			if (fileDescriptor == 0) {
+			if (fd == 0) {
 				throw new IOException();
 			}
 			synchronized (IOLockedMutex) {
@@ -724,7 +724,7 @@ public class RXTXPort extends SerialPort {
 		 */
 		@Override
 		public void write(byte b[], int off, int len) throws IOException {
-			if (baudRate == 0) {
+			if (speed == 0) {
 				return;
 			}
 			if (off + len > b.length) {
@@ -734,7 +734,7 @@ public class RXTXPort extends SerialPort {
 			byte send[] = new byte[len];
 			System.arraycopy(b, off, send, 0, len);
 
-			if (fileDescriptor == 0) {
+			if (fd == 0) {
 				throw new IOException();
 			}
 			if (monThreadisInterrupted) {
@@ -757,10 +757,10 @@ public class RXTXPort extends SerialPort {
 		*/
 		@Override
 		public void flush() throws IOException {
-			if (baudRate == 0) {
+			if (speed == 0) {
 				return;
 			}
-			if (fileDescriptor == 0) {
+			if (fd == 0) {
 				throw new IOException();
 			}
 			if (monThreadisInterrupted) {
@@ -799,7 +799,7 @@ public class RXTXPort extends SerialPort {
 		@Override
 		public synchronized int read() throws IOException {
 
-			if (fileDescriptor == 0) {
+			if (fd == 0) {
 				throw new IOException();
 			}
 			synchronized (IOLockedMutex) {
@@ -873,7 +873,7 @@ public class RXTXPort extends SerialPort {
 			/*
 			 * Some sanity checks
 			 */
-			if (fileDescriptor == 0) {
+			if (fd == 0) {
 				throw new IOException();
 			}
 
@@ -896,7 +896,7 @@ public class RXTXPort extends SerialPort {
 			 */
 			int Minimum = len;
 
-			if (receiveThreshold == 0) {
+			if (threshold == 0) {
 				/*
 				 * If threshold is disabled, read should return as soon as data are available (up to the amount of
 				 * available bytes in order to avoid blocking) Read may return earlier depending of the receive time
@@ -915,7 +915,7 @@ public class RXTXPort extends SerialPort {
 				 * Threshold is enabled. Read should return when 'threshold' bytes have been received (or when the
 				 * receive timeout expired)
 				 */
-				Minimum = Math.min(Minimum, receiveThreshold);
+				Minimum = Math.min(Minimum, threshold);
 			}
 			if (monThreadisInterrupted == true) {
 				return (0);
@@ -955,7 +955,7 @@ public class RXTXPort extends SerialPort {
 			/*
 			 * Some sanity checks
 			 */
-			if (fileDescriptor == 0) {
+			if (fd == 0) {
 				throw new IOException();
 			}
 
@@ -978,7 +978,7 @@ public class RXTXPort extends SerialPort {
 			 */
 			int Minimum = len;
 
-			if (receiveThreshold == 0) {
+			if (threshold == 0) {
 				/*
 				 * If threshold is disabled, read should return as soon as data are available (up to the amount of
 				 * available bytes in order to avoid blocking) Read may return earlier depending of the receive time
@@ -997,7 +997,7 @@ public class RXTXPort extends SerialPort {
 				 * Threshold is enabled. Read should return when 'threshold' bytes have been received (or when the
 				 * receive timeout expired)
 				 */
-				Minimum = Math.min(Minimum, receiveThreshold);
+				Minimum = Math.min(Minimum, threshold);
 			}
 			if (monThreadisInterrupted == true) {
 				return (0);
