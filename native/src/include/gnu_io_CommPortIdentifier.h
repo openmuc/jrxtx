@@ -24,8 +24,8 @@ extern "C" {
  * Method:    native_psmisc_report_owner
  * Signature: (Ljava/lang/String;)Ljava/lang/String;
  */
-JNIEXPORT jstring JNICALL Java_gnu_io_CommPortIdentifier_native_1psmisc_1report_1owner
-  (JNIEnv *, jobject, jstring);
+JNIEXPORT jstring JNICALL Java_gnu_io_CommPortIdentifier_native_1psmisc_1report_1owner(
+		JNIEnv *, jobject, jstring);
 
 #ifdef __cplusplus
 }

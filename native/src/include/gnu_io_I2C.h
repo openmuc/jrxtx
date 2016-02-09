@@ -49,15 +49,14 @@ extern "C" {
  * Signature: ()V
  */
 JNIEXPORT void JNICALL Java_gnu_io_I2C_Initialize
-  (JNIEnv *, jclass);
+(JNIEnv *, jclass);
 
 /*
  * Class:     gnu_io_I2C
  * Method:    open
  * Signature: (Ljava/lang/String;)I
  */
-JNIEXPORT jint JNICALL Java_gnu_io_I2C_open
-  (JNIEnv *, jobject, jstring);
+JNIEXPORT jint JNICALL Java_gnu_io_I2C_open(JNIEnv *, jobject, jstring);
 
 /*
  * Class:     gnu_io_I2C
@@ -65,7 +64,7 @@ JNIEXPORT jint JNICALL Java_gnu_io_I2C_open
  * Signature: (IIII)V
  */
 JNIEXPORT void JNICALL Java_gnu_io_I2C_nativeSetI2CPortParams
-  (JNIEnv *, jobject, jint, jint, jint, jint);
+(JNIEnv *, jobject, jint, jint, jint, jint);
 
 /*
  * Class:     gnu_io_I2C
@@ -73,23 +72,23 @@ JNIEXPORT void JNICALL Java_gnu_io_I2C_nativeSetI2CPortParams
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL Java_gnu_io_I2C_setflowcontrol
-  (JNIEnv *, jobject, jint);
+(JNIEnv *, jobject, jint);
 
 /*
  * Class:     gnu_io_I2C
  * Method:    NativegetReceiveTimeout
  * Signature: ()I
  */
-JNIEXPORT jint JNICALL Java_gnu_io_I2C_NativegetReceiveTimeout
-  (JNIEnv *, jobject);
+JNIEXPORT jint JNICALL Java_gnu_io_I2C_NativegetReceiveTimeout(JNIEnv *,
+		jobject);
 
 /*
  * Class:     gnu_io_I2C
  * Method:    NativeisReceiveTimeoutEnabled
  * Signature: ()Z
  */
-JNIEXPORT jboolean JNICALL Java_gnu_io_I2C_NativeisReceiveTimeoutEnabled
-  (JNIEnv *, jobject);
+JNIEXPORT jboolean JNICALL Java_gnu_io_I2C_NativeisReceiveTimeoutEnabled(
+		JNIEnv *, jobject);
 
 /*
  * Class:     gnu_io_I2C
@@ -97,15 +96,14 @@ JNIEXPORT jboolean JNICALL Java_gnu_io_I2C_NativeisReceiveTimeoutEnabled
  * Signature: (III)V
  */
 JNIEXPORT void JNICALL Java_gnu_io_I2C_NativeEnableReceiveTimeoutThreshold
-  (JNIEnv *, jobject, jint, jint, jint);
+(JNIEnv *, jobject, jint, jint, jint);
 
 /*
  * Class:     gnu_io_I2C
  * Method:    isDTR
  * Signature: ()Z
  */
-JNIEXPORT jboolean JNICALL Java_gnu_io_I2C_isDTR
-  (JNIEnv *, jobject);
+JNIEXPORT jboolean JNICALL Java_gnu_io_I2C_isDTR(JNIEnv *, jobject);
 
 /*
  * Class:     gnu_io_I2C
@@ -113,7 +111,7 @@ JNIEXPORT jboolean JNICALL Java_gnu_io_I2C_isDTR
  * Signature: (Z)V
  */
 JNIEXPORT void JNICALL Java_gnu_io_I2C_setDTR
-  (JNIEnv *, jobject, jboolean);
+(JNIEnv *, jobject, jboolean);
 
 /*
  * Class:     gnu_io_I2C
@@ -121,7 +119,7 @@ JNIEXPORT void JNICALL Java_gnu_io_I2C_setDTR
  * Signature: (Z)V
  */
 JNIEXPORT void JNICALL Java_gnu_io_I2C_setRTS
-  (JNIEnv *, jobject, jboolean);
+(JNIEnv *, jobject, jboolean);
 
 /*
  * Class:     gnu_io_I2C
@@ -129,47 +127,42 @@ JNIEXPORT void JNICALL Java_gnu_io_I2C_setRTS
  * Signature: (Z)V
  */
 JNIEXPORT void JNICALL Java_gnu_io_I2C_setDSR
-  (JNIEnv *, jobject, jboolean);
+(JNIEnv *, jobject, jboolean);
 
 /*
  * Class:     gnu_io_I2C
  * Method:    isCTS
  * Signature: ()Z
  */
-JNIEXPORT jboolean JNICALL Java_gnu_io_I2C_isCTS
-  (JNIEnv *, jobject);
+JNIEXPORT jboolean JNICALL Java_gnu_io_I2C_isCTS(JNIEnv *, jobject);
 
 /*
  * Class:     gnu_io_I2C
  * Method:    isDSR
  * Signature: ()Z
  */
-JNIEXPORT jboolean JNICALL Java_gnu_io_I2C_isDSR
-  (JNIEnv *, jobject);
+JNIEXPORT jboolean JNICALL Java_gnu_io_I2C_isDSR(JNIEnv *, jobject);
 
 /*
  * Class:     gnu_io_I2C
  * Method:    isCD
  * Signature: ()Z
  */
-JNIEXPORT jboolean JNICALL Java_gnu_io_I2C_isCD
-  (JNIEnv *, jobject);
+JNIEXPORT jboolean JNICALL Java_gnu_io_I2C_isCD(JNIEnv *, jobject);
 
 /*
  * Class:     gnu_io_I2C
  * Method:    isRI
  * Signature: ()Z
  */
-JNIEXPORT jboolean JNICALL Java_gnu_io_I2C_isRI
-  (JNIEnv *, jobject);
+JNIEXPORT jboolean JNICALL Java_gnu_io_I2C_isRI(JNIEnv *, jobject);
 
 /*
  * Class:     gnu_io_I2C
  * Method:    isRTS
  * Signature: ()Z
  */
-JNIEXPORT jboolean JNICALL Java_gnu_io_I2C_isRTS
-  (JNIEnv *, jobject);
+JNIEXPORT jboolean JNICALL Java_gnu_io_I2C_isRTS(JNIEnv *, jobject);
 
 /*
  * Class:     gnu_io_I2C
@@ -177,7 +170,7 @@ JNIEXPORT jboolean JNICALL Java_gnu_io_I2C_isRTS
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL Java_gnu_io_I2C_sendBreak
-  (JNIEnv *, jobject, jint);
+(JNIEnv *, jobject, jint);
 
 /*
  * Class:     gnu_io_I2C
@@ -185,7 +178,7 @@ JNIEXPORT void JNICALL Java_gnu_io_I2C_sendBreak
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL Java_gnu_io_I2C_writeByte
-  (JNIEnv *, jobject, jint);
+(JNIEnv *, jobject, jint);
 
 /*
  * Class:     gnu_io_I2C
@@ -193,7 +186,7 @@ JNIEXPORT void JNICALL Java_gnu_io_I2C_writeByte
  * Signature: ([BII)V
  */
 JNIEXPORT void JNICALL Java_gnu_io_I2C_writeArray
-  (JNIEnv *, jobject, jbyteArray, jint, jint);
+(JNIEnv *, jobject, jbyteArray, jint, jint);
 
 /*
  * Class:     gnu_io_I2C
@@ -201,31 +194,29 @@ JNIEXPORT void JNICALL Java_gnu_io_I2C_writeArray
  * Signature: ()V
  */
 JNIEXPORT void JNICALL Java_gnu_io_I2C_drain
-  (JNIEnv *, jobject);
+(JNIEnv *, jobject);
 
 /*
  * Class:     gnu_io_I2C
  * Method:    nativeavailable
  * Signature: ()I
  */
-JNIEXPORT jint JNICALL Java_gnu_io_I2C_nativeavailable
-  (JNIEnv *, jobject);
+JNIEXPORT jint JNICALL Java_gnu_io_I2C_nativeavailable(JNIEnv *, jobject);
 
 /*
  * Class:     gnu_io_I2C
  * Method:    readByte
  * Signature: ()I
  */
-JNIEXPORT jint JNICALL Java_gnu_io_I2C_readByte
-  (JNIEnv *, jobject);
+JNIEXPORT jint JNICALL Java_gnu_io_I2C_readByte(JNIEnv *, jobject);
 
 /*
  * Class:     gnu_io_I2C
  * Method:    readArray
  * Signature: ([BII)I
  */
-JNIEXPORT jint JNICALL Java_gnu_io_I2C_readArray
-  (JNIEnv *, jobject, jbyteArray, jint, jint);
+JNIEXPORT jint JNICALL Java_gnu_io_I2C_readArray(JNIEnv *, jobject, jbyteArray,
+		jint, jint);
 
 /*
  * Class:     gnu_io_I2C
@@ -233,7 +224,7 @@ JNIEXPORT jint JNICALL Java_gnu_io_I2C_readArray
  * Signature: ()V
  */
 JNIEXPORT void JNICALL Java_gnu_io_I2C_eventLoop
-  (JNIEnv *, jobject);
+(JNIEnv *, jobject);
 
 /*
  * Class:     gnu_io_I2C
@@ -241,7 +232,7 @@ JNIEXPORT void JNICALL Java_gnu_io_I2C_eventLoop
  * Signature: ()V
  */
 JNIEXPORT void JNICALL Java_gnu_io_I2C_nativeClose
-  (JNIEnv *, jobject);
+(JNIEnv *, jobject);
 
 #ifdef __cplusplus
 }

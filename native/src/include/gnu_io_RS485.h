@@ -49,15 +49,14 @@ extern "C" {
  * Signature: ()V
  */
 JNIEXPORT void JNICALL Java_gnu_io_RS485_Initialize
-  (JNIEnv *, jclass);
+(JNIEnv *, jclass);
 
 /*
  * Class:     gnu_io_RS485
  * Method:    open
  * Signature: (Ljava/lang/String;)I
  */
-JNIEXPORT jint JNICALL Java_gnu_io_RS485_open
-  (JNIEnv *, jobject, jstring);
+JNIEXPORT jint JNICALL Java_gnu_io_RS485_open(JNIEnv *, jobject, jstring);
 
 /*
  * Class:     gnu_io_RS485
@@ -65,7 +64,7 @@ JNIEXPORT jint JNICALL Java_gnu_io_RS485_open
  * Signature: (IIII)V
  */
 JNIEXPORT void JNICALL Java_gnu_io_RS485_nativeSetRS485PortParams
-  (JNIEnv *, jobject, jint, jint, jint, jint);
+(JNIEnv *, jobject, jint, jint, jint, jint);
 
 /*
  * Class:     gnu_io_RS485
@@ -73,23 +72,23 @@ JNIEXPORT void JNICALL Java_gnu_io_RS485_nativeSetRS485PortParams
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL Java_gnu_io_RS485_setflowcontrol
-  (JNIEnv *, jobject, jint);
+(JNIEnv *, jobject, jint);
 
 /*
  * Class:     gnu_io_RS485
  * Method:    NativegetReceiveTimeout
  * Signature: ()I
  */
-JNIEXPORT jint JNICALL Java_gnu_io_RS485_NativegetReceiveTimeout
-  (JNIEnv *, jobject);
+JNIEXPORT jint JNICALL Java_gnu_io_RS485_NativegetReceiveTimeout(JNIEnv *,
+		jobject);
 
 /*
  * Class:     gnu_io_RS485
  * Method:    NativeisReceiveTimeoutEnabled
  * Signature: ()Z
  */
-JNIEXPORT jboolean JNICALL Java_gnu_io_RS485_NativeisReceiveTimeoutEnabled
-  (JNIEnv *, jobject);
+JNIEXPORT jboolean JNICALL Java_gnu_io_RS485_NativeisReceiveTimeoutEnabled(
+		JNIEnv *, jobject);
 
 /*
  * Class:     gnu_io_RS485
@@ -97,15 +96,14 @@ JNIEXPORT jboolean JNICALL Java_gnu_io_RS485_NativeisReceiveTimeoutEnabled
  * Signature: (III)V
  */
 JNIEXPORT void JNICALL Java_gnu_io_RS485_NativeEnableReceiveTimeoutThreshold
-  (JNIEnv *, jobject, jint, jint, jint);
+(JNIEnv *, jobject, jint, jint, jint);
 
 /*
  * Class:     gnu_io_RS485
  * Method:    isDTR
  * Signature: ()Z
  */
-JNIEXPORT jboolean JNICALL Java_gnu_io_RS485_isDTR
-  (JNIEnv *, jobject);
+JNIEXPORT jboolean JNICALL Java_gnu_io_RS485_isDTR(JNIEnv *, jobject);
 
 /*
  * Class:     gnu_io_RS485
@@ -113,7 +111,7 @@ JNIEXPORT jboolean JNICALL Java_gnu_io_RS485_isDTR
  * Signature: (Z)V
  */
 JNIEXPORT void JNICALL Java_gnu_io_RS485_setDTR
-  (JNIEnv *, jobject, jboolean);
+(JNIEnv *, jobject, jboolean);
 
 /*
  * Class:     gnu_io_RS485
@@ -121,7 +119,7 @@ JNIEXPORT void JNICALL Java_gnu_io_RS485_setDTR
  * Signature: (Z)V
  */
 JNIEXPORT void JNICALL Java_gnu_io_RS485_setRTS
-  (JNIEnv *, jobject, jboolean);
+(JNIEnv *, jobject, jboolean);
 
 /*
  * Class:     gnu_io_RS485
@@ -129,47 +127,42 @@ JNIEXPORT void JNICALL Java_gnu_io_RS485_setRTS
  * Signature: (Z)V
  */
 JNIEXPORT void JNICALL Java_gnu_io_RS485_setDSR
-  (JNIEnv *, jobject, jboolean);
+(JNIEnv *, jobject, jboolean);
 
 /*
  * Class:     gnu_io_RS485
  * Method:    isCTS
  * Signature: ()Z
  */
-JNIEXPORT jboolean JNICALL Java_gnu_io_RS485_isCTS
-  (JNIEnv *, jobject);
+JNIEXPORT jboolean JNICALL Java_gnu_io_RS485_isCTS(JNIEnv *, jobject);
 
 /*
  * Class:     gnu_io_RS485
  * Method:    isDSR
  * Signature: ()Z
  */
-JNIEXPORT jboolean JNICALL Java_gnu_io_RS485_isDSR
-  (JNIEnv *, jobject);
+JNIEXPORT jboolean JNICALL Java_gnu_io_RS485_isDSR(JNIEnv *, jobject);
 
 /*
  * Class:     gnu_io_RS485
  * Method:    isCD
  * Signature: ()Z
  */
-JNIEXPORT jboolean JNICALL Java_gnu_io_RS485_isCD
-  (JNIEnv *, jobject);
+JNIEXPORT jboolean JNICALL Java_gnu_io_RS485_isCD(JNIEnv *, jobject);
 
 /*
  * Class:     gnu_io_RS485
  * Method:    isRI
  * Signature: ()Z
  */
-JNIEXPORT jboolean JNICALL Java_gnu_io_RS485_isRI
-  (JNIEnv *, jobject);
+JNIEXPORT jboolean JNICALL Java_gnu_io_RS485_isRI(JNIEnv *, jobject);
 
 /*
  * Class:     gnu_io_RS485
  * Method:    isRTS
  * Signature: ()Z
  */
-JNIEXPORT jboolean JNICALL Java_gnu_io_RS485_isRTS
-  (JNIEnv *, jobject);
+JNIEXPORT jboolean JNICALL Java_gnu_io_RS485_isRTS(JNIEnv *, jobject);
 
 /*
  * Class:     gnu_io_RS485
@@ -177,7 +170,7 @@ JNIEXPORT jboolean JNICALL Java_gnu_io_RS485_isRTS
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL Java_gnu_io_RS485_sendBreak
-  (JNIEnv *, jobject, jint);
+(JNIEnv *, jobject, jint);
 
 /*
  * Class:     gnu_io_RS485
@@ -185,7 +178,7 @@ JNIEXPORT void JNICALL Java_gnu_io_RS485_sendBreak
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL Java_gnu_io_RS485_writeByte
-  (JNIEnv *, jobject, jint);
+(JNIEnv *, jobject, jint);
 
 /*
  * Class:     gnu_io_RS485
@@ -193,7 +186,7 @@ JNIEXPORT void JNICALL Java_gnu_io_RS485_writeByte
  * Signature: ([BII)V
  */
 JNIEXPORT void JNICALL Java_gnu_io_RS485_writeArray
-  (JNIEnv *, jobject, jbyteArray, jint, jint);
+(JNIEnv *, jobject, jbyteArray, jint, jint);
 
 /*
  * Class:     gnu_io_RS485
@@ -201,31 +194,29 @@ JNIEXPORT void JNICALL Java_gnu_io_RS485_writeArray
  * Signature: ()V
  */
 JNIEXPORT void JNICALL Java_gnu_io_RS485_drain
-  (JNIEnv *, jobject);
+(JNIEnv *, jobject);
 
 /*
  * Class:     gnu_io_RS485
  * Method:    nativeavailable
  * Signature: ()I
  */
-JNIEXPORT jint JNICALL Java_gnu_io_RS485_nativeavailable
-  (JNIEnv *, jobject);
+JNIEXPORT jint JNICALL Java_gnu_io_RS485_nativeavailable(JNIEnv *, jobject);
 
 /*
  * Class:     gnu_io_RS485
  * Method:    readByte
  * Signature: ()I
  */
-JNIEXPORT jint JNICALL Java_gnu_io_RS485_readByte
-  (JNIEnv *, jobject);
+JNIEXPORT jint JNICALL Java_gnu_io_RS485_readByte(JNIEnv *, jobject);
 
 /*
  * Class:     gnu_io_RS485
  * Method:    readArray
  * Signature: ([BII)I
  */
-JNIEXPORT jint JNICALL Java_gnu_io_RS485_readArray
-  (JNIEnv *, jobject, jbyteArray, jint, jint);
+JNIEXPORT jint JNICALL Java_gnu_io_RS485_readArray(JNIEnv *, jobject,
+		jbyteArray, jint, jint);
 
 /*
  * Class:     gnu_io_RS485
@@ -233,7 +224,7 @@ JNIEXPORT jint JNICALL Java_gnu_io_RS485_readArray
  * Signature: ()V
  */
 JNIEXPORT void JNICALL Java_gnu_io_RS485_eventLoop
-  (JNIEnv *, jobject);
+(JNIEnv *, jobject);
 
 /*
  * Class:     gnu_io_RS485
@@ -241,7 +232,7 @@ JNIEXPORT void JNICALL Java_gnu_io_RS485_eventLoop
  * Signature: ()V
  */
 JNIEXPORT void JNICALL Java_gnu_io_RS485_nativeClose
-  (JNIEnv *, jobject);
+(JNIEnv *, jobject);
 
 #ifdef __cplusplus
 }

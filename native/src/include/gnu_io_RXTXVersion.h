@@ -12,8 +12,8 @@ extern "C" {
  * Method:    nativeGetVersion
  * Signature: ()Ljava/lang/String;
  */
-JNIEXPORT jstring JNICALL Java_gnu_io_RXTXVersion_nativeGetVersion
-  (JNIEnv *, jclass);
+JNIEXPORT jstring JNICALL Java_gnu_io_RXTXVersion_nativeGetVersion(JNIEnv *,
+		jclass);
 
 #ifdef __cplusplus
 }

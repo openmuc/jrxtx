@@ -16,40 +16,40 @@ extern "C" {
  * Method:    registerKnownPorts
  * Signature: (I)Z
  */
-JNIEXPORT jboolean JNICALL Java_gnu_io_RXTXCommDriver_registerKnownPorts
-  (JNIEnv *, jobject, jint);
+JNIEXPORT jboolean JNICALL Java_gnu_io_RXTXCommDriver_registerKnownPorts(
+		JNIEnv *, jobject, jint);
 
 /*
  * Class:     gnu_io_RXTXCommDriver
  * Method:    isPortPrefixValid
  * Signature: (Ljava/lang/String;)Z
  */
-JNIEXPORT jboolean JNICALL Java_gnu_io_RXTXCommDriver_isPortPrefixValid
-  (JNIEnv *, jobject, jstring);
+JNIEXPORT jboolean JNICALL Java_gnu_io_RXTXCommDriver_isPortPrefixValid(
+		JNIEnv *, jobject, jstring);
 
 /*
  * Class:     gnu_io_RXTXCommDriver
  * Method:    testRead
  * Signature: (Ljava/lang/String;I)Z
  */
-JNIEXPORT jboolean JNICALL Java_gnu_io_RXTXCommDriver_testRead
-  (JNIEnv *, jobject, jstring, jint);
+JNIEXPORT jboolean JNICALL Java_gnu_io_RXTXCommDriver_testRead(JNIEnv *,
+		jobject, jstring, jint);
 
 /*
  * Class:     gnu_io_RXTXCommDriver
  * Method:    getDeviceDirectory
  * Signature: ()Ljava/lang/String;
  */
-JNIEXPORT jstring JNICALL Java_gnu_io_RXTXCommDriver_getDeviceDirectory
-  (JNIEnv *, jobject);
+JNIEXPORT jstring JNICALL Java_gnu_io_RXTXCommDriver_getDeviceDirectory(
+		JNIEnv *, jobject);
 
 /*
  * Class:     gnu_io_RXTXCommDriver
  * Method:    nativeGetVersion
  * Signature: ()Ljava/lang/String;
  */
-JNIEXPORT jstring JNICALL Java_gnu_io_RXTXCommDriver_nativeGetVersion
-  (JNIEnv *, jclass);
+JNIEXPORT jstring JNICALL Java_gnu_io_RXTXCommDriver_nativeGetVersion(JNIEnv *,
+		jclass);
 
 #ifdef __cplusplus
 }

@@ -53,15 +53,14 @@ extern "C" {
  * Signature: ()V
  */
 JNIEXPORT void JNICALL Java_gnu_io_Raw_Initialize
-  (JNIEnv *, jclass);
+(JNIEnv *, jclass);
 
 /*
  * Class:     gnu_io_Raw
  * Method:    open
  * Signature: (I)I
  */
-JNIEXPORT jint JNICALL Java_gnu_io_Raw_open
-  (JNIEnv *, jobject, jint);
+JNIEXPORT jint JNICALL Java_gnu_io_Raw_open(JNIEnv *, jobject, jint);
 
 /*
  * Class:     gnu_io_Raw
@@ -69,7 +68,7 @@ JNIEXPORT jint JNICALL Java_gnu_io_Raw_open
  * Signature: (IIII)V
  */
 JNIEXPORT void JNICALL Java_gnu_io_Raw_nativeSetRawPortParams
-  (JNIEnv *, jobject, jint, jint, jint, jint);
+(JNIEnv *, jobject, jint, jint, jint, jint);
 
 /*
  * Class:     gnu_io_Raw
@@ -77,23 +76,23 @@ JNIEXPORT void JNICALL Java_gnu_io_Raw_nativeSetRawPortParams
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL Java_gnu_io_Raw_setflowcontrol
-  (JNIEnv *, jobject, jint);
+(JNIEnv *, jobject, jint);
 
 /*
  * Class:     gnu_io_Raw
  * Method:    NativegetReceiveTimeout
  * Signature: ()I
  */
-JNIEXPORT jint JNICALL Java_gnu_io_Raw_NativegetReceiveTimeout
-  (JNIEnv *, jobject);
+JNIEXPORT jint JNICALL Java_gnu_io_Raw_NativegetReceiveTimeout(JNIEnv *,
+		jobject);
 
 /*
  * Class:     gnu_io_Raw
  * Method:    NativeisReceiveTimeoutEnabled
  * Signature: ()Z
  */
-JNIEXPORT jboolean JNICALL Java_gnu_io_Raw_NativeisReceiveTimeoutEnabled
-  (JNIEnv *, jobject);
+JNIEXPORT jboolean JNICALL Java_gnu_io_Raw_NativeisReceiveTimeoutEnabled(
+		JNIEnv *, jobject);
 
 /*
  * Class:     gnu_io_Raw
@@ -101,15 +100,14 @@ JNIEXPORT jboolean JNICALL Java_gnu_io_Raw_NativeisReceiveTimeoutEnabled
  * Signature: (III)V
  */
 JNIEXPORT void JNICALL Java_gnu_io_Raw_NativeEnableReceiveTimeoutThreshold
-  (JNIEnv *, jobject, jint, jint, jint);
+(JNIEnv *, jobject, jint, jint, jint);
 
 /*
  * Class:     gnu_io_Raw
  * Method:    isDTR
  * Signature: ()Z
  */
-JNIEXPORT jboolean JNICALL Java_gnu_io_Raw_isDTR
-  (JNIEnv *, jobject);
+JNIEXPORT jboolean JNICALL Java_gnu_io_Raw_isDTR(JNIEnv *, jobject);
 
 /*
  * Class:     gnu_io_Raw
@@ -117,7 +115,7 @@ JNIEXPORT jboolean JNICALL Java_gnu_io_Raw_isDTR
  * Signature: (Z)V
  */
 JNIEXPORT void JNICALL Java_gnu_io_Raw_setDTR
-  (JNIEnv *, jobject, jboolean);
+(JNIEnv *, jobject, jboolean);
 
 /*
  * Class:     gnu_io_Raw
@@ -125,7 +123,7 @@ JNIEXPORT void JNICALL Java_gnu_io_Raw_setDTR
  * Signature: (Z)V
  */
 JNIEXPORT void JNICALL Java_gnu_io_Raw_setRTS
-  (JNIEnv *, jobject, jboolean);
+(JNIEnv *, jobject, jboolean);
 
 /*
  * Class:     gnu_io_Raw
@@ -133,47 +131,42 @@ JNIEXPORT void JNICALL Java_gnu_io_Raw_setRTS
  * Signature: (Z)V
  */
 JNIEXPORT void JNICALL Java_gnu_io_Raw_setDSR
-  (JNIEnv *, jobject, jboolean);
+(JNIEnv *, jobject, jboolean);
 
 /*
  * Class:     gnu_io_Raw
  * Method:    isCTS
  * Signature: ()Z
  */
-JNIEXPORT jboolean JNICALL Java_gnu_io_Raw_isCTS
-  (JNIEnv *, jobject);
+JNIEXPORT jboolean JNICALL Java_gnu_io_Raw_isCTS(JNIEnv *, jobject);
 
 /*
  * Class:     gnu_io_Raw
  * Method:    isDSR
  * Signature: ()Z
  */
-JNIEXPORT jboolean JNICALL Java_gnu_io_Raw_isDSR
-  (JNIEnv *, jobject);
+JNIEXPORT jboolean JNICALL Java_gnu_io_Raw_isDSR(JNIEnv *, jobject);
 
 /*
  * Class:     gnu_io_Raw
  * Method:    isCD
  * Signature: ()Z
  */
-JNIEXPORT jboolean JNICALL Java_gnu_io_Raw_isCD
-  (JNIEnv *, jobject);
+JNIEXPORT jboolean JNICALL Java_gnu_io_Raw_isCD(JNIEnv *, jobject);
 
 /*
  * Class:     gnu_io_Raw
  * Method:    isRI
  * Signature: ()Z
  */
-JNIEXPORT jboolean JNICALL Java_gnu_io_Raw_isRI
-  (JNIEnv *, jobject);
+JNIEXPORT jboolean JNICALL Java_gnu_io_Raw_isRI(JNIEnv *, jobject);
 
 /*
  * Class:     gnu_io_Raw
  * Method:    isRTS
  * Signature: ()Z
  */
-JNIEXPORT jboolean JNICALL Java_gnu_io_Raw_isRTS
-  (JNIEnv *, jobject);
+JNIEXPORT jboolean JNICALL Java_gnu_io_Raw_isRTS(JNIEnv *, jobject);
 
 /*
  * Class:     gnu_io_Raw
@@ -181,7 +174,7 @@ JNIEXPORT jboolean JNICALL Java_gnu_io_Raw_isRTS
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL Java_gnu_io_Raw_sendBreak
-  (JNIEnv *, jobject, jint);
+(JNIEnv *, jobject, jint);
 
 /*
  * Class:     gnu_io_Raw
@@ -189,7 +182,7 @@ JNIEXPORT void JNICALL Java_gnu_io_Raw_sendBreak
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL Java_gnu_io_Raw_writeByte
-  (JNIEnv *, jobject, jint);
+(JNIEnv *, jobject, jint);
 
 /*
  * Class:     gnu_io_Raw
@@ -197,7 +190,7 @@ JNIEXPORT void JNICALL Java_gnu_io_Raw_writeByte
  * Signature: ([BII)V
  */
 JNIEXPORT void JNICALL Java_gnu_io_Raw_writeArray
-  (JNIEnv *, jobject, jbyteArray, jint, jint);
+(JNIEnv *, jobject, jbyteArray, jint, jint);
 
 /*
  * Class:     gnu_io_Raw
@@ -205,31 +198,29 @@ JNIEXPORT void JNICALL Java_gnu_io_Raw_writeArray
  * Signature: ()V
  */
 JNIEXPORT void JNICALL Java_gnu_io_Raw_drain
-  (JNIEnv *, jobject);
+(JNIEnv *, jobject);
 
 /*
  * Class:     gnu_io_Raw
  * Method:    nativeavailable
  * Signature: ()I
  */
-JNIEXPORT jint JNICALL Java_gnu_io_Raw_nativeavailable
-  (JNIEnv *, jobject);
+JNIEXPORT jint JNICALL Java_gnu_io_Raw_nativeavailable(JNIEnv *, jobject);
 
 /*
  * Class:     gnu_io_Raw
  * Method:    readByte
  * Signature: ()I
  */
-JNIEXPORT jint JNICALL Java_gnu_io_Raw_readByte
-  (JNIEnv *, jobject);
+JNIEXPORT jint JNICALL Java_gnu_io_Raw_readByte(JNIEnv *, jobject);
 
 /*
  * Class:     gnu_io_Raw
  * Method:    readArray
  * Signature: ([BII)I
  */
-JNIEXPORT jint JNICALL Java_gnu_io_Raw_readArray
-  (JNIEnv *, jobject, jbyteArray, jint, jint);
+JNIEXPORT jint JNICALL Java_gnu_io_Raw_readArray(JNIEnv *, jobject, jbyteArray,
+		jint, jint);
 
 /*
  * Class:     gnu_io_Raw
@@ -237,15 +228,14 @@ JNIEXPORT jint JNICALL Java_gnu_io_Raw_readArray
  * Signature: ()V
  */
 JNIEXPORT void JNICALL Java_gnu_io_Raw_eventLoop
-  (JNIEnv *, jobject);
+(JNIEnv *, jobject);
 
 /*
  * Class:     gnu_io_Raw
  * Method:    nativeClose
  * Signature: ()I
  */
-JNIEXPORT jint JNICALL Java_gnu_io_Raw_nativeClose
-  (JNIEnv *, jobject);
+JNIEXPORT jint JNICALL Java_gnu_io_Raw_nativeClose(JNIEnv *, jobject);
 
 #ifdef __cplusplus
 }

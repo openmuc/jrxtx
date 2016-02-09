@@ -1,60 +1,60 @@
 /*-------------------------------------------------------------------------
-|   RXTX License v 2.1 - LGPL v 2.1 + Linking Over Controlled Interface.
-|   RXTX is a native interface to serial ports in java.
-|   Copyright 1997-2009 by Trent Jarvi tjarvi@qbang.org and others who
-|   actually wrote it.  See individual source files for more information.
-|
-|   A copy of the LGPL v 2.1 may be found at
-|   http://www.gnu.org/licenses/lgpl.txt on March 4th 2007.  A copy is
-|   here for your convenience.
-|
-|   This library is free software; you can redistribute it and/or
-|   modify it under the terms of the GNU Lesser General Public
-|   License as published by the Free Software Foundation; either
-|   version 2.1 of the License, or (at your option) any later version.
-|
-|   This library is distributed in the hope that it will be useful,
-|   but WITHOUT ANY WARRANTY; without even the implied warranty of
-|   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-|   Lesser General Public License for more details.
-|
-|   An executable that contains no derivative of any portion of RXTX, but
-|   is designed to work with RXTX by being dynamically linked with it,
-|   is considered a "work that uses the Library" subject to the terms and
-|   conditions of the GNU Lesser General Public License.
-|
-|   The following has been added to the RXTX License to remove
-|   any confusion about linking to RXTX.   We want to allow in part what
-|   section 5, paragraph 2 of the LGPL does not permit in the special
-|   case of linking over a controlled interface.  The intent is to add a
-|   Java Specification Request or standards body defined interface in the
-|   future as another exception but one is not currently available.
-|
-|   http://www.fsf.org/licenses/gpl-faq.html#LinkingOverControlledInterface
-|
-|   As a special exception, the copyright holders of RXTX give you
-|   permission to link RXTX with independent modules that communicate with
-|   RXTX solely through the Sun Microsytems CommAPI interface version 2,
-|   regardless of the license terms of these independent modules, and to copy
-|   and distribute the resulting combined work under terms of your choice,
-|   provided that every copy of the combined work is accompanied by a complete
-|   copy of the source code of RXTX (the version of RXTX used to produce the
-|   combined work), being distributed under the terms of the GNU Lesser General
-|   Public License plus this exception.  An independent module is a
-|   module which is not derived from or based on RXTX.
-|
-|   Note that people who make modified versions of RXTX are not obligated
-|   to grant this special exception for their modified versions; it is
-|   their choice whether to do so.  The GNU Lesser General Public License
-|   gives permission to release a modified version without this exception; this
-|   exception also makes it possible to release a modified version which
-|   carries forward this exception.
-|
-|   You should have received a copy of the GNU Lesser General Public
-|   License along with this library; if not, write to the Free
-|   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-|   All trademarks belong to their respective owners.
---------------------------------------------------------------------------*/
+ |   RXTX License v 2.1 - LGPL v 2.1 + Linking Over Controlled Interface.
+ |   RXTX is a native interface to serial ports in java.
+ |   Copyright 1997-2009 by Trent Jarvi tjarvi@qbang.org and others who
+ |   actually wrote it.  See individual source files for more information.
+ |
+ |   A copy of the LGPL v 2.1 may be found at
+ |   http://www.gnu.org/licenses/lgpl.txt on March 4th 2007.  A copy is
+ |   here for your convenience.
+ |
+ |   This library is free software; you can redistribute it and/or
+ |   modify it under the terms of the GNU Lesser General Public
+ |   License as published by the Free Software Foundation; either
+ |   version 2.1 of the License, or (at your option) any later version.
+ |
+ |   This library is distributed in the hope that it will be useful,
+ |   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ |   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ |   Lesser General Public License for more details.
+ |
+ |   An executable that contains no derivative of any portion of RXTX, but
+ |   is designed to work with RXTX by being dynamically linked with it,
+ |   is considered a "work that uses the Library" subject to the terms and
+ |   conditions of the GNU Lesser General Public License.
+ |
+ |   The following has been added to the RXTX License to remove
+ |   any confusion about linking to RXTX.   We want to allow in part what
+ |   section 5, paragraph 2 of the LGPL does not permit in the special
+ |   case of linking over a controlled interface.  The intent is to add a
+ |   Java Specification Request or standards body defined interface in the
+ |   future as another exception but one is not currently available.
+ |
+ |   http://www.fsf.org/licenses/gpl-faq.html#LinkingOverControlledInterface
+ |
+ |   As a special exception, the copyright holders of RXTX give you
+ |   permission to link RXTX with independent modules that communicate with
+ |   RXTX solely through the Sun Microsytems CommAPI interface version 2,
+ |   regardless of the license terms of these independent modules, and to copy
+ |   and distribute the resulting combined work under terms of your choice,
+ |   provided that every copy of the combined work is accompanied by a complete
+ |   copy of the source code of RXTX (the version of RXTX used to produce the
+ |   combined work), being distributed under the terms of the GNU Lesser General
+ |   Public License plus this exception.  An independent module is a
+ |   module which is not derived from or based on RXTX.
+ |
+ |   Note that people who make modified versions of RXTX are not obligated
+ |   to grant this special exception for their modified versions; it is
+ |   their choice whether to do so.  The GNU Lesser General Public License
+ |   gives permission to release a modified version without this exception; this
+ |   exception also makes it possible to release a modified version which
+ |   carries forward this exception.
+ |
+ |   You should have received a copy of the GNU Lesser General Public
+ |   License along with this library; if not, write to the Free
+ |   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ |   All trademarks belong to their respective owners.
+ --------------------------------------------------------------------------*/
 #ifndef _WIN32S_H_
 #define _WIN32S_H_
 #include <windows.h>
@@ -109,32 +109,30 @@
 	Sleep(1); \
 }
 #endif
-typedef unsigned char   cc_t;
-typedef unsigned int    speed_t;
-typedef unsigned int    tcflag_t;
+typedef unsigned char cc_t;
+typedef unsigned int speed_t;
+typedef unsigned int tcflag_t;
 
 /* structs are from linux includes or linux man pages to match
-   interfaces.
-*/
+ interfaces.
+ */
 
-struct timespec
-{
-	time_t	tv_sec;
-	long	tv_nsec;
+struct timespec {
+	time_t tv_sec;
+	long tv_nsec;
 };
 
 #define NCCS 32
-struct termios
-  {
-    tcflag_t c_iflag;           /* input mode flags */
-    tcflag_t c_oflag;           /* output mode flags */
-    tcflag_t c_cflag;           /* control mode flags */
-    tcflag_t c_lflag;           /* local mode flags */
-    cc_t c_cc[NCCS];            /* control characters */
-    cc_t c_line;                /* line discipline (== c_cc[33]) */
-    speed_t c_ispeed;           /* input speed */
-    speed_t c_ospeed;           /* output speed */
-  };
+struct termios {
+	tcflag_t c_iflag; /* input mode flags */
+	tcflag_t c_oflag; /* output mode flags */
+	tcflag_t c_cflag; /* control mode flags */
+	tcflag_t c_lflag; /* local mode flags */
+	cc_t c_cc[NCCS]; /* control characters */
+	cc_t c_line; /* line discipline (== c_cc[33]) */
+	speed_t c_ispeed; /* input speed */
+	speed_t c_ospeed; /* output speed */
+};
 
 /*  for TIOCGSERIAL and TIOCSSERIAL of interest are baud_base and
  *  custom_divisor
@@ -142,36 +140,36 @@ struct termios
  *             kernel side.
  */
 struct serial_struct {
-/*
-	Mainly we are after baud_base/custom_diviser to match
-	the ioctl() in SerialImp.c
-*/
-	int custom_divisor;   /* use to set unsupported speeds */
-	int baud_base;        /* use to set unsupported speeds */
+	/*
+	 Mainly we are after baud_base/custom_diviser to match
+	 the ioctl() in SerialImp.c
+	 */
+	int custom_divisor; /* use to set unsupported speeds */
+	int baud_base; /* use to set unsupported speeds */
 
-	unsigned short	close_delay, closing_wait, iomem_reg_shift;
+	unsigned short close_delay, closing_wait, iomem_reg_shift;
 	int type, line, irq, flags, xmit_fifo_size, hub6;
-	unsigned int	port, port_high;
-	char		io_type;
-	unsigned char	*iomem_base;
+	unsigned int port, port_high;
+	char io_type;
+	unsigned char *iomem_base;
 };
 struct serial_icounter_struct {
-	int cts;		/* clear to send count */
-	int dsr;		/* data set ready count */
-	int rng;		/* ring count */
-	int dcd;		/* carrier detect count */
-	int rx;			/* recieved byte count */
-	int tx;			/* transmitted byte count */
-	int frame;		/* frame error count */
-	int overrun;		/* hardware overrun error count */
-	int parity;		/* parity error count */
-	int brk;		/* break count */
-	int buf_overrun;	/* buffer overrun count */
-	int reserved[9]; 	/* unused */
+	int cts; /* clear to send count */
+	int dsr; /* data set ready count */
+	int rng; /* ring count */
+	int dcd; /* carrier detect count */
+	int rx; /* recieved byte count */
+	int tx; /* transmitted byte count */
+	int frame; /* frame error count */
+	int overrun; /* hardware overrun error count */
+	int parity; /* parity error count */
+	int brk; /* break count */
+	int buf_overrun; /* buffer overrun count */
+	int reserved[9]; /* unused */
 };
 
-int serial_test( char * );
-int serial_open(const char *File, int flags, ... );
+int serial_test(char *);
+int serial_open(const char *File, int flags, ...);
 int serial_close(int fd);
 int serial_read(int fd, void *b, int size);
 int serial_write(int fd, char *Str, int length);
@@ -179,7 +177,8 @@ int serial_write(int fd, char *Str, int length);
  * lcc winsock.h conflicts
  */
 #ifndef __LCC__
-int serial_select(int, struct fd_set *, struct fd_set *, struct fd_set *, struct timeval *);
+int serial_select(int, struct fd_set *, struct fd_set *, struct fd_set *,
+		struct timeval *);
 #define select serial_select
 #endif
 
@@ -188,9 +187,9 @@ int serial_select(int, struct fd_set *, struct fd_set *, struct fd_set *, struct
 #define READ serial_read
 #define WRITE serial_write
 
-void termios_interrupt_event_loop( int , int );
-void termios_setflags( int , int[] );
-struct termios_list *find_port( int );
+void termios_interrupt_event_loop(int, int);
+void termios_setflags(int, int[]);
+struct termios_list *find_port(int);
 void usleep(unsigned long usec);
 int fcntl(int fd, int command, ...);
 const char *get_dos_port(const char *);
@@ -202,25 +201,25 @@ int termios_to_bytesize(int);
 int bytesize_to_termios(int);
 int tcgetattr(int Fd, struct termios *s_termios);
 int tcsetattr(int Fd, int when, struct termios *);
-int serial_close(int );
+int serial_close(int);
 speed_t cfgetospeed(struct termios *s_termios);
 speed_t cfgetispeed(struct termios *s_termios);
 int cfsetspeed(struct termios *, speed_t speed);
 int cfsetospeed(struct termios *, speed_t speed);
-int cfsetispeed ( struct termios *, speed_t speed);
-int tcflush ( int , int );
-int tcgetpgrp ( int );
-int tcsetpgrp ( int , int );
-int tcdrain ( int );
-int tcflow ( int , int );
-int tcsendbreak ( int , int );
-int ioctl(int fd, int request, ... );
+int cfsetispeed(struct termios *, speed_t speed);
+int tcflush(int, int);
+int tcgetpgrp(int);
+int tcsetpgrp(int, int);
+int tcdrain(int);
+int tcflow(int, int);
+int tcsendbreak(int, int);
+int ioctl(int fd, int request, ...);
 /*
-int fstat(int fd, ... );
-*/
+ int fstat(int fd, ... );
+ */
 void cfmakeraw(struct termios *s_termios);
-int termiosGetParityErrorChar( int );
-void termiosSetParityError( int, char );
+int termiosGetParityErrorChar(int);
+void termiosSetParityError(int, char);
 
 #define O_NOCTTY	0400	/* not for fcntl */
 #define O_NONBLOCK	 00004
@@ -371,10 +370,10 @@ void termiosSetParityError( int, char );
 #define  B4000000 0010017
 
 /*
-	glue for unsupported linux speeds see also SerialImp.h
-	custom baud rates around 8192-9000 will not work because
-	of these.
-*/
+ glue for unsupported linux speeds see also SerialImp.h
+ custom baud rates around 8192-9000 will not work because
+ of these.
+ */
 
 #define B14400		0020001
 #define B28800		0020002
@@ -434,7 +433,6 @@ void termiosSetParityError( int, char );
 #define CBR_3500000	3500000
 #define CBR_4000000	4000000
 
-
 /* Values for the ACTION argument to `tcflow'.  */
 #define	TCOOFF		0
 #define	TCOON		1
@@ -467,12 +465,12 @@ void termiosSetParityError( int, char );
 #define TIOCSSOFTCAR	0x541a
 #define TIOCSER_TEMP	0x01
 /*
-#define FIONREAD	0x541b
-TIOC[GS]SERIAL is not used on win32.  It was dropped after we could not
-find a way to get/set buad_base and divisor directly.
-#define TIOCGSERIAL	0x541e
-#define TIOCSSERIAL	0x541f
-*/
+ #define FIONREAD	0x541b
+ TIOC[GS]SERIAL is not used on win32.  It was dropped after we could not
+ find a way to get/set buad_base and divisor directly.
+ #define TIOCGSERIAL	0x541e
+ #define TIOCSSERIAL	0x541f
+ */
 #define TCSBRKP		0x5425
 #define TIOCSERCONFIG	0x5453
 #define TIOCSERGWILD	0x5454
@@ -483,9 +481,9 @@ find a way to get/set buad_base and divisor directly.
 #define TIOCMIWAIT	0x545c
 /* this would require being able to get the number of overruns ... */
 /*
-	FIXME
-	frame and parity errors caused crashes in testing BlackBox
-*/
+ FIXME
+ frame and parity errors caused crashes in testing BlackBox
+ */
 #define TIOCGICOUNT	0x545d
 
 /* ioctl errors */
@@ -503,6 +501,5 @@ find a way to get/set buad_base and divisor directly.
 #define TIOCM_DSR   0x100
 #define TIOCM_CD    TIOCM_CAR
 #define TIOCM_RI    TIOCM_RNG
-
 
 #define CMSPAR      010000000000  /* mark or space parity */
