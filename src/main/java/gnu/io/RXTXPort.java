@@ -437,7 +437,7 @@ public class RXTXPort extends SerialPort {
 			serialPortEventListener.serialEvent(e);
 		}
 
-		return fd == 0 || SPEventListener == null || monThread == null ? (true) : (false);
+		return fileDescriptor == 0 || serialPortEventListener == null || monThread == null;
 	}
 
 	@Override
