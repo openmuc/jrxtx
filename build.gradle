@@ -11,6 +11,12 @@ targetCompatibility = 1.5
 
 repositories { mavenCentral() }
 
+  sourceSets {
+    itest {
+      compileClasspath += sourceSets.main.runtimeClasspath
+    }
+  }
+
 dependencies {
   testCompile 'junit:junit:4.12'
 }
