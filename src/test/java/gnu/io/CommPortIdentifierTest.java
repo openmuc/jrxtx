@@ -20,7 +20,7 @@
  * along with jRxTx.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package gnu.io.rxtx;
+package gnu.io;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
