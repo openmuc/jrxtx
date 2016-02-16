@@ -80,12 +80,12 @@ public class RXTXPort extends SerialPort {
 	boolean monThreadisInterrupted = true;
 
 	/**
-	 * Open the named port
+	 * Open the named port.
 	 * 
 	 * @param name
 	 *            the name of the device to open
 	 * @throws PortInUseException
-	 * @see gnu.io.SerialPort
+	 *             if the file is already locked by an other application.
 	 */
 	public RXTXPort(String name) throws PortInUseException {
 		fd = open(name);
@@ -361,12 +361,16 @@ public class RXTXPort extends SerialPort {
 		return (true);
 	}
 
-	/**
-	 * @param event
+	/*
+	 * Sends an event.
+	 * 
+	 * @param event the SerialPortEvent id. E.g. SerialPortEvent.DATA_AVAILABLE
+	 * 
 	 * @param state
+	 * 
 	 * @return boolean true if the port is closing
 	 */
-	public boolean sendEvent(int event, boolean state) {
+	boolean sendEvent(int event, boolean state) {
 
 		if (fd == 0 || serialPortEventListener == null || monThread == null) {
 			return (true);
@@ -1491,21 +1495,11 @@ public class RXTXPort extends SerialPort {
 		return nativeGetDivisor();
 	}
 
-	/**
-	 * Extension to CommAPI returns boolean true on success
-	 * 
-	 * @throws UnsupportedCommOperationException
-	 */
 	@Override
 	public boolean setLowLatency() throws UnsupportedCommOperationException {
 		return nativeSetLowLatency();
 	}
 
-	/**
-	 * Extension to CommAPI returns boolean true on success
-	 * 
-	 * @throws UnsupportedCommOperationException
-	 */
 	@Override
 	public boolean getLowLatency() throws UnsupportedCommOperationException {
 		return nativeGetLowLatency();
@@ -1539,6 +1533,4 @@ public class RXTXPort extends SerialPort {
 	public boolean clearCommInput() throws UnsupportedCommOperationException {
 		return nativeClearCommInput();
 	}
-
-	/*------------------------  END OF CommAPI Extensions -----------------------*/
 }

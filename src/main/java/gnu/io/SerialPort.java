@@ -131,8 +131,24 @@ public abstract class SerialPort extends CommPort {
 
 	public abstract int getDivisor() throws UnsupportedCommOperationException, IOException;
 
+	/**
+	 * Set latency to low.
+	 * 
+	 * @return true on success.
+	 * 
+	 * @throws UnsupportedCommOperationException
+	 *             if the operation is not supported by the COM port.
+	 */
 	public abstract boolean setLowLatency() throws UnsupportedCommOperationException;
 
+	/**
+	 * TODO ??
+	 * 
+	 * @return true on success.
+	 * 
+	 * @throws UnsupportedCommOperationException
+	 *             if the operation is not supported by the COM port.
+	 */
 	public abstract boolean getLowLatency() throws UnsupportedCommOperationException;
 
 	public abstract boolean setCallOutHangup(boolean NoHup) throws UnsupportedCommOperationException;
