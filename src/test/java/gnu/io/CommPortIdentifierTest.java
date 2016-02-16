@@ -31,9 +31,6 @@ import java.util.List;
 
 import org.junit.Test;
 
-import gnu.io.CommPortIdentifier;
-import gnu.io.NoSuchPortException;
-
 public class CommPortIdentifierTest {
 	@Test
 	public void testGetPortIdentifiers() throws Exception {
@@ -60,6 +57,7 @@ public class CommPortIdentifierTest {
 	}
 
 	private List<CommPortIdentifier> getPortIdentifiers() {
+		System.out.println("Hello");
 		Enumeration<CommPortIdentifier> e = CommPortIdentifier.getPortIdentifiers();
 		List<CommPortIdentifier> l = new ArrayList<CommPortIdentifier>();
 

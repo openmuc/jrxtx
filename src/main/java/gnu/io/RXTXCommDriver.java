@@ -42,6 +42,9 @@ public class RXTXCommDriver implements CommDriver {
 	private static final boolean devel = false;
 	private static final boolean noVersionOutput = "true".equals(System.getProperty("gnu.io.rxtx.NoVersionOutput"));
 
+	public RXTXCommDriver() {
+	}
+
 	static {
 		if (debug) {
 			System.out.println("RXTXCommDriver {}");
