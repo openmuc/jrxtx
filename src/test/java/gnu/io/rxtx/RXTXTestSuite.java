@@ -55,54 +55,52 @@
 |   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 |   All trademarks belong to their respective owners.
 --------------------------------------------------------------------------*/
-package gnu.io.rxtx.tests;
+package gnu.io.rxtx;
 
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.List;
-
-import gnu.io.CommPortIdentifier;
-import gnu.io.NoSuchPortException;
+import junit.framework.Test;
 import junit.framework.TestCase;
+import junit.framework.TestSuite;
 
-public class CommPortIdentifierTest extends TestCase {
+/**
+ * Main class bundling all single specialized test suites into a
+ * overall complete one.
+ */
+public class RXTXTestSuite extends TestCase {
 
-	public CommPortIdentifierTest(String testName) {
-		super(testName);
+	/**
+	 * Standard Java application main method. Allows to launch the test
+	 * suite from outside as part of nightly runs, headless runs or other.
+	 * <p><b>Note:</b> Use only <code>junit.textui.TestRunner</code> here as
+	 * it is explicitly supposed to output the test output to the shell the
+	 * test suite has been launched from.
+	 * <p>
+	 * @param args The standard Java application command line parameters passed in.
+	 */
+	public static void main(String[] args) {
+		junit.textui.TestRunner.run(suite());
 	}
 
-	public List<CommPortIdentifier> getPortIdentifiers() {
-		Enumeration<CommPortIdentifier> e = CommPortIdentifier.getPortIdentifiers();
-		List<CommPortIdentifier> l = new ArrayList<CommPortIdentifier>();
+	/**
+	 * Combine all test into a suite and returns the test suite instance.
+	 * <p>
+	 * <b>Note: This method must be always called <i><code>suite</code></i> ! Otherwise
+	 * the JUnit plug-in test launcher will fail to detect this class!</b>
+	 * <p>
+	 * @return The test suite instance.
+	 */
+	public static Test suite() {
+		TestSuite suite = new TestSuite(RXTXTestSuite.class.getName());
 
-		while (e.hasMoreElements()) {
-			l.add(e.nextElement());
-		}
-		return l;
+		// add the single test suites to the overall one here.
+		suite.addTestSuite(CommPortIdentifierTest.class);
+		suite.addTestSuite(RXTXCommDriverTest.class);
+		return suite;
 	}
 
-	public void testGetPortIdentifiers() throws Exception {
-		List<CommPortIdentifier> l = getPortIdentifiers();
-		assertFalse("has ports", l.isEmpty());
+	/* (non-Javadoc)
+	 * @see org.eclipse.rse.tests.framework.AbstractTestSuiteHolder#getTestSuite()
+	 */
+	public TestSuite getTestSuite() {
+		return (TestSuite)RXTXTestSuite.suite();
 	}
-
-	public void testGetPortIdentifier() throws Exception {
-		List<CommPortIdentifier> l = getPortIdentifiers();
-		CommPortIdentifier first = l.get(0);
-		CommPortIdentifier last = l.get(l.size() - 1);
-		// first find by name
-		CommPortIdentifier p = CommPortIdentifier.getPortIdentifier(first.getName());
-		assertEquals("first found", p, first);
-		p = CommPortIdentifier.getPortIdentifier(last.getName());
-		assertEquals("last found", p, last);
-		// now the non-existent case
-		boolean exceptionThrown = false;
-		try {
-			p = CommPortIdentifier.getPortIdentifier("wuzziwuzz");
-		} catch (NoSuchPortException e) {
-			exceptionThrown = true;
-		}
-		assertTrue("invalid port", exceptionThrown);
-	}
-
 }
