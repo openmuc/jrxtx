@@ -111,18 +111,84 @@ public abstract class SerialPort extends AbstractCommPort {
 	 * UnsupportedCommOperationException; public abstract static boolean staticSetRTS( String port, boolean flag )
 	 * throws UnsupportedCommOperationException;
 	 */
+
+	/**
+	 * Retrieves the parity error char.
+	 * 
+	 * @return the Parity Error Character
+	 * @throws UnsupportedCommOperationException
+	 *             if this operation is not supported for the OS by the underlying native library.
+	 */
 	public abstract byte getParityErrorChar() throws UnsupportedCommOperationException;
 
+	/**
+	 * Sets the parity error char.
+	 * 
+	 * @param b
+	 *            Parity Error Character
+	 * @return true on success
+	 * @throws UnsupportedCommOperationException
+	 *             if this operation is not supported for the OS by the underlying native library.
+	 * 
+	 */
 	public abstract boolean setParityErrorChar(byte b) throws UnsupportedCommOperationException;
 
+	/**
+	 * Retrieves the end of input character.
+	 * 
+	 * @return the End of Input Character
+	 * @throws UnsupportedCommOperationException
+	 *             if this operation is not supported for the OS by the underlying native library.
+	 * 
+	 */
 	public abstract byte getEndOfInputChar() throws UnsupportedCommOperationException;
 
+	/**
+	 * Sets the end of input character.
+	 * 
+	 * @param b
+	 *            End Of Input Character
+	 * @return true on success
+	 * @throws UnsupportedCommOperationException
+	 *             if this operation is not supported for the OS by the underlying native library.
+	 */
 	public abstract boolean setEndOfInputChar(byte b) throws UnsupportedCommOperationException;
 
+	/**
+	 * Sets the UART type.
+	 * 
+	 * @param type
+	 *            String representation of the UART type which may be "none", "8250", "16450", "16550", "16550A",
+	 *            "16650", "16550V2" or "16750".
+	 * @param test
+	 *            boolean flag to determine if the UART should be tested.
+	 * @return true on success
+	 * @throws UnsupportedCommOperationException
+	 *             if this operation is not supported for the OS by the underlying native library.
+	 */
 	public abstract boolean setUARTType(String type, boolean test) throws UnsupportedCommOperationException;
 
+	/**
+	 * Retrieve the UART type.
+	 * 
+	 * @return type String representation of the UART type which may be "none", "8250", "16450", "16550", "16550A",
+	 *         "16650", "16550V2" or "16750".
+	 * @throws UnsupportedCommOperationException
+	 *             if this operation is not supported for the OS by the underlying native library.
+	 */
 	public abstract String getUARTType() throws UnsupportedCommOperationException;
 
+	/**
+	 * Set Baud Base to 38600 on Linux and W32 before using.
+	 * 
+	 * @param BaudBase
+	 *            The clock frequency divided by 16. Default BaudBase is 115200.
+	 * @return true on success
+	 * @throws UnsupportedCommOperationException
+	 *             if this operation is not supported for the OS by the underlying native library.
+	 * @throws IOException
+	 *             if an IOException occurs.
+	 */
 	public abstract boolean setBaudBase(int BaudBase) throws UnsupportedCommOperationException, IOException;
 
 	public abstract int getBaudBase() throws UnsupportedCommOperationException, IOException;
@@ -137,7 +203,7 @@ public abstract class SerialPort extends AbstractCommPort {
 	 * @return true on success.
 	 * 
 	 * @throws UnsupportedCommOperationException
-	 *             if the operation is not supported by the COM port.
+	 *             if this operation is not supported for the OS by the underlying native library.
 	 */
 	public abstract boolean setLowLatency() throws UnsupportedCommOperationException;
 
@@ -147,7 +213,7 @@ public abstract class SerialPort extends AbstractCommPort {
 	 * @return true on success.
 	 * 
 	 * @throws UnsupportedCommOperationException
-	 *             if the operation is not supported by the COM port.
+	 *             if this operation is not supported for the OS by the underlying native library.
 	 */
 	public abstract boolean getLowLatency() throws UnsupportedCommOperationException;
 

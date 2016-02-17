@@ -833,17 +833,17 @@ public class RXTXPort extends SerialPort {
 			}
 		}
 
-		/*
-		 * read(byte b[], int, int) Documentation is at
-		 * http://java.sun.com/products/jdk/1.2/docs/api/java/io/InputStream.html#read(byte[], int, int)
-		 */
 		/**
-		 * @param b[]
+		 * @see InputStream#read(byte[], int, int)
+		 * 
+		 * @param b
+		 *            the bytes
 		 * @param off
+		 *            the offset
 		 * @param len
-		 * @return int number of bytes read
+		 *            the length
+		 * @return the numbernumber of bytes read
 		 * @throws IOException
-		 *
 		 *             timeout threshold Behavior
 		 *             ------------------------------------------------------------------------ 0 0 blocks until 1 byte
 		 *             is available >0 0 blocks until timeout occurs, returns 0 on timeout >0 >0 blocks until timeout or
@@ -1058,15 +1058,6 @@ public class RXTXPort extends SerialPort {
 		}
 	}
 
-	/**
-	 * A dummy method added so RXTX compiles on Kaffee
-	 * 
-	 * @deprecated deprecated but used in Kaffe
-	 */
-	@Deprecated
-	public void setRcvFifoTrigger(int trigger) {
-	};
-
 	/*------------------------  END OF CommAPI -----------------------------*/
 
 	private native static void nativeStaticSetSerialPortParams(String f, int b, int d, int s, int p)
@@ -1132,15 +1123,16 @@ public class RXTXPort extends SerialPort {
 	private native boolean nativeClearCommInput() throws UnsupportedCommOperationException;
 
 	/**
-	 * Extension to CommAPI This is an extension to CommAPI. It may not be supported on all operating systems.
-	 *
+	 * Retrieve the baud rate.
+	 * <p>
 	 * This is only accurate up to 38600 baud currently.
+	 * </p>
 	 *
 	 * @param port
 	 *            the name of the port thats been preopened
 	 * @return BaudRate on success
-	 * @throws UnsupportedCommOperationException;
-	 *             This will not behave as expected with custom speeds
+	 * @throws UnsupportedCommOperationException
+	 *             if this operation is not supported for the OS by the underlying native library.
 	 *
 	 */
 	public static int staticGetBaudRate(String port) throws UnsupportedCommOperationException {
@@ -1148,38 +1140,41 @@ public class RXTXPort extends SerialPort {
 	}
 
 	/**
-	 * Extension to CommAPI This is an extension to CommAPI. It may not be supported on all operating systems.
+	 * Retrieve the data bits.
 	 *
 	 * @param port
 	 *            the name of the port thats been preopened
 	 * @return DataBits on success
-	 * @throws UnsupportedCommOperationException;
+	 * @throws UnsupportedCommOperationException
+	 *             if this operation is not supported for the OS by the underlying native library.
 	 *
 	 */
 	public static int staticGetDataBits(String port) throws UnsupportedCommOperationException {
-		return (nativeStaticGetDataBits(port));
+		return nativeStaticGetDataBits(port);
 	}
 
 	/**
-	 * Extension to CommAPI This is an extension to CommAPI. It may not be supported on all operating systems.
-	 *
+	 * Retrieve the parity.
+	 * 
 	 * @param port
 	 *            the name of the port thats been preopened
 	 * @return Parity on success
-	 * @throws UnsupportedCommOperationException;
+	 * @throws UnsupportedCommOperationException
+	 *             if this operation is not supported for the OS by the underlying native library.
 	 *
 	 */
 	public static int staticGetParity(String port) throws UnsupportedCommOperationException {
-		return (nativeStaticGetParity(port));
+		return nativeStaticGetParity(port);
 	}
 
 	/**
-	 * Extension to CommAPI This is an extension to CommAPI. It may not be supported on all operating systems.
-	 *
+	 * Retrieve the stop bits.
+	 * 
 	 * @param port
 	 *            the name of the port thats been preopened
 	 * @return StopBits on success
-	 * @throws UnsupportedCommOperationException;
+	 * @throws UnsupportedCommOperationException
+	 *             if this operation is not supported for the OS by the underlying native library.
 	 *
 	 */
 	public static int staticGetStopBits(String port) throws UnsupportedCommOperationException {
@@ -1187,52 +1182,56 @@ public class RXTXPort extends SerialPort {
 	}
 
 	/**
-	 * Extension to CommAPI This is an extension to CommAPI. It may not be supported on all operating systems.
-	 *
 	 * Set the SerialPort parameters 1.5 stop bits requires 5 databits
 	 * 
-	 * @param f
+	 * @see gnu.io.UnsupportedCommOperationException
+	 * 
+	 * @param filename
 	 *            filename
-	 * @param b
+	 * @param baudrate
 	 *            baudrate
-	 * @param d
+	 * @param databits
 	 *            databits
-	 * @param s
+	 * @param stopbits
 	 *            stopbits
-	 * @param p
+	 * @param parity
 	 *            parity
 	 *
 	 * @throws UnsupportedCommOperationException
-	 * @see gnu.io.UnsupportedCommOperationException
+	 *             if this operation is not supported for the OS by the underlying native library.
 	 */
-
-	public static void staticSetSerialPortParams(String f, int b, int d, int s, int p)
+	public static void staticSetSerialPortParams(String filename, int baudrate, int databits, int stopbits, int parity)
 			throws UnsupportedCommOperationException {
-		nativeStaticSetSerialPortParams(f, b, d, s, p);
+		nativeStaticSetSerialPortParams(filename, baudrate, databits, stopbits, parity);
 	}
 
 	/**
-	 * Extension to CommAPI This is an extension to CommAPI. It may not be supported on all operating systems.
-	 *
 	 * Open the port and set DSR. remove lockfile and do not close This is so some software can appear to set the DSR
 	 * before 'opening' the port a second time later on.
-	 *
-	 * @return true on success
-	 * @throws UnsupportedCommOperationException;
-	 *
+	 * 
+	 * @param port
+	 *            the port name
+	 * @param flag
+	 *            boolean DSR FLAG.
+	 * @return true if the operation was successful
+	 * @throws UnsupportedCommOperationException
+	 *             if this operation is not supported for the OS by the underlying native library.
 	 */
 	public static boolean staticSetDSR(String port, boolean flag) throws UnsupportedCommOperationException {
 		return (nativeStaticSetDSR(port, flag));
 	}
 
 	/**
-	 * Extension to CommAPI This is an extension to CommAPI. It may not be supported on all operating systems.
-	 *
 	 * Open the port and set DTR. remove lockfile and do not close This is so some software can appear to set the DTR
 	 * before 'opening' the port a second time later on.
 	 *
-	 * @return true on success
-	 * @throws UnsupportedCommOperationException;
+	 * @param port
+	 *            the port name
+	 * @param flag
+	 *            boolean DTR FLAG.
+	 * @return true if the operation was successful
+	 * @throws UnsupportedCommOperationException
+	 *             if this operation is not supported for the OS by the underlying native library.
 	 *
 	 */
 	public static boolean staticSetDTR(String port, boolean flag) throws UnsupportedCommOperationException {
@@ -1240,27 +1239,30 @@ public class RXTXPort extends SerialPort {
 	}
 
 	/**
-	 * Extension to CommAPI This is an extension to CommAPI. It may not be supported on all operating systems.
-	 *
 	 * Open the port and set RTS. remove lockfile and do not close This is so some software can appear to set the RTS
 	 * before 'opening' the port a second time later on.
 	 *
-	 * @return none
-	 * @throws UnsupportedCommOperationException;
+	 * @param port
+	 *            the port name
+	 * @param flag
+	 *            boolean RTS FLAG.
+	 * @return true if the operation was successful
+	 * @throws UnsupportedCommOperationException
+	 *             if this operation is not supported for the OS by the underlying native library.
 	 *
 	 */
 	public static boolean staticSetRTS(String port, boolean flag) throws UnsupportedCommOperationException {
-		return (nativeStaticSetRTS(port, flag));
+		return nativeStaticSetRTS(port, flag);
 	}
 
 	/**
-	 * Extension to CommAPI This is an extension to CommAPI. It may not be supported on all operating systems.
-	 *
 	 * find the fd and return RTS without using a Java open() call
 	 *
 	 * @param port
+	 *            the port name
 	 * @return true if asserted
-	 * @throws UnsupportedCommOperationException;
+	 * @throws UnsupportedCommOperationException
+	 *             if this operation is not supported for the OS by the underlying native library.
 	 *
 	 */
 	public static boolean staticIsRTS(String port) throws UnsupportedCommOperationException {
@@ -1268,13 +1270,13 @@ public class RXTXPort extends SerialPort {
 	}
 
 	/**
-	 * Extension to CommAPI This is an extension to CommAPI. It may not be supported on all operating systems.
-	 *
 	 * find the fd and return CD without using a Java open() call
 	 *
 	 * @param port
+	 *            the port name
 	 * @return true if asserted
-	 * @throws UnsupportedCommOperationException;
+	 * @throws UnsupportedCommOperationException
+	 *             if this operation is not supported for the OS by the underlying native library.
 	 *
 	 */
 	public static boolean staticIsCD(String port) throws UnsupportedCommOperationException {
@@ -1282,27 +1284,27 @@ public class RXTXPort extends SerialPort {
 	}
 
 	/**
-	 * Extension to CommAPI This is an extension to CommAPI. It may not be supported on all operating systems.
-	 *
 	 * find the fd and return CTS without using a Java open() call
 	 *
 	 * @param port
+	 *            the port name
 	 * @return true if asserted
-	 * @throws UnsupportedCommOperationException;
+	 * @throws UnsupportedCommOperationException
+	 *             if this operation is not supported for the OS by the underlying native library.
 	 *
 	 */
 	public static boolean staticIsCTS(String port) throws UnsupportedCommOperationException {
-		return (nativeStaticIsCTS(port));
+		return nativeStaticIsCTS(port);
 	}
 
 	/**
-	 * Extension to CommAPI This is an extension to CommAPI. It may not be supported on all operating systems.
-	 *
 	 * find the fd and return DSR without using a Java open() call
 	 *
 	 * @param port
+	 *            the port name
 	 * @return true if asserted
-	 * @throws UnsupportedCommOperationException;
+	 * @throws UnsupportedCommOperationException
+	 *             if this operation is not supported for the OS by the underlying native library.
 	 *
 	 */
 	public static boolean staticIsDSR(String port) throws UnsupportedCommOperationException {
@@ -1315,136 +1317,67 @@ public class RXTXPort extends SerialPort {
 	 * find the fd and return DTR without using a Java open() call
 	 *
 	 * @param port
+	 *            the port name
 	 * @return true if asserted
-	 * @throws UnsupportedCommOperationException;
+	 * @throws UnsupportedCommOperationException
+	 *             if this operation is not supported for the OS by the underlying native library.
 	 *
 	 */
 	public static boolean staticIsDTR(String port) throws UnsupportedCommOperationException {
-		return (nativeStaticIsDTR(port));
+		return nativeStaticIsDTR(port);
 	}
 
 	/**
-	 * Extension to CommAPI This is an extension to CommAPI. It may not be supported on all operating systems.
-	 *
-	 * find the fd and return RI without using a Java open() call
+	 * Find the fd and return RI without using a Java open() call
 	 *
 	 * @param port
+	 *            the port name
 	 * @return true if asserted
-	 * @throws UnsupportedCommOperationException;
-	 *
+	 * @throws UnsupportedCommOperationException
+	 *             if this operation is not supported for the OS by the underlying native library.
 	 */
 	public static boolean staticIsRI(String port) throws UnsupportedCommOperationException {
-		return (nativeStaticIsRI(port));
+		return nativeStaticIsRI(port);
 	}
 
-	/**
-	 * Extension to CommAPI This is an extension to CommAPI. It may not be supported on all operating systems.
-	 * 
-	 * @return int the Parity Error Character
-	 * @throws UnsupportedCommOperationException;
-	 *
-	 *             Anyone know how to do this in Unix?
-	 */
 	@Override
 	public byte getParityErrorChar() throws UnsupportedCommOperationException {
-		byte ret;
-		ret = nativeGetParityErrorChar();
-		return (ret);
+		// TODO: Anyone know how to do this in Unix?
+		return nativeGetParityErrorChar();
 	}
 
-	/**
-	 * Extension to CommAPI This is an extension to CommAPI. It may not be supported on all operating systems.
-	 * 
-	 * @param b
-	 *            Parity Error Character
-	 * @return boolean true on success
-	 * @throws UnsupportedCommOperationException;
-	 *
-	 *             Anyone know how to do this in Unix?
-	 */
 	@Override
 	public boolean setParityErrorChar(byte b) throws UnsupportedCommOperationException {
-		return (nativeSetParityErrorChar(b));
+		// TODO: Anyone know how to do this in Unix?
+		return nativeSetParityErrorChar(b);
 	}
 
-	/**
-	 * Extension to CommAPI This is an extension to CommAPI. It may not be supported on all operating systems.
-	 * 
-	 * @return int the End of Input Character
-	 * @throws UnsupportedCommOperationException;
-	 *
-	 *             Anyone know how to do this in Unix?
-	 */
 	@Override
 	public byte getEndOfInputChar() throws UnsupportedCommOperationException {
-		byte ret;
-		ret = nativeGetEndOfInputChar();
-		return (ret);
+		// TODO: Anyone know how to do this in Unix?
+		return nativeGetEndOfInputChar();
 	}
 
-	/**
-	 * Extension to CommAPI This is an extension to CommAPI. It may not be supported on all operating systems.
-	 * 
-	 * @param b
-	 *            End Of Input Character
-	 * @return boolean true on success
-	 * @throws UnsupportedCommOperationException;
-	 */
 	@Override
 	public boolean setEndOfInputChar(byte b) throws UnsupportedCommOperationException {
 		return (nativeSetEndOfInputChar(b));
 	}
 
-	/**
-	 * Extension to CommAPI This is an extension to CommAPI. It may not be supported on all operating systems.
-	 * 
-	 * @param type
-	 *            String representation of the UART type which mayb be "none", "8250", "16450", "16550", "16550A",
-	 *            "16650", "16550V2" or "16750".
-	 * @param test
-	 *            boolean flag to determin if the UART should be tested.
-	 * @return boolean true on success
-	 * @throws UnsupportedCommOperationException;
-	 */
 	@Override
 	public boolean setUARTType(String type, boolean test) throws UnsupportedCommOperationException {
 		return nativeSetUartType(type, test);
 	}
 
-	/**
-	 * Extension to CommAPI This is an extension to CommAPI. It may not be supported on all operating systems.
-	 * 
-	 * @return type String representation of the UART type which mayb be "none", "8250", "16450", "16550", "16550A",
-	 *         "16650", "16550V2" or "16750".
-	 * @throws UnsupportedCommOperationException;
-	 */
 	@Override
 	public String getUARTType() throws UnsupportedCommOperationException {
 		return nativeGetUartType();
 	}
-
-	/**
-	 * Extension to CommAPI. Set Baud Base to 38600 on Linux and W32 before using.
-	 * 
-	 * @param BaudBase
-	 *            The clock frequency divided by 16. Default BaudBase is 115200.
-	 * @return true on success
-	 * @throws UnsupportedCommOperationException,
-	 *             IOException
-	 */
 
 	@Override
 	public boolean setBaudBase(int BaudBase) throws UnsupportedCommOperationException, IOException {
 		return nativeSetBaudBase(BaudBase);
 	}
 
-	/**
-	 * Extension to CommAPI
-	 * 
-	 * @return BaudBase
-	 * @throws UnsupportedCommOperationException,
-	 *             IOException
-	 */
 	@Override
 	public int getBaudBase() throws UnsupportedCommOperationException, IOException {
 		return nativeGetBaudBase();
@@ -1452,10 +1385,6 @@ public class RXTXPort extends SerialPort {
 
 	/**
 	 * Extension to CommAPI. Set Baud Base to 38600 on Linux and W32 before using.
-	 * 
-	 * @param Divisor
-	 * @throws UnsupportedCommOperationException,
-	 *             IOException
 	 */
 	@Override
 	public boolean setDivisor(int Divisor) throws UnsupportedCommOperationException, IOException {
@@ -1464,10 +1393,6 @@ public class RXTXPort extends SerialPort {
 
 	/**
 	 * Extension to CommAPI
-	 * 
-	 * @return Divisor;
-	 * @throws UnsupportedCommOperationException,
-	 *             IOException
 	 */
 	@Override
 	public int getDivisor() throws UnsupportedCommOperationException, IOException {
@@ -1484,31 +1409,19 @@ public class RXTXPort extends SerialPort {
 		return nativeGetLowLatency();
 	}
 
-	/**
-	 * Extension to CommAPI returns boolean true on success
-	 * 
-	 * @throws UnsupportedCommOperationException
-	 */
+	// return true on success
 	@Override
 	public boolean setCallOutHangup(boolean NoHup) throws UnsupportedCommOperationException {
 		return nativeSetCallOutHangup(NoHup);
 	}
 
-	/**
-	 * Extension to CommAPI returns boolean true on success
-	 * 
-	 * @throws UnsupportedCommOperationException
-	 */
+	// return true on success
 	@Override
 	public boolean getCallOutHangup() throws UnsupportedCommOperationException {
 		return nativeGetCallOutHangup();
 	}
 
-	/**
-	 * Extension to CommAPI returns boolean true on success
-	 * 
-	 * @throws UnsupportedCommOperationException
-	 */
+	// return true on success
 	public boolean clearCommInput() throws UnsupportedCommOperationException {
 		return nativeClearCommInput();
 	}
