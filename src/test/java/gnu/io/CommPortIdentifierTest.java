@@ -57,7 +57,6 @@ public class CommPortIdentifierTest {
 	}
 
 	private List<CommPortIdentifier> getPortIdentifiers() {
-		System.out.println("Hello");
 		Enumeration<CommPortIdentifier> e = CommPortIdentifier.getPortIdentifiers();
 		List<CommPortIdentifier> l = new ArrayList<CommPortIdentifier>();
 
