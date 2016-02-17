@@ -98,12 +98,10 @@ public class RXTXPort extends SerialPort {
 		MonitorThreadAlive = true;
 	}
 
-	@Override
 	public OutputStream getOutputStream() {
 		return os;
 	}
 
-	@Override
 	public InputStream getInputStream() {
 		return is;
 	}
@@ -123,9 +121,6 @@ public class RXTXPort extends SerialPort {
 	 */
 	public native int NativegetReceiveTimeout();
 
-	/**
-	 * @return bloolean true if recieve timeout is enabled
-	 */
 	private native boolean NativeisReceiveTimeoutEnabled();
 
 	/**
@@ -198,32 +193,26 @@ public class RXTXPort extends SerialPort {
 		return flowmode;
 	}
 
-	@Override
 	public void enableReceiveFraming(int f) throws UnsupportedCommOperationException {
 		throw new UnsupportedCommOperationException("Not supported");
 	}
 
-	@Override
 	public void disableReceiveFraming() {
 	}
 
-	@Override
 	public boolean isReceiveFramingEnabled() {
 		return false;
 	}
 
-	@Override
 	public int getReceiveFramingByte() {
 		return 0;
 	}
 
-	@Override
 	public void disableReceiveTimeout() {
 		timeout = -1;
 		NativeEnableReceiveTimeoutThreshold(timeout, threshold, InputBuffer);
 	}
 
-	@Override
 	public void enableReceiveTimeout(int time) {
 		if (time >= 0) {
 			timeout = time;
@@ -234,17 +223,14 @@ public class RXTXPort extends SerialPort {
 		}
 	}
 
-	@Override
 	public boolean isReceiveTimeoutEnabled() {
 		return (NativeisReceiveTimeoutEnabled());
 	}
 
-	@Override
 	public int getReceiveTimeout() {
 		return (NativegetReceiveTimeout());
 	}
 
-	@Override
 	public void enableReceiveThreshold(int threshold) {
 		if (threshold >= 0) {
 			this.threshold = threshold;
@@ -255,22 +241,18 @@ public class RXTXPort extends SerialPort {
 		}
 	}
 
-	@Override
 	public void disableReceiveThreshold() {
 		enableReceiveThreshold(0);
 	}
 
-	@Override
 	public int getReceiveThreshold() {
 		return threshold;
 	}
 
-	@Override
 	public boolean isReceiveThresholdEnabled() {
 		return (threshold > 0);
 	}
 
-	@Override
 	public void setInputBufferSize(int size) {
 		if (size < 0) {
 			throw new IllegalArgumentException("Unexpected negative buffer size value");
@@ -280,12 +262,10 @@ public class RXTXPort extends SerialPort {
 		}
 	}
 
-	@Override
 	public int getInputBufferSize() {
 		return (InputBuffer);
 	}
 
-	@Override
 	public void setOutputBufferSize(int size) {
 		if (size < 0) {
 			throw new IllegalArgumentException("Unexpected negative buffer size value");
@@ -295,7 +275,6 @@ public class RXTXPort extends SerialPort {
 		}
 	}
 
-	@Override
 	public int getOutputBufferSize() {
 		return (OutputBuffer);
 	}

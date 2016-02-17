@@ -64,7 +64,6 @@ final class I2C extends I2CPort {
 	/** Output stream */
 	private final I2COutputStream out = new I2COutputStream();
 
-	@Override
 	public OutputStream getOutputStream() {
 		return out;
 	}
@@ -72,7 +71,6 @@ final class I2C extends I2CPort {
 	/** Input stream */
 	private final I2CInputStream in = new I2CInputStream();
 
-	@Override
 	public InputStream getInputStream() {
 		return in;
 	}
@@ -150,21 +148,17 @@ final class I2C extends I2CPort {
 	/**
 	 * Receive framing control
 	 */
-	@Override
 	public void enableReceiveFraming(int f) throws UnsupportedCommOperationException {
 		throw new UnsupportedCommOperationException("Not supported");
 	}
 
-	@Override
 	public void disableReceiveFraming() {
 	}
 
-	@Override
 	public boolean isReceiveFramingEnabled() {
 		return false;
 	}
 
-	@Override
 	public int getReceiveFramingByte() {
 		return 0;
 	}
@@ -178,12 +172,10 @@ final class I2C extends I2CPort {
 
 	public native void NativeEnableReceiveTimeoutThreshold(int time, int threshold, int InputBuffer);
 
-	@Override
 	public void disableReceiveTimeout() {
 		enableReceiveTimeout(0);
 	}
 
-	@Override
 	public void enableReceiveTimeout(int time) {
 		if (time >= 0) {
 			timeout = time;
@@ -194,12 +186,10 @@ final class I2C extends I2CPort {
 		}
 	}
 
-	@Override
 	public boolean isReceiveTimeoutEnabled() {
 		return (NativeisReceiveTimeoutEnabled());
 	}
 
-	@Override
 	public int getReceiveTimeout() {
 		return (NativegetReceiveTimeout());
 	}
@@ -208,7 +198,6 @@ final class I2C extends I2CPort {
 
 	private int threshold = 0;
 
-	@Override
 	public void enableReceiveThreshold(int thresh) {
 		if (thresh >= 0) {
 			threshold = thresh;
@@ -220,17 +209,14 @@ final class I2C extends I2CPort {
 		}
 	}
 
-	@Override
 	public void disableReceiveThreshold() {
 		enableReceiveThreshold(0);
 	}
 
-	@Override
 	public int getReceiveThreshold() {
 		return threshold;
 	}
 
-	@Override
 	public boolean isReceiveThresholdEnabled() {
 		return (threshold > 0);
 	}
@@ -244,22 +230,18 @@ final class I2C extends I2CPort {
 	private int InputBuffer = 0;
 	private int OutputBuffer = 0;
 
-	@Override
 	public void setInputBufferSize(int size) {
 		InputBuffer = size;
 	}
 
-	@Override
 	public int getInputBufferSize() {
 		return (InputBuffer);
 	}
 
-	@Override
 	public void setOutputBufferSize(int size) {
 		OutputBuffer = size;
 	}
 
-	@Override
 	public int getOutputBufferSize() {
 		return (OutputBuffer);
 	}

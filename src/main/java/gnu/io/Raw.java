@@ -56,7 +56,6 @@ final class Raw extends RawPort {
 	/** Output stream */
 	private final RawOutputStream out = new RawOutputStream();
 
-	@Override
 	public OutputStream getOutputStream() {
 		return out;
 	}
@@ -64,7 +63,6 @@ final class Raw extends RawPort {
 	/** Input stream */
 	private final RawInputStream in = new RawInputStream();
 
-	@Override
 	public InputStream getInputStream() {
 		return in;
 	}
@@ -136,21 +134,17 @@ final class Raw extends RawPort {
 	/**
 	 * Receive framing control
 	 */
-	@Override
 	public void enableReceiveFraming(int f) throws UnsupportedCommOperationException {
 		throw new UnsupportedCommOperationException("Not supported");
 	}
 
-	@Override
 	public void disableReceiveFraming() {
 	}
 
-	@Override
 	public boolean isReceiveFramingEnabled() {
 		return false;
 	}
 
-	@Override
 	public int getReceiveFramingByte() {
 		return 0;
 	}
@@ -164,12 +158,10 @@ final class Raw extends RawPort {
 
 	public native void NativeEnableReceiveTimeoutThreshold(int time, int threshold, int InputBuffer);
 
-	@Override
 	public void disableReceiveTimeout() {
 		enableReceiveTimeout(0);
 	}
 
-	@Override
 	public void enableReceiveTimeout(int time) {
 		if (time >= 0) {
 			timeout = time;
@@ -180,12 +172,10 @@ final class Raw extends RawPort {
 		}
 	}
 
-	@Override
 	public boolean isReceiveTimeoutEnabled() {
 		return (NativeisReceiveTimeoutEnabled());
 	}
 
-	@Override
 	public int getReceiveTimeout() {
 		return (NativegetReceiveTimeout());
 	}
@@ -194,7 +184,6 @@ final class Raw extends RawPort {
 
 	private int threshold = 0;
 
-	@Override
 	public void enableReceiveThreshold(int thresh) {
 		if (thresh >= 0) {
 			threshold = thresh;
@@ -206,17 +195,14 @@ final class Raw extends RawPort {
 		}
 	}
 
-	@Override
 	public void disableReceiveThreshold() {
 		enableReceiveThreshold(0);
 	}
 
-	@Override
 	public int getReceiveThreshold() {
 		return threshold;
 	}
 
-	@Override
 	public boolean isReceiveThresholdEnabled() {
 		return (threshold > 0);
 	}
@@ -230,22 +216,18 @@ final class Raw extends RawPort {
 	private int InputBuffer = 0;
 	private int OutputBuffer = 0;
 
-	@Override
 	public void setInputBufferSize(int size) {
 		InputBuffer = size;
 	}
 
-	@Override
 	public int getInputBufferSize() {
 		return (InputBuffer);
 	}
 
-	@Override
 	public void setOutputBufferSize(int size) {
 		OutputBuffer = size;
 	}
 
-	@Override
 	public int getOutputBufferSize() {
 		return (OutputBuffer);
 	}

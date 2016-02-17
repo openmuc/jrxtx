@@ -74,7 +74,6 @@ final class LPRPort extends ParallelPort {
 	/** Output stream */
 	private final ParallelOutputStream out = new ParallelOutputStream();
 
-	@Override
 	public OutputStream getOutputStream() {
 		return out;
 	}
@@ -82,7 +81,6 @@ final class LPRPort extends ParallelPort {
 	/** Input stream */
 	private final ParallelInputStream in = new ParallelInputStream();
 
-	@Override
 	public InputStream getInputStream() {
 		return in;
 	}
@@ -153,21 +151,17 @@ final class LPRPort extends ParallelPort {
 	}
 
 	/** Receive framing control */
-	@Override
 	public void enableReceiveFraming(int f) throws UnsupportedCommOperationException {
 		throw new UnsupportedCommOperationException("Not supported");
 	}
 
-	@Override
 	public void disableReceiveFraming() {
 	}
 
-	@Override
 	public boolean isReceiveFramingEnabled() {
 		return false;
 	}
 
-	@Override
 	public int getReceiveFramingByte() {
 		return 0;
 	}
@@ -175,7 +169,6 @@ final class LPRPort extends ParallelPort {
 	/** Receive timeout control */
 	private int timeout = 0;
 
-	@Override
 	public void enableReceiveTimeout(int t) {
 		if (t > 0) {
 			timeout = t;
@@ -185,17 +178,14 @@ final class LPRPort extends ParallelPort {
 		}
 	}
 
-	@Override
 	public void disableReceiveTimeout() {
 		timeout = 0;
 	}
 
-	@Override
 	public boolean isReceiveTimeoutEnabled() {
 		return timeout > 0;
 	}
 
-	@Override
 	public int getReceiveTimeout() {
 		return timeout;
 	}
@@ -203,7 +193,6 @@ final class LPRPort extends ParallelPort {
 	/** Receive threshold control */
 	private int threshold = 1;
 
-	@Override
 	public void enableReceiveThreshold(int t) {
 		if (t > 1) {
 			threshold = t;
@@ -213,17 +202,14 @@ final class LPRPort extends ParallelPort {
 		}
 	}
 
-	@Override
 	public void disableReceiveThreshold() {
 		threshold = 1;
 	}
 
-	@Override
 	public int getReceiveThreshold() {
 		return threshold;
 	}
 
-	@Override
 	public boolean isReceiveThresholdEnabled() {
 		return threshold > 1;
 	};
@@ -232,19 +218,14 @@ final class LPRPort extends ParallelPort {
 	 * Input/output buffers These are native stubs...
 	 */
 
-	@Override
 	public native void setInputBufferSize(int size);
 
-	@Override
 	public native int getInputBufferSize();
 
-	@Override
 	public native void setOutputBufferSize(int size);
 
-	@Override
 	public native int getOutputBufferSize();
 
-	@Override
 	public native int getOutputBufferFree();
 
 	/** Write to the port */

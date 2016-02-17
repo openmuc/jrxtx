@@ -25,7 +25,7 @@ package gnu.io;
 import java.io.IOException;
 import java.util.TooManyListenersException;
 
-public abstract class SerialPort extends CommPort {
+public abstract class SerialPort extends AbstractCommPort {
 	public static final int DATABITS_5 = 5;
 	public static final int DATABITS_6 = 6;
 	public static final int DATABITS_7 = 7;

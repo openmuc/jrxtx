@@ -26,7 +26,7 @@ import java.util.TooManyListenersException;
 
 /* Non functional contact tjarvi@qbang.org for details */
 
-abstract class RawPort extends CommPort {
+abstract class RawPort extends AbstractCommPort {
 	public static final int DATABITS_5 = 5;
 	public static final int DATABITS_6 = 6;
 	public static final int DATABITS_7 = 7;

@@ -26,7 +26,7 @@ import java.util.TooManyListenersException;
 
 /* Non functional contact tjarvi@qbang.org for details */
 
-abstract class RS485Port extends CommPort {
+abstract class RS485Port extends AbstractCommPort {
 	public static final int DATABITS_5 = 5;
 	public static final int DATABITS_6 = 6;
 	public static final int DATABITS_7 = 7;

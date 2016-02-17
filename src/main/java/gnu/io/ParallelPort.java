@@ -24,7 +24,7 @@ package gnu.io;
 
 import java.util.TooManyListenersException;
 
-public abstract class ParallelPort extends CommPort {
+public abstract class ParallelPort extends AbstractCommPort {
 	public static final int LPT_MODE_ANY = 0;
 	public static final int LPT_MODE_SPP = 1;
 	public static final int LPT_MODE_PS2 = 2;

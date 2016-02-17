@@ -55,7 +55,6 @@ final class RS485 extends RS485Port {
 	/** Output stream */
 	private final RS485OutputStream out = new RS485OutputStream();
 
-	@Override
 	public OutputStream getOutputStream() {
 		return out;
 	}
@@ -63,7 +62,6 @@ final class RS485 extends RS485Port {
 	/** Input stream */
 	private final RS485InputStream in = new RS485InputStream();
 
-	@Override
 	public InputStream getInputStream() {
 		return in;
 	}
@@ -141,21 +139,17 @@ final class RS485 extends RS485Port {
 	/**
 	 * Receive framing control
 	 */
-	@Override
 	public void enableReceiveFraming(int f) throws UnsupportedCommOperationException {
 		throw new UnsupportedCommOperationException("Not supported");
 	}
 
-	@Override
 	public void disableReceiveFraming() {
 	}
 
-	@Override
 	public boolean isReceiveFramingEnabled() {
 		return false;
 	}
 
-	@Override
 	public int getReceiveFramingByte() {
 		return 0;
 	}
@@ -169,12 +163,10 @@ final class RS485 extends RS485Port {
 
 	public native void NativeEnableReceiveTimeoutThreshold(int time, int threshold, int InputBuffer);
 
-	@Override
 	public void disableReceiveTimeout() {
 		enableReceiveTimeout(0);
 	}
 
-	@Override
 	public void enableReceiveTimeout(int time) {
 		if (time >= 0) {
 			timeout = time;
@@ -185,12 +177,10 @@ final class RS485 extends RS485Port {
 		}
 	}
 
-	@Override
 	public boolean isReceiveTimeoutEnabled() {
 		return (NativeisReceiveTimeoutEnabled());
 	}
 
-	@Override
 	public int getReceiveTimeout() {
 		return (NativegetReceiveTimeout());
 	}
@@ -199,7 +189,6 @@ final class RS485 extends RS485Port {
 
 	private int threshold = 0;
 
-	@Override
 	public void enableReceiveThreshold(int thresh) {
 		if (thresh >= 0) {
 			threshold = thresh;
@@ -211,17 +200,14 @@ final class RS485 extends RS485Port {
 		}
 	}
 
-	@Override
 	public void disableReceiveThreshold() {
 		enableReceiveThreshold(0);
 	}
 
-	@Override
 	public int getReceiveThreshold() {
 		return threshold;
 	}
 
-	@Override
 	public boolean isReceiveThresholdEnabled() {
 		return (threshold > 0);
 	}
@@ -235,22 +221,18 @@ final class RS485 extends RS485Port {
 	private int InputBuffer = 0;
 	private int OutputBuffer = 0;
 
-	@Override
 	public void setInputBufferSize(int size) {
 		InputBuffer = size;
 	}
 
-	@Override
 	public int getInputBufferSize() {
 		return (InputBuffer);
 	}
 
-	@Override
 	public void setOutputBufferSize(int size) {
 		OutputBuffer = size;
 	}
 
-	@Override
 	public int getOutputBufferSize() {
 		return (OutputBuffer);
 	}
