@@ -24,13 +24,12 @@ tasks.withType(Test) {
 dependencies {
   testCompile 'junit:junit:4.12'
 }
-  
-task sourcesJar(type: Jar, dependsOn: classes) {
+task sourcesJar(type: Jar, dependsOn: classes, overwrite: true) {
   classifier = 'sources'
   from sourceSets.main.allSource
 }
 
-task javadocJar(type: Jar, dependsOn: javadoc) {
+task javadocJar(type: Jar, dependsOn: javadoc, overwrite: true) {
   classifier = 'javadoc'
   from javadoc.destinationDir
 }
