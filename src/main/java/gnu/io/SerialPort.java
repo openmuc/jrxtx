@@ -23,6 +23,8 @@
 package gnu.io;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.TooManyListenersException;
 
 public abstract class SerialPort extends AbstractCommPort {
@@ -228,4 +230,20 @@ public abstract class SerialPort extends AbstractCommPort {
 	public abstract boolean setCallOutHangup(boolean NoHup) throws UnsupportedCommOperationException;
 
 	public abstract boolean getCallOutHangup() throws UnsupportedCommOperationException;
+
+	/**
+	 * Use {@link SerialPort#inputStream()} instead.
+	 */
+	@Deprecated
+	public abstract InputStream getInputStream() throws IOException;
+
+	/**
+	 * Use {@link SerialPort#outputStream()} instead.
+	 */
+	@Deprecated
+	public abstract OutputStream getOutputStream() throws IOException;
+
+	public abstract InputStream inputStream() throws IOException;
+
+	public abstract OutputStream outputStream() throws IOException;
 }

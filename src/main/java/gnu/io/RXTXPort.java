@@ -34,8 +34,12 @@ public class RXTXPort extends SerialPort {
 		Initialize();
 	}
 
-	private final SerialInputStream is = new SerialInputStream();
-	private final SerialOutputStream os = new SerialOutputStream();
+	@Deprecated
+	private final SerialInputStream is;
+	@Deprecated
+	private final SerialOutputStream os;
+
+	private InputStream serialIS;
 
 	/* dont close the file while accessing the fd */
 	private int IOLocked = 0;
@@ -96,14 +100,31 @@ public class RXTXPort extends SerialPort {
 		monThread.start();
 		waitForTheNativeCodeSilly();
 		MonitorThreadAlive = true;
+
+		this.is = new SerialInputStream();
+		this.os = new SerialOutputStream();
+
+		this.serialIS = new BetterSerialInputStream(is);
 	}
 
+	@Override
 	public OutputStream getOutputStream() {
 		return os;
 	}
 
+	@Override
 	public InputStream getInputStream() {
 		return is;
+	}
+
+	@Override
+	public OutputStream outputStream() {
+		return os; // TODO
+	}
+
+	@Override
+	public InputStream inputStream() {
+		return this.serialIS;
 	}
 
 	private native static void Initialize();
@@ -768,6 +789,36 @@ public class RXTXPort extends SerialPort {
 				}
 			}
 		}
+	}
+
+	/**
+	 * This class is a wrapper for the {@link SerialInputStream}.
+	 */
+	private class BetterSerialInputStream extends InputStream {
+		private SerialInputStream serialInputStream;
+
+		public BetterSerialInputStream(SerialInputStream serialInputStream) {
+			this.serialInputStream = serialInputStream;
+		}
+
+		@Override
+		public int read() throws IOException {
+
+			final long t0 = System.currentTimeMillis();
+			do {
+				if (serialInputStream.available() > 0) {
+					return serialInputStream.read();
+				}
+				try {
+					Thread.sleep(10L);
+				} catch (InterruptedException e) {
+					// ignore
+				}
+			} while (System.currentTimeMillis() - t0 <= (long) timeout);
+
+			return -1;
+		}
+
 	}
 
 	private class SerialInputStream extends InputStream {

@@ -21,6 +21,12 @@ tasks.withType(Test) {
     systemProperty "java.library.path", "native/x86_64-unknown-linux-gnu/.libs/:/usr/lib/jni/"
 }
 
+jar {
+    manifest { // the manifest of the default jar is of type OsgiManifest
+        instruction 'Import-Package', '!gnu.io.internal.*, *'
+    }
+}
+
 dependencies {
   testCompile 'junit:junit:4.12'
 }
