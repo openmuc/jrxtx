@@ -352,7 +352,7 @@ public class RXTXPort extends SerialPort {
 	boolean sendEvent(int event, boolean state) {
 
 		if (fd == 0 || serialPortEventListener == null || monThread == null) {
-			return (true);
+			return true;
 		}
 
 		switch (event) {
@@ -408,14 +408,15 @@ public class RXTXPort extends SerialPort {
 			return (false);
 		default:
 			System.err.println("unknown event: " + event);
-			return (false);
+			return false;
 		}
 
 		SerialPortEvent e = new SerialPortEvent(this, event, !state, state);
 
 		if (monThreadisInterrupted) {
-			return (true);
+			return true;
 		}
+
 		if (serialPortEventListener != null) {
 			serialPortEventListener.serialEvent(e);
 		}
@@ -424,7 +425,7 @@ public class RXTXPort extends SerialPort {
 	}
 
 	@Override
-	public void addEventListener(SerialPortEventListener lsnr) throws TooManyListenersException {
+	public void addEventListener(SerialPortEventListener listener) throws TooManyListenersException {
 		/*
 		 * Don't let and notification requests happen until the Eventloop is ready
 		 */
@@ -432,7 +433,8 @@ public class RXTXPort extends SerialPort {
 		if (serialPortEventListener != null) {
 			throw new TooManyListenersException();
 		}
-		serialPortEventListener = lsnr;
+
+		this.serialPortEventListener = listener;
 		if (!MonitorThreadAlive) {
 			MonitorThreadLock = true;
 			monThread = new MonitorThread();
@@ -982,8 +984,9 @@ public class RXTXPort extends SerialPort {
 				 */
 				Minimum = Math.min(Minimum, threshold);
 			}
-			if (monThreadisInterrupted == true) {
-				return (0);
+
+			if (monThreadisInterrupted) {
+				return 0;
 			}
 			synchronized (IOLockedMutex) {
 				IOLocked++;

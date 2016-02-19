@@ -28,12 +28,6 @@ import java.io.OutputStream;
 import java.util.TooManyListenersException;
 
 /**
-* @author Trent Jarvi
-* @version,
-* @since JDK1.0
-*/
-
-/**
  * I2C
  */
 final class I2C extends I2CPort {

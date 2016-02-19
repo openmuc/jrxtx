@@ -76,7 +76,15 @@ public abstract class SerialPort extends AbstractCommPort {
 
 	public abstract void sendBreak(int duration);
 
-	public abstract void addEventListener(SerialPortEventListener lsnr) throws TooManyListenersException;
+	/**
+	 * Register a listener to the serial port.
+	 * 
+	 * @param listener
+	 *            the serial port event listener.
+	 * @throws TooManyListenersException
+	 *             if a listener is already registered.
+	 */
+	public abstract void addEventListener(SerialPortEventListener listener) throws TooManyListenersException;
 
 	public abstract void removeEventListener();
 
