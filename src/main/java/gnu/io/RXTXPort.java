@@ -814,7 +814,8 @@ public class RXTXPort extends SerialPort {
 				} catch (InterruptedException e) {
 					// ignore
 				}
-			} while (System.currentTimeMillis() - t0 <= (long) timeout);
+			// timeout <= 0 since: less than prove to be compatible to the current way of handling timeouts
+			} while (timeout <= 0 || System.currentTimeMillis() - t0 <= (long) timeout);
 
 			return -1;
 		}
