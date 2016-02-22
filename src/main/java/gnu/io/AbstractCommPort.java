@@ -39,6 +39,15 @@ abstract class AbstractCommPort implements CommPort {
 		return name;
 	}
 
+	public synchronized void setCommPortTimeout(int timeout) throws UnsupportedCommOperationException {
+		if (timeout == 0) {
+			disableReceiveTimeout();
+		}
+		else {
+			enableReceiveTimeout(timeout);
+		}
+	}
+
 	@Override
 	public String toString() {
 		return getName();

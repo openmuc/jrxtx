@@ -14,9 +14,39 @@ public interface CommPort {
 
 	int getReceiveFramingByte();
 
+	/**
+	 * Use {@link CommPort#setCommPortTimeout(int)} instead.
+	 */
+	@Deprecated
 	void disableReceiveTimeout();
 
+	/**
+	 * Use {@link CommPort#setCommPortTimeout(int)} instead.
+	 */
+	@Deprecated
 	void enableReceiveTimeout(int time) throws UnsupportedCommOperationException;
+
+	/**
+	 * Enable/disable TIMEOUT with the specified timeout, in milliseconds. With this option set to a non-zero timeout, a
+	 * read() call on the InputStream associated with this Socket will block for only this amount of time. If the
+	 * timeout expires, a {@link CommPortTimeoutException} is raised, though the Socket is still valid. The option
+	 * <b>must</b> be enabled prior to entering the blocking operation to have effect. The timeout must be {@code > 0}.
+	 * A timeout of <b>zero</b> is interpreted as an infinite timeout.
+	 * 
+	 * @param timeout
+	 *            the specified timeout, in milliseconds.
+	 * @throws UnsupportedCommOperationException
+	 *             if this operation is not supported for the OS by the underlying native library.
+	 */
+	void setCommPortTimeout(int timeout) throws UnsupportedCommOperationException;
+
+	/**
+	 * Returns setting for TIMEOUT. 0 returns implies that the option is disabled (i.e., timeout of infinity).
+	 * 
+	 * @return the setting for TIMEOUT
+	 * @see #setCommPortTimeout(int)
+	 */
+	int commPortTimeout();
 
 	boolean isReceiveTimeoutEnabled();
 
@@ -45,9 +75,21 @@ public interface CommPort {
 
 	void close();
 
+	/**
+	 * Use {@link CommPort#inputStream()} instead.
+	 */
+	@Deprecated
 	InputStream getInputStream() throws IOException;
 
+	/**
+	 * Use {@link CommPort#outputStream()} instead.
+	 */
+	@Deprecated
 	OutputStream getOutputStream() throws IOException;
+
+	InputStream inputStream() throws IOException;
+
+	OutputStream outputStream() throws IOException;
 
 	String getName();
 

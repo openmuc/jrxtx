@@ -58,12 +58,20 @@ final class I2C extends I2CPort {
 	/** Output stream */
 	private final I2COutputStream out = new I2COutputStream();
 
+	public OutputStream outputStream() {
+		return out;
+	}
+
 	public OutputStream getOutputStream() {
 		return out;
 	}
 
 	/** Input stream */
 	private final I2CInputStream in = new I2CInputStream();
+
+	public InputStream inputStream() throws IOException {
+		return in;
+	}
 
 	public InputStream getInputStream() {
 		return in;
@@ -168,6 +176,10 @@ final class I2C extends I2CPort {
 
 	public void disableReceiveTimeout() {
 		enableReceiveTimeout(0);
+	}
+
+	public synchronized int commPortTimeout() {
+		return this.timeout;
 	}
 
 	public void enableReceiveTimeout(int time) {

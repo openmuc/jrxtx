@@ -60,10 +60,18 @@ final class Raw extends RawPort {
 		return out;
 	}
 
+	public OutputStream outputStream() {
+		return out;
+	}
+
 	/** Input stream */
 	private final RawInputStream in = new RawInputStream();
 
 	public InputStream getInputStream() {
+		return in;
+	}
+
+	public InputStream inputStream() {
 		return in;
 	}
 
@@ -160,6 +168,10 @@ final class Raw extends RawPort {
 
 	public void disableReceiveTimeout() {
 		enableReceiveTimeout(0);
+	}
+
+	public synchronized int commPortTimeout() {
+		return this.timeout;
 	}
 
 	public void enableReceiveTimeout(int time) {

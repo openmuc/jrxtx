@@ -23,60 +23,58 @@
 package gnu.io;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.TooManyListenersException;
 
-public abstract class SerialPort extends AbstractCommPort {
-	public static final int DATABITS_5 = 5;
-	public static final int DATABITS_6 = 6;
-	public static final int DATABITS_7 = 7;
-	public static final int DATABITS_8 = 8;
-	public static final int PARITY_NONE = 0;
-	public static final int PARITY_ODD = 1;
-	public static final int PARITY_EVEN = 2;
-	public static final int PARITY_MARK = 3;
-	public static final int PARITY_SPACE = 4;
-	public static final int STOPBITS_1 = 1;
-	public static final int STOPBITS_2 = 2;
-	public static final int STOPBITS_1_5 = 3;
-	public static final int FLOWCONTROL_NONE = 0;
-	public static final int FLOWCONTROL_RTSCTS_IN = 1;
-	public static final int FLOWCONTROL_RTSCTS_OUT = 2;
-	public static final int FLOWCONTROL_XONXOFF_IN = 4;
-	public static final int FLOWCONTROL_XONXOFF_OUT = 8;
+public interface SerialPort extends CommPort {
+	int DATABITS_5 = 5;
+	int DATABITS_6 = 6;
+	int DATABITS_7 = 7;
+	int DATABITS_8 = 8;
+	int PARITY_NONE = 0;
+	int PARITY_ODD = 1;
+	int PARITY_EVEN = 2;
+	int PARITY_MARK = 3;
+	int PARITY_SPACE = 4;
+	int STOPBITS_1 = 1;
+	int STOPBITS_2 = 2;
+	int STOPBITS_1_5 = 3;
+	int FLOWCONTROL_NONE = 0;
+	int FLOWCONTROL_RTSCTS_IN = 1;
+	int FLOWCONTROL_RTSCTS_OUT = 2;
+	int FLOWCONTROL_XONXOFF_IN = 4;
+	int FLOWCONTROL_XONXOFF_OUT = 8;
 
-	public abstract void setSerialPortParams(int b, int d, int s, int p) throws UnsupportedCommOperationException;
+	void setSerialPortParams(int b, int d, int s, int p) throws UnsupportedCommOperationException;
 
-	public abstract int getBaudRate();
+	int getBaudRate();
 
-	public abstract int getDataBits();
+	int getDataBits();
 
-	public abstract int getStopBits();
+	int getStopBits();
 
-	public abstract int getParity();
+	int getParity();
 
-	public abstract void setFlowControlMode(int flowcontrol) throws UnsupportedCommOperationException;
+	void setFlowControlMode(int flowcontrol) throws UnsupportedCommOperationException;
 
-	public abstract int getFlowControlMode();
+	int getFlowControlMode();
 
-	public abstract boolean isDTR();
+	boolean isDTR();
 
-	public abstract void setDTR(boolean state);
+	void setDTR(boolean state);
 
-	public abstract void setRTS(boolean state);
+	void setRTS(boolean state);
 
-	public abstract boolean isCTS();
+	boolean isCTS();
 
-	public abstract boolean isDSR();
+	boolean isDSR();
 
-	public abstract boolean isCD();
+	boolean isCD();
 
-	public abstract boolean isRI();
+	boolean isRI();
 
-	public abstract boolean isRTS();
+	boolean isRTS();
 
-	public abstract void sendBreak(int duration);
+	void sendBreak(int duration);
 
 	/**
 	 * Register a listener to the serial port.
@@ -86,29 +84,29 @@ public abstract class SerialPort extends AbstractCommPort {
 	 * @throws TooManyListenersException
 	 *             if a listener is already registered.
 	 */
-	public abstract void addEventListener(SerialPortEventListener listener) throws TooManyListenersException;
+	void addEventListener(SerialPortEventListener listener) throws TooManyListenersException;
 
-	public abstract void removeEventListener();
+	void removeEventListener();
 
-	public abstract void notifyOnDataAvailable(boolean enable);
+	void notifyOnDataAvailable(boolean enable);
 
-	public abstract void notifyOnOutputEmpty(boolean enable);
+	void notifyOnOutputEmpty(boolean enable);
 
-	public abstract void notifyOnCTS(boolean enable);
+	void notifyOnCTS(boolean enable);
 
-	public abstract void notifyOnDSR(boolean enable);
+	void notifyOnDSR(boolean enable);
 
-	public abstract void notifyOnRingIndicator(boolean enable);
+	void notifyOnRingIndicator(boolean enable);
 
-	public abstract void notifyOnCarrierDetect(boolean enable);
+	void notifyOnCarrierDetect(boolean enable);
 
-	public abstract void notifyOnOverrunError(boolean enable);
+	void notifyOnOverrunError(boolean enable);
 
-	public abstract void notifyOnParityError(boolean enable);
+	void notifyOnParityError(boolean enable);
 
-	public abstract void notifyOnFramingError(boolean enable);
+	void notifyOnFramingError(boolean enable);
 
-	public abstract void notifyOnBreakInterrupt(boolean enable);
+	void notifyOnBreakInterrupt(boolean enable);
 	/*
 	 * public abstract void setRcvFifoTrigger(int trigger); deprecated
 	 */
@@ -129,7 +127,7 @@ public abstract class SerialPort extends AbstractCommPort {
 	 * @throws UnsupportedCommOperationException
 	 *             if this operation is not supported for the OS by the underlying native library.
 	 */
-	public abstract byte getParityErrorChar() throws UnsupportedCommOperationException;
+	byte getParityErrorChar() throws UnsupportedCommOperationException;
 
 	/**
 	 * Sets the parity error char.
@@ -141,7 +139,7 @@ public abstract class SerialPort extends AbstractCommPort {
 	 *             if this operation is not supported for the OS by the underlying native library.
 	 * 
 	 */
-	public abstract boolean setParityErrorChar(byte b) throws UnsupportedCommOperationException;
+	boolean setParityErrorChar(byte b) throws UnsupportedCommOperationException;
 
 	/**
 	 * Retrieves the end of input character.
@@ -151,7 +149,7 @@ public abstract class SerialPort extends AbstractCommPort {
 	 *             if this operation is not supported for the OS by the underlying native library.
 	 * 
 	 */
-	public abstract byte getEndOfInputChar() throws UnsupportedCommOperationException;
+	byte getEndOfInputChar() throws UnsupportedCommOperationException;
 
 	/**
 	 * Sets the end of input character.
@@ -162,7 +160,7 @@ public abstract class SerialPort extends AbstractCommPort {
 	 * @throws UnsupportedCommOperationException
 	 *             if this operation is not supported for the OS by the underlying native library.
 	 */
-	public abstract boolean setEndOfInputChar(byte b) throws UnsupportedCommOperationException;
+	boolean setEndOfInputChar(byte b) throws UnsupportedCommOperationException;
 
 	/**
 	 * Sets the UART type.
@@ -176,7 +174,7 @@ public abstract class SerialPort extends AbstractCommPort {
 	 * @throws UnsupportedCommOperationException
 	 *             if this operation is not supported for the OS by the underlying native library.
 	 */
-	public abstract boolean setUARTType(String type, boolean test) throws UnsupportedCommOperationException;
+	boolean setUARTType(String type, boolean test) throws UnsupportedCommOperationException;
 
 	/**
 	 * Retrieve the UART type.
@@ -186,7 +184,7 @@ public abstract class SerialPort extends AbstractCommPort {
 	 * @throws UnsupportedCommOperationException
 	 *             if this operation is not supported for the OS by the underlying native library.
 	 */
-	public abstract String getUARTType() throws UnsupportedCommOperationException;
+	String getUARTType() throws UnsupportedCommOperationException;
 
 	/**
 	 * Set Baud Base to 38600 on Linux and W32 before using.
@@ -199,13 +197,13 @@ public abstract class SerialPort extends AbstractCommPort {
 	 * @throws IOException
 	 *             if an IOException occurs.
 	 */
-	public abstract boolean setBaudBase(int BaudBase) throws UnsupportedCommOperationException, IOException;
+	boolean setBaudBase(int BaudBase) throws UnsupportedCommOperationException, IOException;
 
-	public abstract int getBaudBase() throws UnsupportedCommOperationException, IOException;
+	int getBaudBase() throws UnsupportedCommOperationException, IOException;
 
-	public abstract boolean setDivisor(int Divisor) throws UnsupportedCommOperationException, IOException;
+	boolean setDivisor(int Divisor) throws UnsupportedCommOperationException, IOException;
 
-	public abstract int getDivisor() throws UnsupportedCommOperationException, IOException;
+	int getDivisor() throws UnsupportedCommOperationException, IOException;
 
 	/**
 	 * Set latency to low.
@@ -215,7 +213,7 @@ public abstract class SerialPort extends AbstractCommPort {
 	 * @throws UnsupportedCommOperationException
 	 *             if this operation is not supported for the OS by the underlying native library.
 	 */
-	public abstract boolean setLowLatency() throws UnsupportedCommOperationException;
+	boolean setLowLatency() throws UnsupportedCommOperationException;
 
 	/**
 	 * TODO ??
@@ -225,25 +223,9 @@ public abstract class SerialPort extends AbstractCommPort {
 	 * @throws UnsupportedCommOperationException
 	 *             if this operation is not supported for the OS by the underlying native library.
 	 */
-	public abstract boolean getLowLatency() throws UnsupportedCommOperationException;
+	boolean getLowLatency() throws UnsupportedCommOperationException;
 
-	public abstract boolean setCallOutHangup(boolean NoHup) throws UnsupportedCommOperationException;
+	boolean setCallOutHangup(boolean NoHup) throws UnsupportedCommOperationException;
 
-	public abstract boolean getCallOutHangup() throws UnsupportedCommOperationException;
-
-	/**
-	 * Use {@link SerialPort#inputStream()} instead.
-	 */
-	@Deprecated
-	public abstract InputStream getInputStream() throws IOException;
-
-	/**
-	 * Use {@link SerialPort#outputStream()} instead.
-	 */
-	@Deprecated
-	public abstract OutputStream getOutputStream() throws IOException;
-
-	public abstract InputStream inputStream() throws IOException;
-
-	public abstract OutputStream outputStream() throws IOException;
+	boolean getCallOutHangup() throws UnsupportedCommOperationException;
 }

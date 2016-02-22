@@ -78,10 +78,18 @@ final class LPRPort extends ParallelPort {
 		return out;
 	}
 
+	public OutputStream outputStream() {
+		return out;
+	}
+
 	/** Input stream */
 	private final ParallelInputStream in = new ParallelInputStream();
 
 	public InputStream getInputStream() {
+		return in;
+	}
+
+	public InputStream inputStream() {
 		return in;
 	}
 
@@ -168,6 +176,10 @@ final class LPRPort extends ParallelPort {
 
 	/** Receive timeout control */
 	private int timeout = 0;
+
+	public synchronized int commPortTimeout() {
+		return this.timeout;
+	}
 
 	public void enableReceiveTimeout(int t) {
 		if (t > 0) {
