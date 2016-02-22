@@ -839,6 +839,11 @@ public class RXTXPort extends AbstractCommPort implements CommPort, SerialPort {
 			} while (true);
 		}
 
+		@Override
+		public int available() throws IOException {
+			return this.serialInputStream.available();
+		}
+
 	}
 
 	private class SerialInputStream extends InputStream {
