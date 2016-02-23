@@ -1,10 +1,11 @@
 package gnu.io;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-public interface CommPort {
+public interface CommPort extends Closeable {
 
 	void enableReceiveFraming(int f) throws UnsupportedCommOperationException;
 
@@ -15,16 +16,26 @@ public interface CommPort {
 	int getReceiveFramingByte();
 
 	/**
-	 * Use {@link CommPort#setCommPortTimeout(int)} instead.
+	 * Disable the timeout.
+	 * 
+	 * @deprecated this method will be removed in future versions. Use {@link #setCommPortTimeout(int)} instead.
 	 */
 	@Deprecated
 	void disableReceiveTimeout();
 
 	/**
-	 * Use {@link CommPort#setCommPortTimeout(int)} instead.
+	 * Set a receive timeout.
+	 * 
+	 * @deprecated this method will be removed in future versions. Use {@link #setCommPortTimeout(int)} instead.
+	 * 
+	 * @param timeout
+	 *            a timeout {@code > 0}.
+	 * 
+	 * @throws UnsupportedCommOperationException
+	 *             if this operation is not supported for the OS by the underlying native library.
 	 */
 	@Deprecated
-	void enableReceiveTimeout(int time) throws UnsupportedCommOperationException;
+	void enableReceiveTimeout(int timeout) throws UnsupportedCommOperationException;
 
 	/**
 	 * Enable/disable TIMEOUT with the specified timeout, in milliseconds. With this option set to a non-zero timeout, a
@@ -73,24 +84,70 @@ public interface CommPort {
 
 	int getOutputBufferSize();
 
+	/**
+	 * Closes this COM port.
+	 * <p>
+	 * Closing this socket will also close the socket's InputStream and OutputStream.
+	 * </p>
+	 */
 	void close();
 
 	/**
-	 * Use {@link CommPort#inputStream()} instead.
+	 * Get the InpuStream.
+	 * 
+	 * @deprecated this method will be removed in future versions. Use {@link #inputStream()} instead.
+	 * @return the InpuStream.
+	 * @throws IOException
+	 *             if an I/O error occurs
 	 */
 	@Deprecated
 	InputStream getInputStream() throws IOException;
 
 	/**
-	 * Use {@link CommPort#outputStream()} instead.
+	 * Get the OutpuStream.
+	 * 
+	 * @deprecated this method will be removed in future versions. Use {@link #outputStream()} instead.
+	 *
+	 * @return the OutpuStream.
+	 * @throws IOException
+	 *             if an I/O error occurs
 	 */
 	@Deprecated
 	OutputStream getOutputStream() throws IOException;
 
+	/**
+	 * Returns an input stream for this COM port.
+	 * 
+	 * <p>
+	 * Closing the returned InputStream will close the associated COM port.
+	 * </p>
+	 * 
+	 * @return an input stream for reading bytes from this COM port.
+	 * @throws IOException
+	 *             if an I/O error occurs when creating the input stream, the socket is closed, the socket is not
+	 *             connected.
+	 */
 	InputStream inputStream() throws IOException;
 
+	/**
+	 * Returns an output stream for this COM port.
+	 * 
+	 * <p>
+	 * Closing the returned OutputStream will close the associated COM port.
+	 * </p>
+	 * 
+	 * @return an output stream for writing bytes to this COM port.
+	 * @throws IOException
+	 *             if an I/O error occurs when creating the input stream, the socket is closed, the socket is not
+	 *             connected.
+	 */
 	OutputStream outputStream() throws IOException;
 
+	/**
+	 * Get the COM port name.
+	 * 
+	 * @return the COM port name.
+	 */
 	String getName();
 
 }
