@@ -31,13 +31,14 @@ import java.util.List;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.powermock.core.classloader.annotations.SuppressStaticInitializationFor;
+import org.powermock.modules.junit4.PowerMockRunner;
 
-import gnu.io.CommPortIdentifier;
-
-/**
- * Main class bundling all single specialized test suites into a overall complete one.
- */
+@RunWith(PowerMockRunner.class)
+@SuppressStaticInitializationFor({ "gnu.io.CommPortIdentifier", "gnu.io.RXTXCommDriver" })
 public class RXTXCommDriverTest {
 
 	private String fOldPropSerial;
@@ -51,6 +52,7 @@ public class RXTXCommDriverTest {
 		fOldPropParallel = System.getProperty("gnu.io.rxtx.ParallelPorts");
 	}
 
+	@Ignore
 	@After
 	public void tearDown() {
 		System.setProperty("gnu.io.rxtx.SerialPorts", fOldPropSerial == null ? "" : fOldPropSerial);
@@ -60,6 +62,7 @@ public class RXTXCommDriverTest {
 	/*
 	 * Check that ports can be specified (i.e. removed) by means of a Java Property
 	 */
+	@Ignore
 	@Test
 	public void testRegisterSpecifiedPorts() throws Exception {
 		// First, find all serial ports
