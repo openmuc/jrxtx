@@ -1,0 +1,123 @@
+
+project.ext {
+
+  cfgJavaVersion = '1.5'
+
+  cfgVersion = '0.0.1-SNAPSHOT'
+  
+  cfgGroup = 'org.openmuc'
+
+  cfgCopyDependencies = false
+
+  cfgCopyToRoot = false
+
+  cfgSignPom = false
+
+  cfgRepository = project.properties.repository
+
+  cfgSnapshotRepository = project.properties.snapshotRepository
+
+  cfgRepositoryUser = project.properties.artifactoryUser
+
+  cfgRepositoryPass = project.properties.artifactoryPass
+
+  javaProjects = allprojects
+
+  distributionProjects = javaProjects
+
+  docProjects = javaProjects
+
+  repositoryProjects = javaProjects
+}
+
+tasks.withType(Tar) {
+
+  into(project.name) {
+    from('./') {
+      include 'build.gradle'
+      include 'configuration.gradle'
+      include 'README'
+      include 'license/**'
+      include 'doc/**'
+      include 'native/**'
+      include 'build/libs/**'
+      include 'build/docs/javadoc/**'
+      include 'src/**'
+    }
+
+  }
+}
+
+tasks.withType(Test) {
+  systemProperty "java.library.path", "native/x86_64-unknown-linux-gnu/.libs/:/usr/lib/jni/"
+}
+
+
+
+//------------------project specific configurations--------------------
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'osgi'
+apply plugin: 'maven'
+apply plugin: 'signing'
+
+
+jar {
+  manifest {
+    name = 'jRxTx'
+    instruction 'Export-Package', '!*.internal.*,*'
+  }
+}
+
+uploadArchives {
+  repositories {
+    mavenDeployer {
+      pom.project {
+        name 'jRxTx'
+        description 'jRxTx is a library for Java serial communication.'
+        
+        licenses {
+          license {
+            name 'GNU Lesser General Public License'
+            url 'http://www.gnu.org/licenses/lgpl-2.1.html'
+            distribution 'repo'
+          }
+        }
+      }
+    }
+  }
+}
+
+jar {
+  manifest { // the manifest of the default jar is of type OsgiManifest
+    instruction 'Import-Package', '!gnu.io.internal.*, *'
+  }
+}
+
+task javah(dependsOn: compileJava) << {
+  def Nclasses = [	
+    'gnu.io.RXTXCommDriver',
+    'gnu.io.CommPortIdentifier',
+    'gnu.io.RXTXVersion',
+    'gnu.io.I2C',
+    'gnu.io.LPRPort',
+    'gnu.io.RXTXPort',
+    'gnu.io.Zystem',
+    'gnu.io.Raw',
+    'gnu.io.RS485',
+    'gnu.io.ParallelPort'
+  ];
+    
+  def nativeIncludes = 'native/src/include'
+  def classpath = sourceSets.main.output.classesDir
+  for (Nclass in Nclasses) {
+      
+    logger.info('Generating header for ' + Nclass)
+      
+    exec {
+	  executable "javah"
+	  args "-d", "$nativeIncludes", "-classpath", "$classpath" , Nclass
+    }
+  }
+}
