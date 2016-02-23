@@ -59,6 +59,11 @@ public interface CommPort extends Closeable {
 	 */
 	int commPortTimeout();
 
+	/**
+	 * @deprecated this method will be removed in future versions. Use {@link #commPortTimeout()} instead.
+	 * @return the COM port receive timeout.
+	 */
+	@Deprecated
 	boolean isReceiveTimeoutEnabled();
 
 	/**
