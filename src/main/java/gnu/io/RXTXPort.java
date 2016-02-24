@@ -26,13 +26,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.TooManyListenersException;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 public class RXTXPort extends AbstractCommPort implements CommPort, SerialPort {
 
@@ -671,6 +664,10 @@ public class RXTXPort extends AbstractCommPort implements CommPort, SerialPort {
 			fd = 0;
 			closeLock = false;
 		} finally {
+			try {
+				this.serialIS.close();
+			} catch (IOException e) {
+			}
 			this.closed = true;
 		}
 	}
@@ -824,6 +821,7 @@ public class RXTXPort extends AbstractCommPort implements CommPort, SerialPort {
 	 * This class is a wrapper for the {@link SerialInputStream}.
 	 */
 	private class BetterSerialInputStream extends InputStream {
+		private static final long SLEEP_TIME = 10L;// TODO: sleep appropriate time
 		private SerialInputStream serialInputStream;
 
 		public BetterSerialInputStream(SerialInputStream serialInputStream) {
@@ -832,34 +830,24 @@ public class RXTXPort extends AbstractCommPort implements CommPort, SerialPort {
 
 		@Override
 		public synchronized int read() throws IOException {
-			ExecutorService executor = Executors.newFixedThreadPool(1);
-			Future<Integer> future = executor.submit(new ReadTask());
+			long elapsedTime = 0;
+			do {
+				if (serialInputStream.available() > 0) {
+					return serialInputStream.read();
+				}
+				try {
+					Thread.sleep(SLEEP_TIME);
+					elapsedTime += SLEEP_TIME;
+				} catch (InterruptedException e) {
+					// ignore
+				}
 
-			try {
-				if (timeout == -1 || timeout == 0) {
-					return future.get();
+				if (closed) {
+					throw new CommPortException("Connection has been closed..");
 				}
-				else {
-					return future.get(timeout, TimeUnit.MILLISECONDS);
-				}
-			} catch (InterruptedException e) {
-				throw new CommPortException("Reading Thread got interrupted.", e);
+			} while (timeout <= 0 || elapsedTime <= (long) timeout);
 
-			} catch (TimeoutException e) {
-				throw new CommPortTimeoutException("Read timed out.");
-
-			} catch (ExecutionException e) {
-				if (e.getCause() instanceof IOException) {
-					throw (IOException) e.getCause();
-				}
-				else if (e.getCause() instanceof RuntimeException) {
-					throw (RuntimeException) e.getCause();
-				}
-				else {
-					// should never occur..
-					throw new CommPortException("Unknown thrown exception. Please notfy a developer", e.getCause());
-				}
-			}
+			throw new CommPortTimeoutException("Timed out, while reading the serial port.");
 		}
 
 		@Override
@@ -870,25 +858,6 @@ public class RXTXPort extends AbstractCommPort implements CommPort, SerialPort {
 		@Override
 		public void close() throws IOException {
 			serialInputStream.close();
-		}
-
-		private class ReadTask implements Callable<Integer> {
-			public Integer call() throws Exception {
-				while (true) {
-					if (serialInputStream.available() > 0) {
-						return serialInputStream.read();
-					}
-					try {
-						Thread.sleep(10L); // TODO: sleep appropriate time
-					} catch (InterruptedException e) {
-						// ignore
-					}
-
-					if (closed) {
-						throw new CommPortException("Connection has been closed..");
-					}
-				}
-			}
 		}
 	}
 
@@ -922,15 +891,6 @@ public class RXTXPort extends AbstractCommPort implements CommPort, SerialPort {
 				synchronized (IOLockedMutex) {
 					IOLocked--;
 				}
-			}
-		}
-
-		@Override
-		public void close() throws IOException {
-			try {
-				super.close();
-			} finally {
-				RXTXPort.this.close();
 			}
 		}
 
