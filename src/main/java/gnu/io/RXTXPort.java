@@ -27,7 +27,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.TooManyListenersException;
 
-public class RXTXPort extends AbstractCommPort implements CommPort, SerialPort {
+public class RXTXPort extends SerialPort {
 
 	static {
 		System.loadLibrary("rxtxSerial");
@@ -110,22 +110,22 @@ public class RXTXPort extends AbstractCommPort implements CommPort, SerialPort {
 		this.closed = false;
 	}
 
-	// @Override
+	@Override
 	public OutputStream getOutputStream() {
 		return os;
 	}
 
-	// @Override
+	@Override
 	public InputStream getInputStream() {
 		return is;
 	}
 
-	// @Override
+	@Override
 	public OutputStream outputStream() {
 		return os; // TODO
 	}
 
-	// @Override
+	@Override
 	public InputStream inputStream() {
 		return this.serialIS;
 	}
@@ -161,7 +161,7 @@ public class RXTXPort extends AbstractCommPort implements CommPort, SerialPort {
 	private native boolean nativeSetSerialPortParams(int speed, int dataBits, int stopBits, int parity)
 			throws UnsupportedCommOperationException;
 
-	// @Override
+	@Override
 	public synchronized void setSerialPortParams(int baudRate, int dataBits, int stopBits, int parity)
 			throws UnsupportedCommOperationException {
 		if (nativeSetSerialPortParams(baudRate, dataBits, stopBits, parity)) {
@@ -178,27 +178,27 @@ public class RXTXPort extends AbstractCommPort implements CommPort, SerialPort {
 		this.parity = parity;
 	}
 
-	// @Override
+	@Override
 	public int getBaudRate() {
 		return speed;
 	}
 
-	// @Override
+	@Override
 	public int getDataBits() {
 		return dataBits;
 	}
 
-	// @Override
+	@Override
 	public int getStopBits() {
 		return stopBits;
 	}
 
-	// @Override
+	@Override
 	public int getParity() {
 		return parity;
 	}
 
-	// @Override
+	@Override
 	public void setFlowControlMode(int flowcontrol) {
 		if (monThreadisInterrupted) {
 			return;
@@ -212,36 +212,43 @@ public class RXTXPort extends AbstractCommPort implements CommPort, SerialPort {
 		flowmode = flowcontrol;
 	}
 
-	// @Override
+	@Override
 	public int getFlowControlMode() {
 		return flowmode;
 	}
 
+	@Override
 	public void enableReceiveFraming(int f) throws UnsupportedCommOperationException {
 		throw new UnsupportedCommOperationException("Not supported");
 	}
 
+	@Override
 	public void disableReceiveFraming() {
 	}
 
+	@Override
 	public boolean isReceiveFramingEnabled() {
 		return false;
 	}
 
+	@Override
 	public int getReceiveFramingByte() {
 		return 0;
 	}
 
+	@Override
 	@Deprecated
 	public void disableReceiveTimeout() {
 		timeout = -1;
 		NativeEnableReceiveTimeoutThreshold(timeout, threshold, InputBuffer);
 	}
 
+	@Override
 	public synchronized int commPortTimeout() {
 		return this.timeout == -1 ? 0 : this.timeout;
 	}
 
+	@Override
 	@Deprecated
 	public void enableReceiveTimeout(int time) {
 		if (time >= 0) {
@@ -253,14 +260,17 @@ public class RXTXPort extends AbstractCommPort implements CommPort, SerialPort {
 		}
 	}
 
+	@Override
 	public boolean isReceiveTimeoutEnabled() {
 		return (NativeisReceiveTimeoutEnabled());
 	}
 
+	@Override
 	public int getReceiveTimeout() {
 		return (NativegetReceiveTimeout());
 	}
 
+	@Override
 	public void enableReceiveThreshold(int threshold) {
 		if (threshold >= 0) {
 			this.threshold = threshold;
@@ -271,18 +281,22 @@ public class RXTXPort extends AbstractCommPort implements CommPort, SerialPort {
 		}
 	}
 
+	@Override
 	public void disableReceiveThreshold() {
 		enableReceiveThreshold(0);
 	}
 
+	@Override
 	public int getReceiveThreshold() {
 		return threshold;
 	}
 
+	@Override
 	public boolean isReceiveThresholdEnabled() {
 		return (threshold > 0);
 	}
 
+	@Override
 	public void setInputBufferSize(int size) {
 		if (size < 0) {
 			throw new IllegalArgumentException("Unexpected negative buffer size value");
@@ -292,10 +306,12 @@ public class RXTXPort extends AbstractCommPort implements CommPort, SerialPort {
 		}
 	}
 
+	@Override
 	public int getInputBufferSize() {
 		return (InputBuffer);
 	}
 
+	@Override
 	public void setOutputBufferSize(int size) {
 		if (size < 0) {
 			throw new IllegalArgumentException("Unexpected negative buffer size value");
@@ -305,39 +321,40 @@ public class RXTXPort extends AbstractCommPort implements CommPort, SerialPort {
 		}
 	}
 
+	@Override
 	public int getOutputBufferSize() {
 		return (OutputBuffer);
 	}
 
 	// Line status methods
 
-	// @Override
+	@Override
 	public native boolean isDTR();
 
-	// @Override
+	@Override
 	public native void setDTR(boolean state);
 
-	// @Override
+	@Override
 	public native void setRTS(boolean state);
 
 	private native void setDSR(boolean state);
 
-	// @Override
+	@Override
 	public native boolean isCTS();
 
-	// @Override
+	@Override
 	public native boolean isDSR();
 
-	// @Override
+	@Override
 	public native boolean isCD();
 
-	// @Override
+	@Override
 	public native boolean isRI();
 
-	// @Override
+	@Override
 	public native boolean isRTS();
 
-	// @Override
+	@Override
 	public native void sendBreak(int duration);
 
 	protected native void writeByte(int b, boolean i) throws IOException;
@@ -454,7 +471,7 @@ public class RXTXPort extends AbstractCommPort implements CommPort, SerialPort {
 		return fd == 0 || serialPortEventListener == null || monThread == null;
 	}
 
-	// @Override
+	@Override
 	public void addEventListener(SerialPortEventListener listener) throws TooManyListenersException {
 		/*
 		 * Don't let and notification requests happen until the Eventloop is ready
@@ -477,7 +494,8 @@ public class RXTXPort extends AbstractCommPort implements CommPort, SerialPort {
 	/**
 	 * Remove the serial port event listener
 	 */
-	// @Override
+
+	@Override
 	public void removeEventListener() {
 		waitForTheNativeCodeSilly();
 		// if( monThread != null && monThread.isAlive() )
@@ -531,7 +549,7 @@ public class RXTXPort extends AbstractCommPort implements CommPort, SerialPort {
 
 	private native void nativeSetEventFlag(int fd, int event, boolean flag);
 
-	// @Override
+	@Override
 	public void notifyOnDataAvailable(boolean enable) {
 
 		waitForTheNativeCodeSilly();
@@ -542,7 +560,7 @@ public class RXTXPort extends AbstractCommPort implements CommPort, SerialPort {
 		MonitorThreadLock = false;
 	}
 
-	// @Override
+	@Override
 	public void notifyOnOutputEmpty(boolean enable) {
 		waitForTheNativeCodeSilly();
 		MonitorThreadLock = true;
@@ -551,7 +569,7 @@ public class RXTXPort extends AbstractCommPort implements CommPort, SerialPort {
 		MonitorThreadLock = false;
 	}
 
-	// @Override
+	@Override
 	public void notifyOnCTS(boolean enable) {
 		waitForTheNativeCodeSilly();
 		MonitorThreadLock = true;
@@ -560,7 +578,7 @@ public class RXTXPort extends AbstractCommPort implements CommPort, SerialPort {
 		MonitorThreadLock = false;
 	}
 
-	// @Override
+	@Override
 	public void notifyOnDSR(boolean enable) {
 		waitForTheNativeCodeSilly();
 		MonitorThreadLock = true;
@@ -569,7 +587,7 @@ public class RXTXPort extends AbstractCommPort implements CommPort, SerialPort {
 		MonitorThreadLock = false;
 	}
 
-	// @Override
+	@Override
 	public void notifyOnRingIndicator(boolean enable) {
 		waitForTheNativeCodeSilly();
 		MonitorThreadLock = true;
@@ -578,7 +596,7 @@ public class RXTXPort extends AbstractCommPort implements CommPort, SerialPort {
 		MonitorThreadLock = false;
 	}
 
-	// @Override
+	@Override
 	public void notifyOnCarrierDetect(boolean enable) {
 		waitForTheNativeCodeSilly();
 		MonitorThreadLock = true;
@@ -587,7 +605,7 @@ public class RXTXPort extends AbstractCommPort implements CommPort, SerialPort {
 		MonitorThreadLock = false;
 	}
 
-	// @Override
+	@Override
 	public void notifyOnOverrunError(boolean enable) {
 		waitForTheNativeCodeSilly();
 		MonitorThreadLock = true;
@@ -596,7 +614,7 @@ public class RXTXPort extends AbstractCommPort implements CommPort, SerialPort {
 		MonitorThreadLock = false;
 	}
 
-	// @Override
+	@Override
 	public void notifyOnParityError(boolean enable) {
 		waitForTheNativeCodeSilly();
 		MonitorThreadLock = true;
@@ -605,7 +623,7 @@ public class RXTXPort extends AbstractCommPort implements CommPort, SerialPort {
 		MonitorThreadLock = false;
 	}
 
-	// @Override
+	@Override
 	public void notifyOnFramingError(boolean enable) {
 		waitForTheNativeCodeSilly();
 		MonitorThreadLock = true;
@@ -614,7 +632,7 @@ public class RXTXPort extends AbstractCommPort implements CommPort, SerialPort {
 		MonitorThreadLock = false;
 	}
 
-	// @Override
+	@Override
 	public void notifyOnBreakInterrupt(boolean enable) {
 		waitForTheNativeCodeSilly();
 		MonitorThreadLock = true;
@@ -845,7 +863,7 @@ public class RXTXPort extends AbstractCommPort implements CommPort, SerialPort {
 				if (closed) {
 					throw new CommPortException("Connection has been closed..");
 				}
-			} while (timeout <= 0 || elapsedTime <= (long) timeout);
+			} while (timeout <= 0 || elapsedTime <= timeout);
 
 			throw new CommPortTimeoutException("Timed out, while reading the serial port.");
 		}
@@ -1434,45 +1452,45 @@ public class RXTXPort extends AbstractCommPort implements CommPort, SerialPort {
 		return nativeStaticIsRI(port);
 	}
 
-	// @Override
+	@Override
 	public byte getParityErrorChar() throws UnsupportedCommOperationException {
 		// TODO: Anyone know how to do this in Unix?
 		return nativeGetParityErrorChar();
 	}
 
-	// @Override
+	@Override
 	public boolean setParityErrorChar(byte b) throws UnsupportedCommOperationException {
 		// TODO: Anyone know how to do this in Unix?
 		return nativeSetParityErrorChar(b);
 	}
 
-	// @Override
+	@Override
 	public byte getEndOfInputChar() throws UnsupportedCommOperationException {
 		// TODO: Anyone know how to do this in Unix?
 		return nativeGetEndOfInputChar();
 	}
 
-	// @Override
+	@Override
 	public boolean setEndOfInputChar(byte b) throws UnsupportedCommOperationException {
 		return (nativeSetEndOfInputChar(b));
 	}
 
-	// @Override
+	@Override
 	public boolean setUARTType(String type, boolean test) throws UnsupportedCommOperationException {
 		return nativeSetUartType(type, test);
 	}
 
-	// @Override
+	@Override
 	public String getUARTType() throws UnsupportedCommOperationException {
 		return nativeGetUartType();
 	}
 
-	// @Override
+	@Override
 	public boolean setBaudBase(int BaudBase) throws UnsupportedCommOperationException, IOException {
 		return nativeSetBaudBase(BaudBase);
 	}
 
-	// @Override
+	@Override
 	public int getBaudBase() throws UnsupportedCommOperationException, IOException {
 		return nativeGetBaudBase();
 	}
@@ -1480,7 +1498,7 @@ public class RXTXPort extends AbstractCommPort implements CommPort, SerialPort {
 	/**
 	 * Extension to CommAPI. Set Baud Base to 38600 on Linux and W32 before using.
 	 */
-	// @Override
+	@Override
 	public boolean setDivisor(int Divisor) throws UnsupportedCommOperationException, IOException {
 		return nativeSetDivisor(Divisor);
 	}
@@ -1488,29 +1506,29 @@ public class RXTXPort extends AbstractCommPort implements CommPort, SerialPort {
 	/**
 	 * Extension to CommAPI
 	 */
-	// @Override
+	@Override
 	public int getDivisor() throws UnsupportedCommOperationException, IOException {
 		return nativeGetDivisor();
 	}
 
-	// @Override
+	@Override
 	public boolean setLowLatency() throws UnsupportedCommOperationException {
 		return nativeSetLowLatency();
 	}
 
-	// @Override
+	@Override
 	public boolean getLowLatency() throws UnsupportedCommOperationException {
 		return nativeGetLowLatency();
 	}
 
 	// return true on success
-	// @Override
+	@Override
 	public boolean setCallOutHangup(boolean NoHup) throws UnsupportedCommOperationException {
 		return nativeSetCallOutHangup(NoHup);
 	}
 
 	// return true on success
-	// @Override
+	@Override
 	public boolean getCallOutHangup() throws UnsupportedCommOperationException {
 		return nativeGetCallOutHangup();
 	}
@@ -1518,5 +1536,11 @@ public class RXTXPort extends AbstractCommPort implements CommPort, SerialPort {
 	// return true on success
 	public boolean clearCommInput() throws UnsupportedCommOperationException {
 		return nativeClearCommInput();
+	}
+
+	@Override
+	public synchronized void setSerialPortParams(int baudRate, DataBits dataBits, StopBits stopBits, Parity parity)
+			throws UnsupportedCommOperationException {
+		setSerialPortParams(baudRate, dataBits.value(), stopBits.value(), parity.value());
 	}
 }

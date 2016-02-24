@@ -22,9 +22,10 @@
  */
 package gnu.io;
 
-abstract class AbstractCommPort implements CommPort {
+abstract class AbstractCommPort extends CommPort {
 	protected String name;
 
+	@Override
 	public void close() {
 		try {
 			CommPortIdentifier cp = CommPortIdentifier.getPortIdentifier(this);
@@ -35,10 +36,12 @@ abstract class AbstractCommPort implements CommPort {
 		}
 	};
 
+	@Override
 	public String getName() {
 		return name;
 	}
 
+	@Override
 	public synchronized void setCommPortTimeout(int timeout) throws UnsupportedCommOperationException {
 		if (timeout == 0) {
 			disableReceiveTimeout();
