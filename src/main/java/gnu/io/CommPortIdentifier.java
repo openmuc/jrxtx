@@ -268,11 +268,11 @@ public class CommPortIdentifier /* extends Vector? */ {
 	 * @throws NoSuchPortException
 	 *             if the port object is invalid
 	 */
-	public static CommPortIdentifier getPortIdentifier(CommPort p) throws NoSuchPortException {
+	public static CommPortIdentifier getPortIdentifier(CommPort port) throws NoSuchPortException {
 		CommPortIdentifier c;
 		synchronized (sync) {
 			c = CommPortIndex;
-			while (c != null && c.commport != p) {
+			while (c != null && c.commport != port) {
 				c = c.next;
 			}
 		}

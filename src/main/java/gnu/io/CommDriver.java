@@ -44,8 +44,8 @@ public interface CommDriver {
 	CommPort getCommPort(String portName, int portType);
 
 	/**
-	 * {@link #getCommPort(String, int)} will be called by {@link CommPortIdentifier#open(String, int)} {@code portName}
-	 * is a string that was registered earlier using the
+	 * {@link #commPort(String, PortType)} will be called by {@link CommPortIdentifier#open(String, int)}
+	 * {@code portName} is a string that was registered earlier using the
 	 * {@link CommPortIdentifier#addPortName(String, gnu.io.CommPortIdentifier.PortType, CommDriver)} method.
 	 * 
 	 * @param portName
