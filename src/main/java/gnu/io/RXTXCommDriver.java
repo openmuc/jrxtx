@@ -33,6 +33,8 @@ import java.io.FileInputStream;
 import java.util.Properties;
 import java.util.StringTokenizer;
 
+import gnu.io.CommPortIdentifier.PortType;
+
 /**
  * This is the JavaComm for Linux driver.
  */
@@ -101,7 +103,7 @@ public class RXTXCommDriver implements CommDriver {
 	// for rxtx prior to 2.1.7
 	public static native String nativeGetVersion();
 
-	private final String[] getValidPortPrefixes(String CandidatePortPrefixes[]) {
+	private final String[] getValidPortPrefixes(String candidatePortPrefixes[]) {
 		/*
 		 * 256 is the number of prefixes ( COM, cua, ttyS, ...) not the number of devices (ttyS0, ttyS1, ttyS2, ...)
 		 * 
@@ -111,11 +113,11 @@ public class RXTXCommDriver implements CommDriver {
 		 * Trent
 		 */
 
-		String ValidPortPrefixes[] = new String[256];
+		String validPortPrefixes[] = new String[256];
 		if (debug) {
 			System.out.println("\nRXTXCommDriver:getValidPortPrefixes()");
 		}
-		if (CandidatePortPrefixes == null) {
+		if (candidatePortPrefixes == null) {
 			if (debug) {
 				System.out.println(
 						"\nRXTXCommDriver:getValidPortPrefixes() No ports prefixes known for this System.\nPlease check the port prefixes listed for "
@@ -123,21 +125,21 @@ public class RXTXCommDriver implements CommDriver {
 			}
 		}
 		int i = 0;
-		for (String candidatePortPrefixe : CandidatePortPrefixes) {
+		for (String candidatePortPrefixe : candidatePortPrefixes) {
 			if (isPortPrefixValid(candidatePortPrefixe)) {
-				ValidPortPrefixes[i++] = candidatePortPrefixe;
+				validPortPrefixes[i++] = candidatePortPrefixe;
 			}
 		}
 		String[] returnArray = new String[i];
-		System.arraycopy(ValidPortPrefixes, 0, returnArray, 0, i);
-		if (ValidPortPrefixes[0] == null) {
+		System.arraycopy(validPortPrefixes, 0, returnArray, 0, i);
+		if (validPortPrefixes[0] == null) {
 			if (debug) {
 				System.out.println(
 						"\nRXTXCommDriver:getValidPortPrefixes() No ports matched the list assumed for this\nSystem in the directory "
 								+ deviceDirectory + ".  Please check the ports listed for \"" + osName
 								+ "\" in\nRXTXCommDriver:registerScannedPorts()\nTried:");
-				for (String candidatePortPrefixe : CandidatePortPrefixes) {
-					System.out.println("\t" + CandidatePortPrefixes[i]);
+				for (String candidatePortPrefixe : candidatePortPrefixes) {
+					System.out.println("\t" + candidatePortPrefixes[i]);
 				}
 			}
 		}
@@ -156,22 +158,22 @@ public class RXTXCommDriver implements CommDriver {
 	}
 
 	/** handle solaris/sunos /dev/cua/a convention */
-	private void checkSolaris(String PortName, int PortType) {
+	private void checkSolaris(String portName, PortType portType) {
 		char p[] = { 91 };
 		for (p[0] = 97; p[0] < 123; p[0]++) {
-			if (testRead(PortName.concat(new String(p)), PortType)) {
-				CommPortIdentifier.addPortName(PortName.concat(new String(p)), PortType, this);
+			if (testRead(portName.concat(String.valueOf(p)), portType.value())) {
+				CommPortIdentifier.addPortName(portName.concat(String.valueOf(p)), portType, this);
 			}
 		}
 		/** check for 0-9 in case we have them (Solaris USB) */
 		for (p[0] = 48; p[0] <= 57; p[0]++) {
-			if (testRead(PortName.concat(new String(p)), PortType)) {
-				CommPortIdentifier.addPortName(PortName.concat(new String(p)), PortType, this);
+			if (testRead(portName.concat(String.valueOf(p)), portType.value())) {
+				CommPortIdentifier.addPortName(portName.concat(String.valueOf(p)), portType, this);
 			}
 		}
 	}
 
-	private void registerValidPorts(String CandidateDeviceNames[], String ValidPortPrefixes[], int PortType) {
+	private void registerValidPorts(String CandidateDeviceNames[], String ValidPortPrefixes[], PortType portType) {
 		int i = 0;
 		int p = 0;
 		/*
@@ -205,39 +207,36 @@ public class RXTXCommDriver implements CommDriver {
 					 *
 					 * If the above passes, we try to read from the port. If there is no err the port is added. Trent
 					 */
-					String V = ValidPortPrefixes[p];
-					int VL = V.length();
-					String C = CandidateDeviceNames[i];
-					if (C.length() < VL) {
+					String validPortPrefixe = ValidPortPrefixes[p];
+					int validPortPrefixeLength = validPortPrefixe.length();
+					String candidateDeviceName = CandidateDeviceNames[i];
+					if (candidateDeviceName.length() < validPortPrefixeLength) {
 						continue;
 					}
-					String CU = C.substring(VL).toUpperCase();
-					String Cl = C.substring(VL).toLowerCase();
-					if (!(C.regionMatches(0, V, 0, VL) && CU.equals(Cl))) {
+					String CU = candidateDeviceName.substring(validPortPrefixeLength).toUpperCase();
+					String Cl = candidateDeviceName.substring(validPortPrefixeLength).toLowerCase();
+					if (!(candidateDeviceName.regionMatches(0, validPortPrefixe, 0, validPortPrefixeLength) && CU.equals(Cl))) {
 						continue;
 					}
 					String PortName;
 					if (osName.toLowerCase().indexOf("windows") == -1) {
-						PortName = deviceDirectory + C;
+						PortName = deviceDirectory + candidateDeviceName;
 					}
 					else {
-						PortName = C;
+						PortName = candidateDeviceName;
 					}
 					if (debug) {
-						System.out.println(C + " " + V);
+						System.out.println(candidateDeviceName + " " + validPortPrefixe);
 						System.out.println(CU + " " + Cl);
 					}
 					if (osName.equals("Solaris") || osName.equals("SunOS")) {
-						checkSolaris(PortName, PortType);
+						checkSolaris(PortName, portType);
 					}
-					else if (testRead(PortName, PortType)) {
-						CommPortIdentifier.addPortName(PortName, PortType, this);
+					else if (testRead(PortName, portType.value())) {
+						CommPortIdentifier.addPortName(PortName, portType, this);
 					}
 				}
 			}
-		}
-		if (debug) {
-			System.out.println("Leaving registerValidPorts()");
 		}
 	}
 
@@ -258,47 +257,36 @@ public class RXTXCommDriver implements CommDriver {
 	 * Determine the OS and where the OS has the devices located
 	 */
 	public void initialize() {
-
-		if (debug) {
-			System.out.println("RXTXCommDriver:initialize()");
-		}
-
-		osName = System.getProperty("os.name");
-		deviceDirectory = getDeviceDirectory();
+		this.osName = System.getProperty("os.name");
+		this.deviceDirectory = getDeviceDirectory();
 
 		/*
 		 * First try to register ports specified in the properties file. If that doesn't exist, then scan for ports.
 		 */
-		for (int PortType = CommPortIdentifier.PORT_SERIAL; PortType <= CommPortIdentifier.PORT_PARALLEL; PortType++) {
-			if (!registerSpecifiedPorts(PortType)) {
-				if (!registerKnownPorts(PortType)) {
-					registerScannedPorts(PortType);
-				}
+		initPort(PortType.SERIAL);
+		initPort(PortType.PARALLEL);
+	}
+
+	private void initPort(PortType portType) {
+		if (!registerSpecifiedPorts(portType)) {
+			if (!registerKnownPorts(portType.value())) {
+				registerScannedPorts(portType);
 			}
 		}
 	}
 
-	private void addSpecifiedPorts(String names, int PortType) {
+	private void addSpecifiedPorts(String names, PortType portType) {
 		final String pathSep = System.getProperty("path.separator", ":");
 		final StringTokenizer tok = new StringTokenizer(names, pathSep);
 
-		if (debug) {
-			System.out.println("\nRXTXCommDriver:addSpecifiedPorts()");
-		}
 		while (tok.hasMoreElements()) {
-			String PortName = tok.nextToken();
-			if (debug) {
-				System.out.println("Trying " + PortName + ".");
-			}
-			if (testRead(PortName, PortType)) {
-				CommPortIdentifier.addPortName(PortName, PortType, this);
-				if (debug) {
-					System.out.println("Success: Read from " + PortName + ".");
-				}
+			String portName = tok.nextToken();
+			if (testRead(portName, portType.value())) {
+				CommPortIdentifier.addPortName(portName, portType, this);
 			}
 			else {
 				if (debug) {
-					System.out.println("Fail: Cannot read from " + PortName + ".");
+					System.out.println("Fail: Cannot read from " + portName + ".");
 				}
 			}
 		}
@@ -317,7 +305,7 @@ public class RXTXCommDriver implements CommDriver {
 	 * gnu.io.rxtx.SerialPorts=/dev/ttyS0:/dev/ttyS1: gnu.io.rxtx.ParallelPorts=/dev/lp0:
 	 *
 	 */
-	private boolean registerSpecifiedPorts(int PortType) {
+	private boolean registerSpecifiedPorts(PortType portType) {
 		String val = null;
 		Properties origp = System.getProperties(); // save system properties
 
@@ -352,20 +340,20 @@ public class RXTXCommDriver implements CommDriver {
 		} // end for
 
 		if (debug) {
-			System.out.println("checking for system-known ports of type " + PortType);
+			System.out.println("checking for system-known ports of type " + portType);
 		}
 		if (debug) {
-			System.out.println("checking registry for ports of type " + PortType);
+			System.out.println("checking registry for ports of type " + portType);
 		}
 
-		switch (PortType) {
-		case CommPortIdentifier.PORT_SERIAL:
+		switch (portType) {
+		case SERIAL:
 			if ((val = System.getProperty("gnu.io.rxtx.SerialPorts")) == null) {
 				val = System.getProperty("gnu.io.SerialPorts");
 			}
 			break;
 
-		case CommPortIdentifier.PORT_PARALLEL:
+		case PARALLEL:
 			if ((val = System.getProperty("gnu.io.rxtx.ParallelPorts")) == null) {
 				val = System.getProperty("gnu.io.ParallelPorts");
 			}
@@ -373,13 +361,13 @@ public class RXTXCommDriver implements CommDriver {
 		default:
 			if (debug) {
 				System.out.println(
-						"unknown port type " + PortType + " passed to RXTXCommDriver.registerSpecifiedPorts()");
+						"unknown port type " + portType + " passed to RXTXCommDriver.registerSpecifiedPorts()");
 			}
 		}
 
 		System.setProperties(origp); // recall saved properties
 		if (val != null) {
-			addSpecifiedPorts(val, PortType);
+			addSpecifiedPorts(val, portType);
 			return true;
 		}
 		else {
@@ -392,10 +380,10 @@ public class RXTXCommDriver implements CommDriver {
 	 * can be opened then register them.
 	 *
 	 */
-	private void registerScannedPorts(int PortType) {
+	private void registerScannedPorts(PortType portType) {
 		String[] CandidateDeviceNames;
 		if (debug) {
-			System.out.println("scanning device directory " + deviceDirectory + " for ports of type " + PortType);
+			System.out.println("scanning device directory " + deviceDirectory + " for ports of type " + portType);
 		}
 		if (osName.equals("Windows CE")) {
 			String[] temp = { "COM1:", "COM2:", "COM3:", "COM4:", "COM5:", "COM6:", "COM7:", "COM8:" };
@@ -464,8 +452,8 @@ public class RXTXCommDriver implements CommDriver {
 		}
 
 		String CandidatePortPrefixes[] = {};
-		switch (PortType) {
-		case CommPortIdentifier.PORT_SERIAL:
+		switch (portType) {
+		case SERIAL:
 			if (debug) {
 				System.out.println("scanning for serial ports for os " + osName);
 			}
@@ -623,7 +611,7 @@ public class RXTXCommDriver implements CommDriver {
 			}
 			break;
 
-		case CommPortIdentifier.PORT_PARALLEL:
+		case PARALLEL:
 			if (debug) {
 				System.out.println("scanning for parallel ports for os " + osName);
 			}
@@ -656,54 +644,45 @@ public class RXTXCommDriver implements CommDriver {
 			break;
 		default:
 			if (debug) {
-				System.out.println("Unknown PortType " + PortType + " passed to RXTXCommDriver.registerScannedPorts()");
+				System.out.println("Unknown PortType " + portType + " passed to RXTXCommDriver.registerScannedPorts()");
 			}
 		}
-		registerValidPorts(CandidateDeviceNames, CandidatePortPrefixes, PortType);
+		registerValidPorts(CandidateDeviceNames, CandidatePortPrefixes, portType);
 	}
 
-	/*
-	 * <p>From the NullDriver.java CommAPI sample.
-	 */
-	/**
-	 * @param PortName
-	 *            The name of the port the OS recognizes
-	 * @param PortType
-	 *            CommPortIdentifier.PORT_SERIAL or PORT_PARALLEL
-	 * @return CommPort getCommPort() will be called by CommPortIdentifier from its openPort() method. PortName is a
-	 *         string that was registered earlier using the CommPortIdentifier.addPortName() method. getCommPort()
-	 *         returns an object that extends either SerialPort or ParallelPort.
-	 */
-	public CommPort getCommPort(String PortName, int PortType) {
-		if (debug) {
-			System.out.println("RXTXCommDriver:getCommPort(" + PortName + "," + PortType + ")");
-		}
+	public CommPort commPort(String portName, PortType portType) {
 		try {
-			switch (PortType) {
-			case CommPortIdentifier.PORT_SERIAL:
+			switch (portType) {
+			case SERIAL:
 				if (osName.toLowerCase().indexOf("windows") == -1) {
 
-					return new RXTXPort(PortName);
+					return new RXTXPort(portName);
 				}
 				else {
-					return new RXTXPort(deviceDirectory + PortName);
+					return new RXTXPort(deviceDirectory + portName);
 				}
-			case CommPortIdentifier.PORT_PARALLEL:
-				return new LPRPort(PortName);
+			case PARALLEL:
+				return new LPRPort(portName);
 			default:
-				if (debug) {
-					System.out.println("unknown PortType  " + PortType + " passed to RXTXCommDriver.getCommPort()");
-				}
+				// TODO throw appropriate EX?
+				return null;
 			}
 		} catch (PortInUseException e) {
 			if (debug) {
-				System.out.println("Port " + PortName + " in use by another application");
+				System.out.println("Port " + portName + " in use by another application");
 			}
+			return null;
 		}
-		return null;
 	}
 
+	@Deprecated
+	public CommPort getCommPort(String portName, int portType) {
+		return commPort(portName, Enu.enumFor(portType, PortType.class));
+	}
+
+	// TODO remove this in future versions
 	/* Yikes. Trying to call println from C for odd reasons */
+	@Deprecated
 	public void Report(String arg) {
 		System.out.println(arg);
 	}

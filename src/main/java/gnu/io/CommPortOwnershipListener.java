@@ -24,12 +24,6 @@ package gnu.io;
 
 import java.util.EventListener;
 
-/**
- * @author Trent Jarvi
- * @version %I%, %G%
- * @since JDK1.0
- */
-
 public interface CommPortOwnershipListener extends EventListener {
 	int PORT_OWNED = 1;
 	int PORT_UNOWNED = 2;

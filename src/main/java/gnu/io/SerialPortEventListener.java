@@ -24,6 +24,15 @@ package gnu.io;
 
 import java.util.EventListener;
 
+/**
+ * Propagates a {@link SerialPortEvent} event.
+ */
 public interface SerialPortEventListener extends EventListener {
-	void serialEvent(SerialPortEvent ev);
+	/**
+	 * Invoked when an action occurs.
+	 * 
+	 * @param portEvent
+	 *            the port event.
+	 */
+	void serialEvent(SerialPortEvent portEvent);
 }

@@ -109,8 +109,11 @@ public abstract class CommPort implements Closeable {
 	public abstract int commPortTimeout();
 
 	/**
-	 * @deprecated this method will be removed in future versions. Use {@link #commPortTimeout()} instead.
+	 * Status of receive timout.
+	 * 
 	 * @return the COM port receive timeout.
+	 * 
+	 * @deprecated this method will be removed in future versions. Use {@link #commPortTimeout()} instead.
 	 */
 	@Deprecated
 	public abstract boolean isReceiveTimeoutEnabled();
@@ -119,9 +122,10 @@ public abstract class CommPort implements Closeable {
 	 * Gets the integer value of the receive timeout. If the receive timeout is disabled or not supported by the driver,
 	 * then the value returned is meaningless.
 	 * 
-	 * @deprecated this function will be removed in future versions. Use {@link #commPortTimeout()} instead
 	 * 
 	 * @return number of milliseconds in receive timeout
+	 * 
+	 * @deprecated this function will be removed in future versions. Use {@link #commPortTimeout()} instead
 	 */
 	@Deprecated
 	public abstract int getReceiveTimeout();

@@ -35,6 +35,40 @@ public class CommPortIdentifier /* extends Vector? */ {
 	public static final int PORT_RS485 = 4; // rs485 Port
 	public static final int PORT_RAW = 5; // Raw Port
 
+	public enum PortType implements CommPortEnum {
+		/**
+		 * RS232 Port
+		 */
+		SERIAL(1),
+		/**
+		 * Parallel Port
+		 */
+		PARALLEL(2),
+		/**
+		 * I2C Port
+		 */
+		I2C(3),
+		/**
+		 * RS485 Port
+		 */
+		RS485(4),
+		/**
+		 * Raw Port
+		 */
+		RAW(5);
+
+		private int value;
+
+		private PortType(int value) {
+			this.value = value;
+		}
+
+		public int value() {
+			return this.value;
+		}
+
+	}
+
 	static CommPortIdentifier CommPortIndex;
 	static Object sync;
 
@@ -71,26 +105,47 @@ public class CommPortIdentifier /* extends Vector? */ {
 		System.loadLibrary("rxtxSerial");
 	}
 
-	CommPortIdentifier(String pn, CommPort cp, int pt, CommDriver driver) {
-		portName = pn;
-		commport = cp;
-		PortType = pt;
-		next = null;
-		rxtxDriver = driver;
+	CommPortIdentifier(String portName, CommPort commPort, int portType, CommDriver commDriver) {
+		this.portName = portName;
+		this.commport = commPort;
+		this.PortType = portType;
+		this.next = null;
+		this.rxtxDriver = commDriver;
 
 	}
 
-	/*------------------------------------------------------------------------------
-		addPortName()
-		accept:         Name of the port s, Port type, 
-	                    reverence to RXTXCommDriver.
-		perform:        place a new CommPortIdentifier in the linked list
-		return: 	none.
-		exceptions:     none.
-		comments:
-	------------------------------------------------------------------------------*/
-	public static void addPortName(String s, int type, CommDriver c) {
-		addIdentifierToList(new CommPortIdentifier(s, null, type, c));
+	/**
+	 * Adds {@link #portName} to the list of ports.
+	 * 
+	 * @param appname
+	 *            The name of the port being added
+	 * @param portType
+	 *            The type of the port being added
+	 * @param driver
+	 *            The driver representing the port being added
+	 * 
+	 * @deprecated use {@link #addPortName(String, PortType, CommDriver)} instead.
+	 */
+	@Deprecated
+	public static void addPortName(String appname, int portType, CommDriver driver) {
+		addIdentifierToList(new CommPortIdentifier(appname, null, portType, driver));
+	}
+
+	/**
+	 * 
+	 * Adds {@link #portName} to the list of ports.
+	 * 
+	 * @param appname
+	 *            The name of the port being added
+	 * @param portType
+	 *            The type of the port being added
+	 * @param driver
+	 *            The driver representing the port being added
+	 * 
+	 * @see CommPort
+	 */
+	public static void addPortName(String appname, PortType portType, CommDriver driver) {
+		addIdentifierToList(new CommPortIdentifier(appname, null, portType.value(), driver));
 	}
 
 	/*------------------------------------------------------------------------------
@@ -116,15 +171,24 @@ public class CommPortIdentifier /* extends Vector? */ {
 		}
 	}
 
-	/*------------------------------------------------------------------------------
-		addPortOwnershipListener()
-		accept:
-		perform:
-		return:
-		exceptions:
-		comments:   
-	------------------------------------------------------------------------------*/
-	public void addPortOwnershipListener(CommPortOwnershipListener c) {
+	/**
+	 * Registers an interested application so that it can receive notification of changes in port ownership. This
+	 * includes notification of the following events:
+	 * 
+	 * <ul>
+	 * <li>{@link CommPortOwnershipListener#PORT_OWNED}: Port became owned</li>
+	 * <li>{@link CommPortOwnershipListener#PORT_UNOWNED}: Port became unowned</li>
+	 * <li>{@link CommPortOwnershipListener#PORT_OWNERSHIP_REQUESTED}: If the application owns this port and is willing
+	 * to give up ownership, then it should call close now.</li>
+	 * </ul>
+	 * 
+	 * The ownershipChange method of the listener registered using addPortOwnershipListener will be called with one of
+	 * the above events.
+	 * 
+	 * @param listener
+	 *            {@link CommPortOwnershipListener} callback object
+	 */
+	public void addPortOwnershipListener(CommPortOwnershipListener listener) {
 		/* is the Vector instantiated? */
 
 		if (ownershipListener == null) {
@@ -133,49 +197,44 @@ public class CommPortIdentifier /* extends Vector? */ {
 
 		/* is the ownership listener already in the list? */
 
-		if (!ownershipListener.contains(c)) {
-			ownershipListener.addElement(c);
+		if (!ownershipListener.contains(listener)) {
+			ownershipListener.addElement(listener);
 		}
 	}
 
-	/*------------------------------------------------------------------------------
-		getCurrentOwner()
-		accept:
-		perform:
-		return:
-		exceptions:
-		comments:    
-	------------------------------------------------------------------------------*/
+	/**
+	 * Returns the owner of the port.
+	 * 
+	 * @return current owner of the port.
+	 */
 	public String getCurrentOwner() {
 		return (owner);
 	}
 
-	/*------------------------------------------------------------------------------
-		getName()
-		accept:
-		perform:
-		return:
-		exceptions:
-		comments:
-	------------------------------------------------------------------------------*/
+	/**
+	 * Returns the name of the port.
+	 * 
+	 * @return the name of the port
+	 */
 	public String getName() {
 		return (portName);
 	}
 
-	/*------------------------------------------------------------------------------
-		getPortIdentifier()
-		accept:
-		perform:
-		return:
-		exceptions:
-		comments:   
-	------------------------------------------------------------------------------*/
-	static public CommPortIdentifier getPortIdentifier(String s) throws NoSuchPortException {
+	/**
+	 * Obtains the CommPortIdentifier object corresponding to a port that has already been opened by the application.
+	 * 
+	 * @param portName
+	 *            name of the port to open
+	 * @return {@link CommPortIdentifier} object
+	 * @throws NoSuchPortException
+	 *             if the port object is invalid
+	 */
+	public static CommPortIdentifier getPortIdentifier(String portName) throws NoSuchPortException {
 		CommPortIdentifier index;
 
 		synchronized (sync) {
 			index = CommPortIndex;
-			while (index != null && !index.portName.equals(s)) {
+			while (index != null && !index.portName.equals(portName)) {
 				index = index.next;
 			}
 			if (index == null) {
@@ -187,7 +246,7 @@ public class CommPortIdentifier /* extends Vector? */ {
 				 */
 				getPortIdentifiers();
 				index = CommPortIndex;
-				while (index != null && !index.portName.equals(s)) {
+				while (index != null && !index.portName.equals(portName)) {
 					index = index.next;
 				}
 			}
@@ -200,15 +259,16 @@ public class CommPortIdentifier /* extends Vector? */ {
 		}
 	}
 
-	/*------------------------------------------------------------------------------
-		getPortIdentifier()
-		accept:
-		perform:
-		return:
-		exceptions:
-		comments:    
-	------------------------------------------------------------------------------*/
-	static public CommPortIdentifier getPortIdentifier(CommPort p) throws NoSuchPortException {
+	/**
+	 * Obtains the CommPortIdentifier object corresponding to a port that has already been opened by the application.
+	 * 
+	 * @param port
+	 *            a {@link CommPort} object obtained from a previous open
+	 * @return {@link CommPortIdentifier} object
+	 * @throws NoSuchPortException
+	 *             if the port object is invalid
+	 */
+	public static CommPortIdentifier getPortIdentifier(CommPort p) throws NoSuchPortException {
 		CommPortIdentifier c;
 		synchronized (sync) {
 			c = CommPortIndex;
@@ -223,14 +283,11 @@ public class CommPortIdentifier /* extends Vector? */ {
 		throw new NoSuchPortException();
 	}
 
-	/*------------------------------------------------------------------------------
-		getPortIdentifiers()
-		accept:
-		perform:
-		return:
-		exceptions:
-		comments:
-	------------------------------------------------------------------------------*/
+	/**
+	 * The CommPortOwnershipListener object that was previously registered using addPortOwnershipListener
+	 * 
+	 * @return {@link Enumeration} that can be used to enumerate all the ports known to the system
+	 */
 	public static Enumeration<CommPortIdentifier> getPortIdentifiers() {
 		// Do not allow anybody get any ports while we are re-initializing
 		// because the CommPortIndex points to invalid instances during that time
@@ -282,39 +339,49 @@ public class CommPortIdentifier /* extends Vector? */ {
 		return new CommPortEnumerator();
 	}
 
-	/*------------------------------------------------------------------------------
-		getPortType()
-		accept:
-		perform:
-		return:
-		exceptions:
-		comments:
-	------------------------------------------------------------------------------*/
+	/**
+	 * Returns the port type.
+	 * 
+	 * @return PORT_SERIAL, PORT_PARALLEL, PORT_I2C, PORT_RS485, PORT_RAW
+	 * 
+	 * @deprecated use {@link #portType()} instead.
+	 */
+	@Deprecated
 	public int getPortType() {
 		return (PortType);
 	}
 
-	/*------------------------------------------------------------------------------
-		isCurrentlyOwned()
-		accept:
-		perform:
-		return:
-		exceptions:
-		comments:    
-	------------------------------------------------------------------------------*/
+	/**
+	 * Returns the port type.
+	 * 
+	 * @return the port type.
+	 */
+	public PortType portType() {
+		return Enu.enumFor(this.PortType, PortType.class);
+	}
+
+	/**
+	 * Checks whether the port is owned.
+	 * 
+	 * @return {@code true} if port is owned by an application, {@code false} if port is not owned.
+	 */
 	public synchronized boolean isCurrentlyOwned() {
 		return (!available);
 	}
 
-	/*------------------------------------------------------------------------------
-		open()
-		accept:
-		perform:
-		return:
-		exceptions:
-		comments:
-	------------------------------------------------------------------------------*/
-	public synchronized CommPort open(FileDescriptor f) throws UnsupportedCommOperationException {
+	/**
+	 * Opens the communications port using a FileDescriptor object on platforms that support this technique.
+	 * 
+	 * @param fileDescriptor
+	 *            The {@link FileDescriptor} associated with this CommPort.
+	 * @return
+	 * @throws UnsupportedCommOperationException
+	 *             on platforms which do not support this functionality.
+	 * 
+	 * @deprecated since this function was never implemented.
+	 */
+	@Deprecated
+	public synchronized CommPort open(FileDescriptor fileDescriptor) throws UnsupportedCommOperationException {
 		throw new UnsupportedCommOperationException();
 	}
 
@@ -331,19 +398,35 @@ public class CommPortIdentifier /* extends Vector? */ {
 	------------------------------------------------------------------------------*/
 	private boolean HideOwnerEvents;
 
-	public CommPort open(String TheOwner, int i) throws gnu.io.PortInUseException {
+	/**
+	 * Opens the communications port. open obtains exclusive ownership of the port. If the port is owned by some other
+	 * application, a PORT_OWNERSHIP_REQUESTED event is propagated using the CommPortOwnershipListener event mechanism.
+	 * If the application that owns the port calls close during the event processing, then this open will succeed. There
+	 * is one InputStream and one OutputStream associated with each port. After a port is opened with open, then all
+	 * calls to getInputStream will return the same stream object until close is called.
+	 * 
+	 * @param appname
+	 *            Name of application making this call. This name will become the owner of the port. Useful when
+	 *            resolving ownership contention.
+	 * @param timeout
+	 *            Time in milliseconds to block waiting for port open.
+	 * @return the {@link CommPort}
+	 * @throws PortInUseException
+	 *             if the port is in use by some other application that is not willing to relinquish ownership
+	 */
+	public CommPort open(String appname, int timeout) throws PortInUseException {
 		boolean isAvailable;
 		synchronized (this) {
 			isAvailable = this.available;
 			if (isAvailable) {
 				// assume ownership inside the synchronized block
 				this.available = false;
-				this.owner = TheOwner;
+				this.owner = appname;
 			}
 		}
 		if (!isAvailable) {
-			long waitTimeEnd = System.currentTimeMillis() + i;
-			// fire the ownership event outside the synchronized block
+			long waitTimeEnd = System.currentTimeMillis() + timeout;
+			// timeout the ownership event outside the synchronized block
 			fireOwnershipEvent(CommPortOwnershipListener.PORT_OWNERSHIP_REQUESTED);
 			long waitTimeCurr;
 			synchronized (this) {
@@ -359,7 +442,7 @@ public class CommPortIdentifier /* extends Vector? */ {
 				if (isAvailable) {
 					// assume ownership inside the synchronized block
 					this.available = false;
-					this.owner = TheOwner;
+					this.owner = appname;
 				}
 			}
 		}
@@ -369,7 +452,8 @@ public class CommPortIdentifier /* extends Vector? */ {
 		// At this point, the CommPortIdentifier is owned by us.
 		try {
 			if (commport == null) {
-				commport = rxtxDriver.getCommPort(portName, PortType);
+				commport = rxtxDriver.commPort(portName,
+						Enu.enumFor(this.PortType, gnu.io.CommPortIdentifier.PortType.class));
 			}
 			if (commport != null) {
 				fireOwnershipEvent(CommPortOwnershipListener.PORT_OWNED);
@@ -389,18 +473,17 @@ public class CommPortIdentifier /* extends Vector? */ {
 		}
 	}
 
-	/*------------------------------------------------------------------------------
-		removePortOwnership()
-		accept:
-		perform:
-		return:
-		exceptions:
-		comments:
-	------------------------------------------------------------------------------*/
-	public void removePortOwnershipListener(CommPortOwnershipListener c) {
+	/**
+	 * Unregisters a {@link CommPortOwnershipListener} registered using
+	 * {@link #addPortOwnershipListener(CommPortOwnershipListener)}
+	 * 
+	 * @param listener
+	 *            The CommPortOwnershipListener object that was previously registered using addPortOwnershipListener
+	 */
+	public void removePortOwnershipListener(CommPortOwnershipListener listener) {
 		/* why is this called twice? */
 		if (ownershipListener != null) {
-			ownershipListener.removeElement(c);
+			ownershipListener.removeElement(listener);
 		}
 	}
 

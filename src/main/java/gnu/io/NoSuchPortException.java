@@ -22,12 +22,15 @@
  */
 package gnu.io;
 
+/**
+ * Thrown when a driver can't find the specified port.
+ */
 public class NoSuchPortException extends Exception {
-	NoSuchPortException(String str) {
-		super(str);
+	NoSuchPortException(String message) {
+		super(message);
 	}
 
-	public NoSuchPortException() {
+	NoSuchPortException() {
 		super();
 	}
 }

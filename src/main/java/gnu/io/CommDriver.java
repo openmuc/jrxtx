@@ -22,8 +22,44 @@
  */
 package gnu.io;
 
+import gnu.io.CommPortIdentifier.PortType;
+
+/**
+ * Part of the loadable device driver interface. CommDriver should not be used by application-level programs.
+ */
 public interface CommDriver {
+	/**
+	 * {@link #getCommPort(String, int)} will be called by {@link CommPortIdentifier#open(String, int)} {@code portName}
+	 * is a string that was registered earlier using the
+	 * {@link CommPortIdentifier#addPortName(String, gnu.io.CommPortIdentifier.PortType, CommDriver)} method.
+	 * 
+	 * @param portName
+	 *            port name
+	 * @param portType
+	 *            port type
+	 * @return the {@link CommPort}
+	 * @deprecated use {@link #commPort(String, PortType)} instead.
+	 */
+	@Deprecated
 	CommPort getCommPort(String portName, int portType);
 
+	/**
+	 * {@link #getCommPort(String, int)} will be called by {@link CommPortIdentifier#open(String, int)} {@code portName}
+	 * is a string that was registered earlier using the
+	 * {@link CommPortIdentifier#addPortName(String, gnu.io.CommPortIdentifier.PortType, CommDriver)} method.
+	 * 
+	 * @param portName
+	 *            port name
+	 * @param portType
+	 *            port type
+	 * @return the {@link CommPort}
+	 */
+	CommPort commPort(String portName, PortType portType);
+
+	/**
+	 * initialize() will be called by the CommPortIdentifier's static initializer. The responsibility of this method is:
+	 * 1) Ensure that that the hardware is present. 2) Load any required native libraries. 3) Register the port names
+	 * with the CommPortIdentifier.
+	 */
 	void initialize();
 }

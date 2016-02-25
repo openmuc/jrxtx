@@ -27,6 +27,13 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.TooManyListenersException;
 
+import gnu.io.SerialPortEvent.EventType;
+import gnu.io.serialport.DataBits;
+import gnu.io.serialport.FlowControl;
+import gnu.io.serialport.Parity;
+import gnu.io.serialport.StopBits;
+import gnu.io.serialport.UARTType;
+
 public class RXTXPort extends SerialPort {
 
 	static {
@@ -48,11 +55,11 @@ public class RXTXPort extends SerialPort {
 	private int fd = 0;
 	private boolean MonitorThreadAlive = false;
 
-	private int dataBits = DATABITS_8;
+	private int dataBits = DataBits.DATABITS_8.value();
 	private int speed = 9600;
-	private int stopBits = SerialPort.STOPBITS_1;
-	private int parity = SerialPort.PARITY_NONE;
-	private int flowmode = SerialPort.FLOWCONTROL_NONE;
+	private int stopBits = StopBits.STOPBITS_1.value();
+	private int parity = Parity.NONE.value();
+	private int flowmode = FlowControl.NONE.value();
 
 	private int timeout = -1;
 	private int threshold = 0;
@@ -168,8 +175,8 @@ public class RXTXPort extends SerialPort {
 			throw new UnsupportedCommOperationException("Invalid Parameter");
 		}
 		this.speed = baudRate;
-		if (stopBits == STOPBITS_1_5) {
-			this.dataBits = DATABITS_5;
+		if (stopBits == StopBits.STOPBITS_1_5.value()) {
+			this.dataBits = DataBits.DATABITS_5.value();
 		}
 		else {
 			this.dataBits = dataBits;
@@ -184,21 +191,40 @@ public class RXTXPort extends SerialPort {
 	}
 
 	@Override
+	@Deprecated
 	public int getDataBits() {
 		return dataBits;
 	}
 
 	@Override
+	public DataBits dataBits() {
+		return Enu.enumFor(this.dataBits, DataBits.class);
+	}
+
+	@Override
+	@Deprecated
 	public int getStopBits() {
 		return stopBits;
 	}
 
 	@Override
+	public StopBits stopBits() {
+		return Enu.enumFor(this.stopBits, StopBits.class);
+	}
+
+	@Override
+	@Deprecated
 	public int getParity() {
 		return parity;
 	}
 
 	@Override
+	public Parity parity() {
+		return Enu.enumFor(this.parity, Parity.class);
+	}
+
+	@Override
+	@Deprecated
 	public void setFlowControlMode(int flowcontrol) {
 		if (monThreadisInterrupted) {
 			return;
@@ -213,8 +239,19 @@ public class RXTXPort extends SerialPort {
 	}
 
 	@Override
+	public void setFlowControlMode(FlowControl flowcontrol) throws UnsupportedCommOperationException {
+		setFlowControlMode(flowcontrol.value());
+	}
+
+	@Override
+	@Deprecated
 	public int getFlowControlMode() {
 		return flowmode;
+	}
+
+	@Override
+	public FlowControl flowControlMode() {
+		return Enu.enumFor(this.flowmode, FlowControl.class);
 	}
 
 	@Override
@@ -261,11 +298,13 @@ public class RXTXPort extends SerialPort {
 	}
 
 	@Override
+	@Deprecated
 	public boolean isReceiveTimeoutEnabled() {
 		return (NativeisReceiveTimeoutEnabled());
 	}
 
 	@Override
+	@Deprecated
 	public int getReceiveTimeout() {
 		return (NativegetReceiveTimeout());
 	}
@@ -401,54 +440,54 @@ public class RXTXPort extends SerialPort {
 		if (fd == 0 || serialPortEventListener == null || monThread == null) {
 			return true;
 		}
-
-		switch (event) {
-		case SerialPortEvent.DATA_AVAILABLE:
+		EventType eventType = Enu.enumFor(event, EventType.class);
+		switch (eventType) {
+		case DATA_AVAILABLE:
 			if (monThread.Data) {
 				break;
 			}
 			return (false);
-		case SerialPortEvent.OUTPUT_BUFFER_EMPTY:
+		case OUTPUT_BUFFER_EMPTY:
 			if (monThread.Output) {
 				break;
 			}
 			return (false);
-		case SerialPortEvent.CTS:
+		case CLEAR_TO_SEND:
 			if (monThread.CTS) {
 				break;
 			}
 			return (false);
-		case SerialPortEvent.DSR:
+		case DATA_SET_READY:
 			if (monThread.DSR) {
 				break;
 			}
 			return (false);
-		case SerialPortEvent.RI:
+		case RING_INDICATOR:
 			if (monThread.RI) {
 				break;
 			}
 			return (false);
-		case SerialPortEvent.CD:
+		case CARRIER_DETECT:
 			if (monThread.CD) {
 				break;
 			}
 			return (false);
-		case SerialPortEvent.OE:
+		case OVERRUN_ERROR:
 			if (monThread.OE) {
 				break;
 			}
 			return (false);
-		case SerialPortEvent.PE:
+		case PARITY_ERROR:
 			if (monThread.PE) {
 				break;
 			}
 			return (false);
-		case SerialPortEvent.FE:
+		case FRAMING_ERROR:
 			if (monThread.FE) {
 				break;
 			}
 			return (false);
-		case SerialPortEvent.BI:
+		case BREAK_INTERRUPT:
 			if (monThread.BI) {
 				break;
 			}
@@ -555,7 +594,7 @@ public class RXTXPort extends SerialPort {
 		waitForTheNativeCodeSilly();
 
 		MonitorThreadLock = true;
-		nativeSetEventFlag(fd, SerialPortEvent.DATA_AVAILABLE, enable);
+		nativeSetEventFlag(fd, EventType.DATA_AVAILABLE.value(), enable);
 		monThread.Data = enable;
 		MonitorThreadLock = false;
 	}
@@ -564,7 +603,7 @@ public class RXTXPort extends SerialPort {
 	public void notifyOnOutputEmpty(boolean enable) {
 		waitForTheNativeCodeSilly();
 		MonitorThreadLock = true;
-		nativeSetEventFlag(fd, SerialPortEvent.OUTPUT_BUFFER_EMPTY, enable);
+		nativeSetEventFlag(fd, EventType.OUTPUT_BUFFER_EMPTY.value(), enable);
 		monThread.Output = enable;
 		MonitorThreadLock = false;
 	}
@@ -573,7 +612,7 @@ public class RXTXPort extends SerialPort {
 	public void notifyOnCTS(boolean enable) {
 		waitForTheNativeCodeSilly();
 		MonitorThreadLock = true;
-		nativeSetEventFlag(fd, SerialPortEvent.CTS, enable);
+		nativeSetEventFlag(fd, EventType.CLEAR_TO_SEND.value(), enable);
 		monThread.CTS = enable;
 		MonitorThreadLock = false;
 	}
@@ -582,7 +621,7 @@ public class RXTXPort extends SerialPort {
 	public void notifyOnDSR(boolean enable) {
 		waitForTheNativeCodeSilly();
 		MonitorThreadLock = true;
-		nativeSetEventFlag(fd, SerialPortEvent.DSR, enable);
+		nativeSetEventFlag(fd, EventType.DATA_SET_READY.value(), enable);
 		monThread.DSR = enable;
 		MonitorThreadLock = false;
 	}
@@ -591,7 +630,7 @@ public class RXTXPort extends SerialPort {
 	public void notifyOnRingIndicator(boolean enable) {
 		waitForTheNativeCodeSilly();
 		MonitorThreadLock = true;
-		nativeSetEventFlag(fd, SerialPortEvent.RI, enable);
+		nativeSetEventFlag(fd, EventType.RING_INDICATOR.value(), enable);
 		monThread.RI = enable;
 		MonitorThreadLock = false;
 	}
@@ -600,7 +639,7 @@ public class RXTXPort extends SerialPort {
 	public void notifyOnCarrierDetect(boolean enable) {
 		waitForTheNativeCodeSilly();
 		MonitorThreadLock = true;
-		nativeSetEventFlag(fd, SerialPortEvent.CD, enable);
+		nativeSetEventFlag(fd, EventType.CARRIER_DETECT.value(), enable);
 		monThread.CD = enable;
 		MonitorThreadLock = false;
 	}
@@ -609,7 +648,7 @@ public class RXTXPort extends SerialPort {
 	public void notifyOnOverrunError(boolean enable) {
 		waitForTheNativeCodeSilly();
 		MonitorThreadLock = true;
-		nativeSetEventFlag(fd, SerialPortEvent.OE, enable);
+		nativeSetEventFlag(fd, EventType.OVERRUN_ERROR.value(), enable);
 		monThread.OE = enable;
 		MonitorThreadLock = false;
 	}
@@ -618,7 +657,7 @@ public class RXTXPort extends SerialPort {
 	public void notifyOnParityError(boolean enable) {
 		waitForTheNativeCodeSilly();
 		MonitorThreadLock = true;
-		nativeSetEventFlag(fd, SerialPortEvent.PE, enable);
+		nativeSetEventFlag(fd, EventType.PARITY_ERROR.value(), enable);
 		monThread.PE = enable;
 		MonitorThreadLock = false;
 	}
@@ -627,7 +666,7 @@ public class RXTXPort extends SerialPort {
 	public void notifyOnFramingError(boolean enable) {
 		waitForTheNativeCodeSilly();
 		MonitorThreadLock = true;
-		nativeSetEventFlag(fd, SerialPortEvent.FE, enable);
+		nativeSetEventFlag(fd, EventType.FRAMING_ERROR.value(), enable);
 		monThread.FE = enable;
 		MonitorThreadLock = false;
 	}
@@ -636,7 +675,7 @@ public class RXTXPort extends SerialPort {
 	public void notifyOnBreakInterrupt(boolean enable) {
 		waitForTheNativeCodeSilly();
 		MonitorThreadLock = true;
-		nativeSetEventFlag(fd, SerialPortEvent.BI, enable);
+		nativeSetEventFlag(fd, EventType.BREAK_INTERRUPT.value(), enable);
 		monThread.BI = enable;
 		MonitorThreadLock = false;
 	}
@@ -825,7 +864,7 @@ public class RXTXPort extends SerialPort {
 				 * this is probably good on all OS's but for now just sendEvent from java on Sol
 				 */
 				if (nativeDrain(monThreadisInterrupted)) {
-					sendEvent(SerialPortEvent.OUTPUT_BUFFER_EMPTY, true);
+					sendEvent(EventType.OUTPUT_BUFFER_EMPTY.value(), true);
 				}
 			} finally {
 				synchronized (IOLockedMutex) {
@@ -1476,13 +1515,25 @@ public class RXTXPort extends SerialPort {
 	}
 
 	@Override
+	@Deprecated
 	public boolean setUARTType(String type, boolean test) throws UnsupportedCommOperationException {
 		return nativeSetUartType(type, test);
 	}
 
 	@Override
+	public boolean setUARTType(UARTType type, boolean test) throws UnsupportedCommOperationException {
+		return nativeSetUartType(type.type(), test);
+	}
+
+	@Override
+	@Deprecated
 	public String getUARTType() throws UnsupportedCommOperationException {
 		return nativeGetUartType();
+	}
+
+	@Override
+	public UARTType uartType() throws UnsupportedCommOperationException {
+		return UARTType.typeFor(nativeGetUartType());
 	}
 
 	@Override
@@ -1543,4 +1594,5 @@ public class RXTXPort extends SerialPort {
 			throws UnsupportedCommOperationException {
 		setSerialPortParams(baudRate, dataBits.value(), stopBits.value(), parity.value());
 	}
+
 }
