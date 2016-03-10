@@ -6,23 +6,20 @@ maintainers.
 
 jRxTx is licensed under the LGPLv2.1 or later
 
-jRxTx has been initiated with the following goals in mind:
+jRxTx has the goal to maintain full backward compatibility to RXTX
+while embracing future bug fixes by the community.
 
-- Maintain backward compatibility to RXTX.
+The following lists some of the improvements added to the original RXTX:
 
-- Add javadoc
+- Javadoc added
 
-- Clean up the code and file structure to make it more maintainable.
+- Cleaned up the code and file structure to make it more maintainable.
 
-- Make the jar file a bundle that can run in OSGi.
+- The jar file is now a bundle that can run in OSGi.
 
-- Publish the jar file in maven central.
+- The jar file is published on maven central.
 
-- Update the build system to use Gradle.
+- The Java build system has been moved to Gradle.
 
-- Improve the input and output stream implementations (or add
-  additional ones, to keep backward compatibility) that are returned
-  by the SerialPort class. The improved streams shall behave like the
-  streams that the Java TCP socket API provides.
-
-- Embrace future bug fixes by the community.
+- Improve the input and output stream implementations that behave like
+  the streams that the Java TCP socket API provides.
