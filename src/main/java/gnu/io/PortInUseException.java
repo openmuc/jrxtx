@@ -26,30 +26,30 @@ package gnu.io;
  * Thrown when the specified port is in use.
  */
 public class PortInUseException extends Exception {
-	/**
-	 * @deprecated use {@link #currentOwner()} instead.
-	 */
-	@Deprecated
-	public String currentOwner;
-	private String portOwner;
+    /**
+     * @deprecated use {@link #currentOwner()} instead.
+     */
+    @Deprecated
+    public String currentOwner;
+    private String portOwner;
 
-	PortInUseException(String owner) {
-		super(owner);
-		this.portOwner = owner;
+    PortInUseException(String owner) {
+        super(owner);
+        this.portOwner = owner;
 
-		currentOwner = owner;
-	}
+        currentOwner = owner;
+    }
 
-	public PortInUseException() {
-		super();
-	}
+    public PortInUseException() {
+        super();
+    }
 
-	/**
-	 * Describes the current owner of the communications port.
-	 * 
-	 * @return the owner as string.
-	 */
-	public String currentOwner() {
-		return this.portOwner;
-	}
+    /**
+     * Describes the current owner of the communications port.
+     * 
+     * @return the owner as string.
+     */
+    public String currentOwner() {
+        return this.portOwner;
+    }
 }

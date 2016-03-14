@@ -23,36 +23,36 @@
 package gnu.io;
 
 abstract class AbstractCommPort extends CommPort {
-	protected String name;
+    protected String name;
 
-	@Override
-	public void close() {
-		try {
-			CommPortIdentifier cp = CommPortIdentifier.getPortIdentifier(this);
-			if (cp != null) {
-				CommPortIdentifier.getPortIdentifier(this).internalClosePort();
-			}
-		} catch (NoSuchPortException e) {
-		}
-	};
+    @Override
+    public void close() {
+        try {
+            CommPortIdentifier cp = CommPortIdentifier.getPortIdentifier(this);
+            if (cp != null) {
+                CommPortIdentifier.getPortIdentifier(this).internalClosePort();
+            }
+        } catch (NoSuchPortException e) {
+        }
+    };
 
-	@Override
-	public String getName() {
-		return name;
-	}
+    @Override
+    public String getName() {
+        return name;
+    }
 
-	@Override
-	public synchronized void setCommPortTimeout(int timeout) throws UnsupportedCommOperationException {
-		if (timeout == 0) {
-			disableReceiveTimeout();
-		}
-		else {
-			enableReceiveTimeout(timeout);
-		}
-	}
+    @Override
+    public synchronized void setCommPortTimeout(int timeout) throws UnsupportedCommOperationException {
+        if (timeout == 0) {
+            disableReceiveTimeout();
+        }
+        else {
+            enableReceiveTimeout(timeout);
+        }
+    }
 
-	@Override
-	public String toString() {
-		return getName();
-	}
+    @Override
+    public String toString() {
+        return getName();
+    }
 }

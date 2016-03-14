@@ -25,30 +25,30 @@ package gnu.io;
 import java.util.EventObject;
 
 public class ParallelPortEvent extends EventObject {
-	static public final int PAR_EV_ERROR = 1;
-	static public final int PAR_EV_BUFFER = 2;
+    static public final int PAR_EV_ERROR = 1;
+    static public final int PAR_EV_BUFFER = 2;
 
-	private final boolean OldValue;
-	private final boolean NewValue;
-	private final int eventType;
-	/* public int eventType =0; depricated */
+    private final boolean OldValue;
+    private final boolean NewValue;
+    private final int eventType;
+    /* public int eventType =0; depricated */
 
-	public ParallelPortEvent(ParallelPort srcport, int eventtype, boolean oldvalue, boolean newvalue) {
-		super(srcport);
-		OldValue = oldvalue;
-		NewValue = newvalue;
-		eventType = eventtype;
-	}
+    public ParallelPortEvent(ParallelPort srcport, int eventtype, boolean oldvalue, boolean newvalue) {
+        super(srcport);
+        OldValue = oldvalue;
+        NewValue = newvalue;
+        eventType = eventtype;
+    }
 
-	public int getEventType() {
-		return (eventType);
-	}
+    public int getEventType() {
+        return (eventType);
+    }
 
-	public boolean getNewValue() {
-		return (NewValue);
-	}
+    public boolean getNewValue() {
+        return (NewValue);
+    }
 
-	public boolean getOldValue() {
-		return (OldValue);
-	}
+    public boolean getOldValue() {
+        return (OldValue);
+    }
 }

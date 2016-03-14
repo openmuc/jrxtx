@@ -27,5 +27,5 @@ import java.util.EventListener;
 /* Non functional contact taj@qbang.org for details */
 
 public interface I2CPortEventListener extends EventListener {
-	void I2CEvent(I2CPortEvent ev);
+    void I2CEvent(I2CPortEvent ev);
 }

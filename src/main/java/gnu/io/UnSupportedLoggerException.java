@@ -27,20 +27,20 @@ package gnu.io;
  * 
  */
 public class UnSupportedLoggerException extends Exception {
-	/**
-	 * create an instances with no message about why the Exception was thrown.
-	 */
-	public UnSupportedLoggerException() {
-		super();
-	}
+    /**
+     * create an instances with no message about why the Exception was thrown.
+     */
+    public UnSupportedLoggerException() {
+        super();
+    }
 
-	/**
-	 * create an instance with a message about why the Exception was thrown.
-	 * 
-	 * @param str
-	 *            A detailed message explaining the reason for the Exception.
-	 */
-	public UnSupportedLoggerException(String str) {
-		super(str);
-	}
+    /**
+     * create an instance with a message about why the Exception was thrown.
+     * 
+     * @param str
+     *            A detailed message explaining the reason for the Exception.
+     */
+    public UnSupportedLoggerException(String str) {
+        super(str);
+    }
 }

@@ -26,11 +26,11 @@ package gnu.io;
  * Thrown when a driver can't find the specified port.
  */
 public class NoSuchPortException extends Exception {
-	NoSuchPortException(String message) {
-		super(message);
-	}
+    NoSuchPortException(String message) {
+        super(message);
+    }
 
-	NoSuchPortException() {
-		super();
-	}
+    NoSuchPortException() {
+        super();
+    }
 }

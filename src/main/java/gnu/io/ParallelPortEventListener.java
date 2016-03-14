@@ -25,5 +25,5 @@ package gnu.io;
 import java.util.EventListener;
 
 public interface ParallelPortEventListener extends EventListener {
-	void parallelEvent(ParallelPortEvent ev);
+    void parallelEvent(ParallelPortEvent ev);
 }

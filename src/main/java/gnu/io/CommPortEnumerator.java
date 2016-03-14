@@ -25,31 +25,31 @@ package gnu.io;
 import java.util.Enumeration;
 
 class CommPortEnumerator implements Enumeration<CommPortIdentifier> {
-	private CommPortIdentifier index;
+    private CommPortIdentifier index;
 
-	CommPortEnumerator() {
-	}
+    CommPortEnumerator() {
+    }
 
-	public CommPortIdentifier nextElement() {
-		synchronized (CommPortIdentifier.sync) {
-			if (index != null) {
-				index = index.next;
-			}
-			else {
-				index = CommPortIdentifier.CommPortIndex;
-			}
-			return index;
-		}
-	}
+    public CommPortIdentifier nextElement() {
+        synchronized (CommPortIdentifier.sync) {
+            if (index != null) {
+                index = index.next;
+            }
+            else {
+                index = CommPortIdentifier.CommPortIndex;
+            }
+            return index;
+        }
+    }
 
-	public boolean hasMoreElements() {
-		synchronized (CommPortIdentifier.sync) {
-			if (index != null) {
-				return index.next == null ? false : true;
-			}
-			else {
-				return CommPortIdentifier.CommPortIndex == null ? false : true;
-			}
-		}
-	}
+    public boolean hasMoreElements() {
+        synchronized (CommPortIdentifier.sync) {
+            if (index != null) {
+                return index.next == null ? false : true;
+            }
+            else {
+                return CommPortIdentifier.CommPortIndex == null ? false : true;
+            }
+        }
+    }
 }

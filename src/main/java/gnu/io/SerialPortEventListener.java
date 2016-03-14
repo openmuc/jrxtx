@@ -28,11 +28,11 @@ import java.util.EventListener;
  * Propagates a {@link SerialPortEvent} event.
  */
 public interface SerialPortEventListener extends EventListener {
-	/**
-	 * Invoked when an action occurs.
-	 * 
-	 * @param portEvent
-	 *            the port event.
-	 */
-	void serialEvent(SerialPortEvent portEvent);
+    /**
+     * Invoked when an action occurs.
+     * 
+     * @param portEvent
+     *            the port event.
+     */
+    void serialEvent(SerialPortEvent portEvent);
 }

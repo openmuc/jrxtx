@@ -36,1563 +36,1563 @@ import gnu.io.serialport.UARTType;
 
 public class RXTXPort extends SerialPort {
 
-	static {
-		System.loadLibrary("rxtxSerial");
-		Initialize();
-	}
-
-	@Deprecated
-	private final SerialInputStream is;
-	@Deprecated
-	private final SerialOutputStream os;
-
-	private InputStream serialIS;
+    static {
+        System.loadLibrary("rxtxSerial");
+        Initialize();
+    }
+
+    @Deprecated
+    private final SerialInputStream is;
+    @Deprecated
+    private final SerialOutputStream os;
+
+    private final InputStream serialIS;
 
-	/* dont close the file while accessing the fd */
-	private int IOLocked = 0;
-	private Object IOLockedMutex = new Object();
-
-	private int fd = 0;
-	private boolean MonitorThreadAlive = false;
+    /* dont close the file while accessing the fd */
+    private int IOLocked = 0;
+    private final Object IOLockedMutex = new Object();
+
+    private int fd = 0;
+    private boolean MonitorThreadAlive = false;
 
-	private int dataBits = DataBits.DATABITS_8.value();
-	private int speed = 9600;
-	private int stopBits = StopBits.STOPBITS_1.value();
-	private int parity = Parity.NONE.value();
-	private int flowmode = FlowControl.NONE.value();
-
-	private int timeout = -1;
-	private int threshold = 0;
-
-	private volatile boolean closed;
-
-	/**
-	 * a pointer to the event info structure used to share information between threads so write threads can send output
-	 * buffer empty from a pthread if need be.
-	 * 
-	 * long for 64 bit pointers.
-	 */
-	long eis = 0;
-	/** pid for lock files */
-	int pid = 0;
-
-	static boolean dsrFlag = false;
-
-	private int InputBuffer = 0;
-	private int OutputBuffer = 0;
-
-	private SerialPortEventListener serialPortEventListener;
-
-	private MonitorThread monThread;
-
-	boolean MonitorThreadLock = true;
-
-	/**
-	 * @return boolean true if monitor thread is interrupted
-	 */
-	boolean monThreadisInterrupted = true;
-
-	/**
-	 * Open the named port.
-	 * 
-	 * @param name
-	 *            the name of the device to open
-	 * @throws PortInUseException
-	 *             if the file is already locked by an other application.
-	 */
-	public RXTXPort(String name) throws PortInUseException {
-		fd = open(name);
-		this.name = name;
-
-		MonitorThreadLock = true;
-		monThread = new MonitorThread();
-		monThread.start();
-		waitForTheNativeCodeSilly();
-		MonitorThreadAlive = true;
-
-		this.is = new SerialInputStream();
-		this.os = new SerialOutputStream();
-
-		this.serialIS = new BetterSerialInputStream(is);
-		this.closed = false;
-	}
-
-	@Override
-	public OutputStream getOutputStream() {
-		return os;
-	}
-
-	@Override
-	public InputStream getInputStream() {
-		return is;
-	}
-
-	@Override
-	public OutputStream outputStream() {
-		return os; // TODO
-	}
-
-	@Override
-	public InputStream inputStream() {
-		return this.serialIS;
-	}
-
-	private native static void Initialize();
-
-	private native synchronized int open(String name) throws PortInUseException;
-
-	private native int nativeGetParity(int fd);
-
-	private native int nativeGetFlowControlMode(int fd);
-
-	native void setflowcontrol(int flowcontrol) throws IOException;
-
-	/**
-	 * @return int the timeout
-	 */
-	public native int NativegetReceiveTimeout();
-
-	private native boolean NativeisReceiveTimeoutEnabled();
-
-	/**
-	 * @param time
-	 * @param threshold
-	 * @param InputBuffer
-	 */
-	private native void NativeEnableReceiveTimeoutThreshold(int time, int threshold, int InputBuffer);
-
-	/**
-	 * Set the native serial port parameters If speed is not a predifined speed it is assumed to be the actual speed
-	 * desired.
-	 */
-	private native boolean nativeSetSerialPortParams(int speed, int dataBits, int stopBits, int parity)
-			throws UnsupportedCommOperationException;
-
-	@Override
-	public synchronized void setSerialPortParams(int baudRate, int dataBits, int stopBits, int parity)
-			throws UnsupportedCommOperationException {
-		if (nativeSetSerialPortParams(baudRate, dataBits, stopBits, parity)) {
-			throw new UnsupportedCommOperationException("Invalid Parameter");
-		}
-		this.speed = baudRate;
-		if (stopBits == StopBits.STOPBITS_1_5.value()) {
-			this.dataBits = DataBits.DATABITS_5.value();
-		}
-		else {
-			this.dataBits = dataBits;
-		}
-		this.stopBits = stopBits;
-		this.parity = parity;
-	}
-
-	@Override
-	public int getBaudRate() {
-		return speed;
-	}
-
-	@Override
-	@Deprecated
-	public int getDataBits() {
-		return dataBits;
-	}
-
-	@Override
-	public DataBits dataBits() {
-		return Enu.enumFor(this.dataBits, DataBits.class);
-	}
-
-	@Override
-	@Deprecated
-	public int getStopBits() {
-		return stopBits;
-	}
-
-	@Override
-	public StopBits stopBits() {
-		return Enu.enumFor(this.stopBits, StopBits.class);
-	}
-
-	@Override
-	@Deprecated
-	public int getParity() {
-		return parity;
-	}
-
-	@Override
-	public Parity parity() {
-		return Enu.enumFor(this.parity, Parity.class);
-	}
-
-	@Override
-	@Deprecated
-	public void setFlowControlMode(int flowcontrol) {
-		if (monThreadisInterrupted) {
-			return;
-		}
-		try {
-			setflowcontrol(flowcontrol);
-		} catch (IOException e) {
-			e.printStackTrace();
-			return;
-		}
-		flowmode = flowcontrol;
-	}
-
-	@Override
-	public void setFlowControlMode(FlowControl flowcontrol) throws UnsupportedCommOperationException {
-		setFlowControlMode(flowcontrol.value());
-	}
-
-	@Override
-	@Deprecated
-	public int getFlowControlMode() {
-		return flowmode;
-	}
-
-	@Override
-	public FlowControl flowControlMode() {
-		return Enu.enumFor(this.flowmode, FlowControl.class);
-	}
-
-	@Override
-	public void enableReceiveFraming(int f) throws UnsupportedCommOperationException {
-		throw new UnsupportedCommOperationException("Not supported");
-	}
-
-	@Override
-	public void disableReceiveFraming() {
-	}
-
-	@Override
-	public boolean isReceiveFramingEnabled() {
-		return false;
-	}
-
-	@Override
-	public int getReceiveFramingByte() {
-		return 0;
-	}
-
-	@Override
-	@Deprecated
-	public void disableReceiveTimeout() {
-		timeout = -1;
-		NativeEnableReceiveTimeoutThreshold(timeout, threshold, InputBuffer);
-	}
-
-	@Override
-	public synchronized int commPortTimeout() {
-		return this.timeout == -1 ? 0 : this.timeout;
-	}
-
-	@Override
-	@Deprecated
-	public void enableReceiveTimeout(int time) {
-		if (time >= 0) {
-			timeout = time;
-			NativeEnableReceiveTimeoutThreshold(time, threshold, InputBuffer);
-		}
-		else {
-			throw new IllegalArgumentException("Unexpected negative timeout value");
-		}
-	}
-
-	@Override
-	@Deprecated
-	public boolean isReceiveTimeoutEnabled() {
-		return (NativeisReceiveTimeoutEnabled());
-	}
-
-	@Override
-	@Deprecated
-	public int getReceiveTimeout() {
-		return (NativegetReceiveTimeout());
-	}
-
-	@Override
-	public void enableReceiveThreshold(int threshold) {
-		if (threshold >= 0) {
-			this.threshold = threshold;
-			NativeEnableReceiveTimeoutThreshold(timeout, threshold, InputBuffer);
-		}
-		else {
-			throw new IllegalArgumentException("Unexpected negative threshold value");
-		}
-	}
-
-	@Override
-	public void disableReceiveThreshold() {
-		enableReceiveThreshold(0);
-	}
-
-	@Override
-	public int getReceiveThreshold() {
-		return threshold;
-	}
-
-	@Override
-	public boolean isReceiveThresholdEnabled() {
-		return (threshold > 0);
-	}
-
-	@Override
-	public void setInputBufferSize(int size) {
-		if (size < 0) {
-			throw new IllegalArgumentException("Unexpected negative buffer size value");
-		}
-		else {
-			InputBuffer = size;
-		}
-	}
-
-	@Override
-	public int getInputBufferSize() {
-		return (InputBuffer);
-	}
-
-	@Override
-	public void setOutputBufferSize(int size) {
-		if (size < 0) {
-			throw new IllegalArgumentException("Unexpected negative buffer size value");
-		}
-		else {
-			OutputBuffer = size;
-		}
-	}
-
-	@Override
-	public int getOutputBufferSize() {
-		return (OutputBuffer);
-	}
-
-	// Line status methods
-
-	@Override
-	public native boolean isDTR();
-
-	@Override
-	public native void setDTR(boolean state);
-
-	@Override
-	public native void setRTS(boolean state);
-
-	private native void setDSR(boolean state);
-
-	@Override
-	public native boolean isCTS();
-
-	@Override
-	public native boolean isDSR();
-
-	@Override
-	public native boolean isCD();
-
-	@Override
-	public native boolean isRI();
-
-	@Override
-	public native boolean isRTS();
-
-	@Override
-	public native void sendBreak(int duration);
-
-	protected native void writeByte(int b, boolean i) throws IOException;
-
-	protected native void writeArray(byte b[], int off, int len, boolean i) throws IOException;
-
-	protected native boolean nativeDrain(boolean i) throws IOException;
-
-	protected native int nativeavailable() throws IOException;
-
-	protected native int readByte() throws IOException;
-
-	protected native int readArray(byte b[], int off, int len) throws IOException;
-
-	protected native int readTerminatedArray(byte b[], int off, int len, byte t[]) throws IOException;
-
-	/** Process SerialPortEvents */
-	/** DSR flag **/
-	native void eventLoop();
-
-	private native void interruptEventLoop();
-
-	/** Close the port */
-	private native void nativeClose(String name);
-
-	public boolean checkMonitorThread() {
-		if (monThread != null) {
-			return monThreadisInterrupted;
-		}
-		return (true);
-	}
-
-	/*
-	 * Sends an event.
-	 * 
-	 * @param event the SerialPortEvent id. E.g. SerialPortEvent.DATA_AVAILABLE
-	 * 
-	 * @param state
-	 * 
-	 * @return boolean true if the port is closing
-	 */
-	boolean sendEvent(int event, boolean state) {
-
-		if (fd == 0 || serialPortEventListener == null || monThread == null) {
-			return true;
-		}
-		EventType eventType = Enu.enumFor(event, EventType.class);
-		switch (eventType) {
-		case DATA_AVAILABLE:
-			if (monThread.Data) {
-				break;
-			}
-			return (false);
-		case OUTPUT_BUFFER_EMPTY:
-			if (monThread.Output) {
-				break;
-			}
-			return (false);
-		case CLEAR_TO_SEND:
-			if (monThread.CTS) {
-				break;
-			}
-			return (false);
-		case DATA_SET_READY:
-			if (monThread.DSR) {
-				break;
-			}
-			return (false);
-		case RING_INDICATOR:
-			if (monThread.RI) {
-				break;
-			}
-			return (false);
-		case CARRIER_DETECT:
-			if (monThread.CD) {
-				break;
-			}
-			return (false);
-		case OVERRUN_ERROR:
-			if (monThread.OE) {
-				break;
-			}
-			return (false);
-		case PARITY_ERROR:
-			if (monThread.PE) {
-				break;
-			}
-			return (false);
-		case FRAMING_ERROR:
-			if (monThread.FE) {
-				break;
-			}
-			return (false);
-		case BREAK_INTERRUPT:
-			if (monThread.BI) {
-				break;
-			}
-			return (false);
-		default:
-			System.err.println("unknown event: " + event);
-			return false;
-		}
-
-		SerialPortEvent e = new SerialPortEvent(this, event, !state, state);
-
-		if (monThreadisInterrupted) {
-			return true;
-		}
-
-		if (serialPortEventListener != null) {
-			serialPortEventListener.serialEvent(e);
-		}
-
-		return fd == 0 || serialPortEventListener == null || monThread == null;
-	}
-
-	@Override
-	public void addEventListener(SerialPortEventListener listener) throws TooManyListenersException {
-		/*
-		 * Don't let and notification requests happen until the Eventloop is ready
-		 */
-
-		if (serialPortEventListener != null) {
-			throw new TooManyListenersException();
-		}
-
-		this.serialPortEventListener = listener;
-		if (!MonitorThreadAlive) {
-			MonitorThreadLock = true;
-			monThread = new MonitorThread();
-			monThread.start();
-			waitForTheNativeCodeSilly();
-			MonitorThreadAlive = true;
-		}
-	}
-
-	/**
-	 * Remove the serial port event listener
-	 */
-
-	@Override
-	public void removeEventListener() {
-		waitForTheNativeCodeSilly();
-		// if( monThread != null && monThread.isAlive() )
-		if (monThreadisInterrupted == true) {
-			monThread = null;
-			serialPortEventListener = null;
-			return;
-		}
-		else if (monThread != null && monThread.isAlive()) {
-			monThreadisInterrupted = true;
-			/*
-			 * Notify all threads in this PID that something is up They will call back to see if its their thread using
-			 * isInterrupted().
-			 */
-			interruptEventLoop();
-
-			try {
-
-				// wait a reasonable moment for the death of the monitor thread
-				monThread.join(3000);
-			} catch (InterruptedException ex) {
-				// somebody called interrupt() on us (ie wants us to abort)
-				// we dont propagate InterruptedExceptions so lets re-set the flag
-				Thread.currentThread().interrupt();
-				return;
-			}
-
-		}
-		monThread = null;
-		serialPortEventListener = null;
-		MonitorThreadLock = false;
-		MonitorThreadAlive = false;
-		monThreadisInterrupted = true;
-	}
-
-	/**
-	 * Give the native code a chance to start listening to the hardware or should we say give the native code control of
-	 * the issue.
-	 *
-	 * This is important for applications that flicker the Monitor thread while keeping the port open. In worst case
-	 * test cases this loops once or twice every time.
-	 */
-	protected void waitForTheNativeCodeSilly() {
-		while (MonitorThreadLock) {
-			try {
-				Thread.sleep(5);
-			} catch (Exception e) {
-			}
-		}
-	}
-
-	private native void nativeSetEventFlag(int fd, int event, boolean flag);
-
-	@Override
-	public void notifyOnDataAvailable(boolean enable) {
-
-		waitForTheNativeCodeSilly();
-
-		MonitorThreadLock = true;
-		nativeSetEventFlag(fd, EventType.DATA_AVAILABLE.value(), enable);
-		monThread.Data = enable;
-		MonitorThreadLock = false;
-	}
-
-	@Override
-	public void notifyOnOutputEmpty(boolean enable) {
-		waitForTheNativeCodeSilly();
-		MonitorThreadLock = true;
-		nativeSetEventFlag(fd, EventType.OUTPUT_BUFFER_EMPTY.value(), enable);
-		monThread.Output = enable;
-		MonitorThreadLock = false;
-	}
-
-	@Override
-	public void notifyOnCTS(boolean enable) {
-		waitForTheNativeCodeSilly();
-		MonitorThreadLock = true;
-		nativeSetEventFlag(fd, EventType.CLEAR_TO_SEND.value(), enable);
-		monThread.CTS = enable;
-		MonitorThreadLock = false;
-	}
-
-	@Override
-	public void notifyOnDSR(boolean enable) {
-		waitForTheNativeCodeSilly();
-		MonitorThreadLock = true;
-		nativeSetEventFlag(fd, EventType.DATA_SET_READY.value(), enable);
-		monThread.DSR = enable;
-		MonitorThreadLock = false;
-	}
-
-	@Override
-	public void notifyOnRingIndicator(boolean enable) {
-		waitForTheNativeCodeSilly();
-		MonitorThreadLock = true;
-		nativeSetEventFlag(fd, EventType.RING_INDICATOR.value(), enable);
-		monThread.RI = enable;
-		MonitorThreadLock = false;
-	}
-
-	@Override
-	public void notifyOnCarrierDetect(boolean enable) {
-		waitForTheNativeCodeSilly();
-		MonitorThreadLock = true;
-		nativeSetEventFlag(fd, EventType.CARRIER_DETECT.value(), enable);
-		monThread.CD = enable;
-		MonitorThreadLock = false;
-	}
-
-	@Override
-	public void notifyOnOverrunError(boolean enable) {
-		waitForTheNativeCodeSilly();
-		MonitorThreadLock = true;
-		nativeSetEventFlag(fd, EventType.OVERRUN_ERROR.value(), enable);
-		monThread.OE = enable;
-		MonitorThreadLock = false;
-	}
-
-	@Override
-	public void notifyOnParityError(boolean enable) {
-		waitForTheNativeCodeSilly();
-		MonitorThreadLock = true;
-		nativeSetEventFlag(fd, EventType.PARITY_ERROR.value(), enable);
-		monThread.PE = enable;
-		MonitorThreadLock = false;
-	}
-
-	@Override
-	public void notifyOnFramingError(boolean enable) {
-		waitForTheNativeCodeSilly();
-		MonitorThreadLock = true;
-		nativeSetEventFlag(fd, EventType.FRAMING_ERROR.value(), enable);
-		monThread.FE = enable;
-		MonitorThreadLock = false;
-	}
-
-	@Override
-	public void notifyOnBreakInterrupt(boolean enable) {
-		waitForTheNativeCodeSilly();
-		MonitorThreadLock = true;
-		nativeSetEventFlag(fd, EventType.BREAK_INTERRUPT.value(), enable);
-		monThread.BI = enable;
-		MonitorThreadLock = false;
-	}
-
-	boolean closeLock = false;
-
-	@Override
-	public void close() {
-		try {
-			synchronized (this) {
-
-				while (IOLocked > 0) {
-					try {
-						this.wait(500);
-					} catch (InterruptedException ie) {
-						// somebody called interrupt() on us
-						// we obbey and return without without closing the socket
-						Thread.currentThread().interrupt();
-						return;
-					}
-				}
-
-				// we set the closeLock after the above check because we might
-				// have returned without proceeding
-				if (closeLock) {
-					return;
-				}
-				closeLock = true;
-			}
-
-			if (fd <= 0) {
-				return;
-			}
-			setDTR(false);
-			setDSR(false);
-			if (!monThreadisInterrupted) {
-				removeEventListener();
-			}
-
-			nativeClose(this.name);
-
-			super.close();
-			fd = 0;
-			closeLock = false;
-		} finally {
-			try {
-				this.serialIS.close();
-			} catch (IOException e) {
-			}
-			this.closed = true;
-		}
-	}
-
-	/** Finalize the port */
-	@Override
-	protected void finalize() {
-		if (fd > 0) {
-			close();
-		}
-	}
-
-	/** Inner class for SerialOutputStream */
-	private class SerialOutputStream extends OutputStream {
-		/**
-		 * @param b
-		 * @throws IOException
-		 */
-		@Override
-		public void write(int b) throws IOException {
-			if (speed == 0) {
-				return;
-			}
-			if (monThreadisInterrupted) {
-				return;
-			}
-			synchronized (IOLockedMutex) {
-				IOLocked++;
-			}
-			try {
-				waitForTheNativeCodeSilly();
-				if (fd == 0) {
-					throw new IOException();
-				}
-				writeByte(b, monThreadisInterrupted);
-			} finally {
-				synchronized (IOLockedMutex) {
-					IOLocked--;
-				}
-			}
-		}
-
-		/**
-		 * @param b[]
-		 * @throws IOException
-		 */
-		@Override
-		public void write(byte b[]) throws IOException {
-			if (speed == 0) {
-				return;
-			}
-			if (monThreadisInterrupted) {
-				return;
-			}
-			if (fd == 0) {
-				throw new IOException();
-			}
-			synchronized (IOLockedMutex) {
-				IOLocked++;
-			}
-			try {
-				waitForTheNativeCodeSilly();
-				writeArray(b, 0, b.length, monThreadisInterrupted);
-			} finally {
-				synchronized (IOLockedMutex) {
-					IOLocked--;
-				}
-			}
-
-		}
-
-		@Override
-		public void close() throws IOException {
-			try {
-				super.close();
-			} finally {
-				RXTXPort.this.close();
-			}
-		}
-
-		/**
-		 * @param b[]
-		 * @param off
-		 * @param len
-		 * @throws IOException
-		 */
-		@Override
-		public void write(byte b[], int off, int len) throws IOException {
-			if (speed == 0) {
-				return;
-			}
-			if (off + len > b.length) {
-				throw new IndexOutOfBoundsException("Invalid offset/length passed to read");
-			}
-
-			byte send[] = new byte[len];
-			System.arraycopy(b, off, send, 0, len);
-
-			if (fd == 0) {
-				throw new IOException();
-			}
-			if (monThreadisInterrupted) {
-				return;
-			}
-			synchronized (IOLockedMutex) {
-				IOLocked++;
-			}
-			try {
-				waitForTheNativeCodeSilly();
-				writeArray(send, 0, len, monThreadisInterrupted);
-			} finally {
-				synchronized (IOLockedMutex) {
-					IOLocked--;
-				}
-			}
-		}
-
-		/**
-		*/
-		@Override
-		public void flush() throws IOException {
-			if (speed == 0) {
-				return;
-			}
-			if (fd == 0) {
-				throw new IOException();
-			}
-			if (monThreadisInterrupted) {
-				return;
-			}
-			synchronized (IOLockedMutex) {
-				IOLocked++;
-			}
-			try {
-				waitForTheNativeCodeSilly();
-				/*
-				 * this is probably good on all OS's but for now just sendEvent from java on Sol
-				 */
-				if (nativeDrain(monThreadisInterrupted)) {
-					sendEvent(EventType.OUTPUT_BUFFER_EMPTY.value(), true);
-				}
-			} finally {
-				synchronized (IOLockedMutex) {
-					IOLocked--;
-				}
-			}
-		}
-	}
-
-	/**
-	 * This class is a wrapper for the {@link SerialInputStream}.
-	 */
-	private class BetterSerialInputStream extends InputStream {
-		private static final long SLEEP_TIME = 10L;// TODO: sleep appropriate time
-		private SerialInputStream serialInputStream;
-
-		public BetterSerialInputStream(SerialInputStream serialInputStream) {
-			this.serialInputStream = serialInputStream;
-		}
-
-		@Override
-		public synchronized int read() throws IOException {
-			long elapsedTime = 0;
-			do {
-				if (serialInputStream.available() > 0) {
-					return serialInputStream.read();
-				}
-				try {
-					Thread.sleep(SLEEP_TIME);
-					elapsedTime += SLEEP_TIME;
-				} catch (InterruptedException e) {
-					// ignore
-				}
-
-				if (closed) {
-					throw new CommPortException("Connection has been closed..");
-				}
-			} while (timeout <= 0 || elapsedTime <= timeout);
-
-			throw new CommPortTimeoutException("Timed out, while reading the serial port.");
-		}
-
-		@Override
-		public int available() throws IOException {
-			return this.serialInputStream.available();
-		}
-
-		@Override
-		public void close() throws IOException {
-			serialInputStream.close();
-		}
-	}
-
-	private class SerialInputStream extends InputStream {
-		/**
-		 * @return int the int read
-		 * @throws IOException
-		 * @see java.io.InputStream
-		 *
-		 *      timeout threshold Behavior ------------------------------------------------------------------------ 0 0
-		 *      blocks until 1 byte is available timeout > 0, threshold = 0, blocks until timeout occurs, returns -1 on
-		 *      timeout >0 >0 blocks until timeout, returns - 1 on timeout, magnitude of threshold doesn't play a role.
-		 *      0 >0 Blocks until 1 byte, magnitude of threshold doesn't play a role
-		 */
-		@Override
-		public synchronized int read() throws IOException {
-
-			if (fd == 0) {
-				throw new IOException();
-			}
-			synchronized (IOLockedMutex) {
-				IOLocked++;
-			}
-			try {
-
-				waitForTheNativeCodeSilly();
-
-				int result = readByte();
-				return result;
-			} finally {
-				synchronized (IOLockedMutex) {
-					IOLocked--;
-				}
-			}
-		}
-
-		/**
-		 * @param b[]
-		 * @return int number of bytes read
-		 * @throws IOException
-		 *
-		 *             timeout threshold Behavior
-		 *             ------------------------------------------------------------------------ 0 0 blocks until 1 byte
-		 *             is available >0 0 blocks until timeout occurs, returns 0 on timeout >0 >0 blocks until timeout or
-		 *             reads threshold bytes, returns 0 on timeout 0 >0 blocks until reads threshold bytes
-		 */
-		@Override
-		public synchronized int read(byte b[]) throws IOException {
-			int result;
-
-			if (monThreadisInterrupted) {
-				return (0);
-			}
-			synchronized (IOLockedMutex) {
-				IOLocked++;
-			}
-			try {
-				waitForTheNativeCodeSilly();
-				result = read(b, 0, b.length);
-
-				return result;
-			} finally {
-				synchronized (IOLockedMutex) {
-					IOLocked--;
-				}
-			}
-		}
-
-		/**
-		 * @see InputStream#read(byte[], int, int)
-		 * 
-		 * @param b
-		 *            the bytes
-		 * @param off
-		 *            the offset
-		 * @param len
-		 *            the length
-		 * @return the numbernumber of bytes read
-		 * @throws IOException
-		 *             timeout threshold Behavior
-		 *             ------------------------------------------------------------------------ 0 0 blocks until 1 byte
-		 *             is available >0 0 blocks until timeout occurs, returns 0 on timeout >0 >0 blocks until timeout or
-		 *             reads threshold bytes, returns 0 on timeout 0 >0 blocks until either threshold # of bytes or len
-		 *             bytes, whichever was lower.
-		 */
-		@Override
-		public synchronized int read(byte b[], int off, int len) throws IOException {
-			int result;
-			/*
-			 * Some sanity checks
-			 */
-			if (fd == 0) {
-				throw new IOException();
-			}
-
-			if (b == null) {
-				throw new NullPointerException();
-			}
-
-			if ((off < 0) || (len < 0) || (off + len > b.length)) {
-				throw new IndexOutOfBoundsException();
-			}
-
-			/*
-			 * Return immediately if len==0
-			 */
-			if (len == 0) {
-				return 0;
-			}
-			/*
-			 * See how many bytes we should read
-			 */
-			int Minimum = len;
-
-			if (threshold == 0) {
-				/*
-				 * If threshold is disabled, read should return as soon as data are available (up to the amount of
-				 * available bytes in order to avoid blocking) Read may return earlier depending of the receive time
-				 * out.
-				 */
-				int a = nativeavailable();
-				if (a == 0) {
-					Minimum = 1;
-				}
-				else {
-					Minimum = Math.min(Minimum, a);
-				}
-			}
-			else {
-				/*
-				 * Threshold is enabled. Read should return when 'threshold' bytes have been received (or when the
-				 * receive timeout expired)
-				 */
-				Minimum = Math.min(Minimum, threshold);
-			}
-			if (monThreadisInterrupted == true) {
-				return (0);
-			}
-			synchronized (IOLockedMutex) {
-				IOLocked++;
-			}
-			try {
-				waitForTheNativeCodeSilly();
-				result = readArray(b, off, Minimum);
-				return (result);
-			} finally {
-				synchronized (IOLockedMutex) {
-					IOLocked--;
-				}
-			}
-		}
-
-		/**
-		 * @param b[]
-		 * @param off
-		 * @param len
-		 * @param t[]
-		 * @return int number of bytes read
-		 * @throws IOException
-		 * 
-		 *             We are trying to catch the terminator in the native code Right now it is assumed that t[] is an
-		 *             array of 2 bytes.
-		 * 
-		 *             if the read encounters the two bytes, it will return and the array will contain the terminator.
-		 *             Otherwise read behavior should be the same as read( b[], off, len ). Timeouts have not been well
-		 *             tested.
-		 */
-
-		public synchronized int read(byte b[], int off, int len, byte t[]) throws IOException {
-			int result;
-			/*
-			 * Some sanity checks
-			 */
-			if (fd == 0) {
-				throw new IOException();
-			}
-
-			if (b == null) {
-				throw new NullPointerException();
-			}
-
-			if ((off < 0) || (len < 0) || (off + len > b.length)) {
-				throw new IndexOutOfBoundsException();
-			}
-
-			/*
-			 * Return immediately if len==0
-			 */
-			if (len == 0) {
-				return 0;
-			}
-			/*
-			 * See how many bytes we should read
-			 */
-			int Minimum = len;
-
-			if (threshold == 0) {
-				/*
-				 * If threshold is disabled, read should return as soon as data are available (up to the amount of
-				 * available bytes in order to avoid blocking) Read may return earlier depending of the receive time
-				 * out.
-				 */
-				int a = nativeavailable();
-				if (a == 0) {
-					Minimum = 1;
-				}
-				else {
-					Minimum = Math.min(Minimum, a);
-				}
-			}
-			else {
-				/*
-				 * Threshold is enabled. Read should return when 'threshold' bytes have been received (or when the
-				 * receive timeout expired)
-				 */
-				Minimum = Math.min(Minimum, threshold);
-			}
-
-			if (monThreadisInterrupted) {
-				return 0;
-			}
-			synchronized (IOLockedMutex) {
-				IOLocked++;
-			}
-			try {
-				waitForTheNativeCodeSilly();
-				result = readTerminatedArray(b, off, Minimum, t);
-				return (result);
-			} finally {
-				synchronized (IOLockedMutex) {
-					IOLocked--;
-				}
-			}
-		}
-
-		/**
-		 * @return int bytes available
-		 * @throws IOException
-		 */
-		@Override
-		public synchronized int available() throws IOException {
-			if (monThreadisInterrupted) {
-				return (0);
-			}
-			synchronized (IOLockedMutex) {
-				IOLocked++;
-			}
-			try {
-				int r = nativeavailable();
-				return r;
-			} finally {
-				synchronized (IOLockedMutex) {
-					IOLocked--;
-				}
-			}
-		}
-	}
-
-	/**
-	*/
-	class MonitorThread extends Thread {
-		/**
-		 * Note: these have to be separate boolean flags because the SerialPortEvent constants are NOT bit-flags, they
-		 * are just defined as integers from 1 to 10 -DPL
-		 */
-		private volatile boolean CTS = false;
-		private volatile boolean DSR = false;
-		private volatile boolean RI = false;
-		private volatile boolean CD = false;
-		private volatile boolean OE = false;
-		private volatile boolean PE = false;
-		private volatile boolean FE = false;
-		private volatile boolean BI = false;
-		private volatile boolean Data = false;
-		private volatile boolean Output = false;
-
-		MonitorThread() {
-			setDaemon(true);
-		}
-
-		/**
-		 * run the thread and call the event loop.
-		 */
-		@Override
-		public void run() {
-			monThreadisInterrupted = false;
-			eventLoop();
-		}
-
-		@Override
-		protected void finalize() throws Throwable {
-		}
-	}
-
-	/*------------------------  END OF CommAPI -----------------------------*/
-
-	private native static void nativeStaticSetSerialPortParams(String f, int b, int d, int s, int p)
-			throws UnsupportedCommOperationException;
-
-	private native static boolean nativeStaticSetDSR(String port, boolean flag)
-			throws UnsupportedCommOperationException;
-
-	private native static boolean nativeStaticSetDTR(String port, boolean flag)
-			throws UnsupportedCommOperationException;
-
-	private native static boolean nativeStaticSetRTS(String port, boolean flag)
-			throws UnsupportedCommOperationException;
-
-	private native static boolean nativeStaticIsDSR(String port) throws UnsupportedCommOperationException;
-
-	private native static boolean nativeStaticIsDTR(String port) throws UnsupportedCommOperationException;
-
-	private native static boolean nativeStaticIsRTS(String port) throws UnsupportedCommOperationException;
-
-	private native static boolean nativeStaticIsCTS(String port) throws UnsupportedCommOperationException;
-
-	private native static boolean nativeStaticIsCD(String port) throws UnsupportedCommOperationException;
-
-	private native static boolean nativeStaticIsRI(String port) throws UnsupportedCommOperationException;
-
-	private native static int nativeStaticGetBaudRate(String port) throws UnsupportedCommOperationException;
-
-	private native static int nativeStaticGetDataBits(String port) throws UnsupportedCommOperationException;
-
-	private native static int nativeStaticGetParity(String port) throws UnsupportedCommOperationException;
-
-	private native static int nativeStaticGetStopBits(String port) throws UnsupportedCommOperationException;
-
-	private native byte nativeGetParityErrorChar() throws UnsupportedCommOperationException;
-
-	private native boolean nativeSetParityErrorChar(byte b) throws UnsupportedCommOperationException;
-
-	private native byte nativeGetEndOfInputChar() throws UnsupportedCommOperationException;
-
-	private native boolean nativeSetEndOfInputChar(byte b) throws UnsupportedCommOperationException;
-
-	private native boolean nativeSetUartType(String type, boolean test) throws UnsupportedCommOperationException;
-
-	native String nativeGetUartType() throws UnsupportedCommOperationException;
-
-	private native boolean nativeSetBaudBase(int BaudBase) throws UnsupportedCommOperationException;
-
-	private native int nativeGetBaudBase() throws UnsupportedCommOperationException;
-
-	private native boolean nativeSetDivisor(int Divisor) throws UnsupportedCommOperationException;
-
-	private native int nativeGetDivisor() throws UnsupportedCommOperationException;
-
-	private native boolean nativeSetLowLatency() throws UnsupportedCommOperationException;
-
-	private native boolean nativeGetLowLatency() throws UnsupportedCommOperationException;
-
-	private native boolean nativeSetCallOutHangup(boolean NoHup) throws UnsupportedCommOperationException;
-
-	private native boolean nativeGetCallOutHangup() throws UnsupportedCommOperationException;
-
-	private native boolean nativeClearCommInput() throws UnsupportedCommOperationException;
-
-	/**
-	 * Retrieve the baud rate.
-	 * <p>
-	 * This is only accurate up to 38600 baud currently.
-	 * </p>
-	 *
-	 * @param port
-	 *            the name of the port thats been preopened
-	 * @return BaudRate on success
-	 * @throws UnsupportedCommOperationException
-	 *             if this operation is not supported for the OS by the underlying native library.
-	 *
-	 */
-	public static int staticGetBaudRate(String port) throws UnsupportedCommOperationException {
-		return (nativeStaticGetBaudRate(port));
-	}
-
-	/**
-	 * Retrieve the data bits.
-	 *
-	 * @param port
-	 *            the name of the port thats been preopened
-	 * @return DataBits on success
-	 * @throws UnsupportedCommOperationException
-	 *             if this operation is not supported for the OS by the underlying native library.
-	 *
-	 */
-	public static int staticGetDataBits(String port) throws UnsupportedCommOperationException {
-		return nativeStaticGetDataBits(port);
-	}
-
-	/**
-	 * Retrieve the parity.
-	 * 
-	 * @param port
-	 *            the name of the port thats been preopened
-	 * @return Parity on success
-	 * @throws UnsupportedCommOperationException
-	 *             if this operation is not supported for the OS by the underlying native library.
-	 *
-	 */
-	public static int staticGetParity(String port) throws UnsupportedCommOperationException {
-		return nativeStaticGetParity(port);
-	}
-
-	/**
-	 * Retrieve the stop bits.
-	 * 
-	 * @param port
-	 *            the name of the port thats been preopened
-	 * @return StopBits on success
-	 * @throws UnsupportedCommOperationException
-	 *             if this operation is not supported for the OS by the underlying native library.
-	 *
-	 */
-	public static int staticGetStopBits(String port) throws UnsupportedCommOperationException {
-		return (nativeStaticGetStopBits(port));
-	}
-
-	/**
-	 * Set the SerialPort parameters 1.5 stop bits requires 5 databits
-	 * 
-	 * @see gnu.io.UnsupportedCommOperationException
-	 * 
-	 * @param filename
-	 *            filename
-	 * @param baudrate
-	 *            baudrate
-	 * @param databits
-	 *            databits
-	 * @param stopbits
-	 *            stopbits
-	 * @param parity
-	 *            parity
-	 *
-	 * @throws UnsupportedCommOperationException
-	 *             if this operation is not supported for the OS by the underlying native library.
-	 */
-	public static void staticSetSerialPortParams(String filename, int baudrate, int databits, int stopbits, int parity)
-			throws UnsupportedCommOperationException {
-		nativeStaticSetSerialPortParams(filename, baudrate, databits, stopbits, parity);
-	}
-
-	/**
-	 * Open the port and set DSR. remove lockfile and do not close This is so some software can appear to set the DSR
-	 * before 'opening' the port a second time later on.
-	 * 
-	 * @param port
-	 *            the port name
-	 * @param flag
-	 *            boolean DSR FLAG.
-	 * @return true if the operation was successful
-	 * @throws UnsupportedCommOperationException
-	 *             if this operation is not supported for the OS by the underlying native library.
-	 */
-	public static boolean staticSetDSR(String port, boolean flag) throws UnsupportedCommOperationException {
-		return (nativeStaticSetDSR(port, flag));
-	}
-
-	/**
-	 * Open the port and set DTR. remove lockfile and do not close This is so some software can appear to set the DTR
-	 * before 'opening' the port a second time later on.
-	 *
-	 * @param port
-	 *            the port name
-	 * @param flag
-	 *            boolean DTR FLAG.
-	 * @return true if the operation was successful
-	 * @throws UnsupportedCommOperationException
-	 *             if this operation is not supported for the OS by the underlying native library.
-	 *
-	 */
-	public static boolean staticSetDTR(String port, boolean flag) throws UnsupportedCommOperationException {
-		return (nativeStaticSetDTR(port, flag));
-	}
-
-	/**
-	 * Open the port and set RTS. remove lockfile and do not close This is so some software can appear to set the RTS
-	 * before 'opening' the port a second time later on.
-	 *
-	 * @param port
-	 *            the port name
-	 * @param flag
-	 *            boolean RTS FLAG.
-	 * @return true if the operation was successful
-	 * @throws UnsupportedCommOperationException
-	 *             if this operation is not supported for the OS by the underlying native library.
-	 *
-	 */
-	public static boolean staticSetRTS(String port, boolean flag) throws UnsupportedCommOperationException {
-		return nativeStaticSetRTS(port, flag);
-	}
-
-	/**
-	 * find the fd and return RTS without using a Java open() call
-	 *
-	 * @param port
-	 *            the port name
-	 * @return true if asserted
-	 * @throws UnsupportedCommOperationException
-	 *             if this operation is not supported for the OS by the underlying native library.
-	 *
-	 */
-	public static boolean staticIsRTS(String port) throws UnsupportedCommOperationException {
-		return (nativeStaticIsRTS(port));
-	}
-
-	/**
-	 * find the fd and return CD without using a Java open() call
-	 *
-	 * @param port
-	 *            the port name
-	 * @return true if asserted
-	 * @throws UnsupportedCommOperationException
-	 *             if this operation is not supported for the OS by the underlying native library.
-	 *
-	 */
-	public static boolean staticIsCD(String port) throws UnsupportedCommOperationException {
-		return (nativeStaticIsCD(port));
-	}
-
-	/**
-	 * find the fd and return CTS without using a Java open() call
-	 *
-	 * @param port
-	 *            the port name
-	 * @return true if asserted
-	 * @throws UnsupportedCommOperationException
-	 *             if this operation is not supported for the OS by the underlying native library.
-	 *
-	 */
-	public static boolean staticIsCTS(String port) throws UnsupportedCommOperationException {
-		return nativeStaticIsCTS(port);
-	}
-
-	/**
-	 * find the fd and return DSR without using a Java open() call
-	 *
-	 * @param port
-	 *            the port name
-	 * @return true if asserted
-	 * @throws UnsupportedCommOperationException
-	 *             if this operation is not supported for the OS by the underlying native library.
-	 *
-	 */
-	public static boolean staticIsDSR(String port) throws UnsupportedCommOperationException {
-		return (nativeStaticIsDSR(port));
-	}
-
-	/**
-	 * Extension to CommAPI This is an extension to CommAPI. It may not be supported on all operating systems.
-	 *
-	 * find the fd and return DTR without using a Java open() call
-	 *
-	 * @param port
-	 *            the port name
-	 * @return true if asserted
-	 * @throws UnsupportedCommOperationException
-	 *             if this operation is not supported for the OS by the underlying native library.
-	 *
-	 */
-	public static boolean staticIsDTR(String port) throws UnsupportedCommOperationException {
-		return nativeStaticIsDTR(port);
-	}
-
-	/**
-	 * Find the fd and return RI without using a Java open() call
-	 *
-	 * @param port
-	 *            the port name
-	 * @return true if asserted
-	 * @throws UnsupportedCommOperationException
-	 *             if this operation is not supported for the OS by the underlying native library.
-	 */
-	public static boolean staticIsRI(String port) throws UnsupportedCommOperationException {
-		return nativeStaticIsRI(port);
-	}
-
-	@Override
-	public byte getParityErrorChar() throws UnsupportedCommOperationException {
-		// TODO: Anyone know how to do this in Unix?
-		return nativeGetParityErrorChar();
-	}
-
-	@Override
-	public boolean setParityErrorChar(byte b) throws UnsupportedCommOperationException {
-		// TODO: Anyone know how to do this in Unix?
-		return nativeSetParityErrorChar(b);
-	}
-
-	@Override
-	public byte getEndOfInputChar() throws UnsupportedCommOperationException {
-		// TODO: Anyone know how to do this in Unix?
-		return nativeGetEndOfInputChar();
-	}
-
-	@Override
-	public boolean setEndOfInputChar(byte b) throws UnsupportedCommOperationException {
-		return (nativeSetEndOfInputChar(b));
-	}
-
-	@Override
-	@Deprecated
-	public boolean setUARTType(String type, boolean test) throws UnsupportedCommOperationException {
-		return nativeSetUartType(type, test);
-	}
-
-	@Override
-	public boolean setUARTType(UARTType type, boolean test) throws UnsupportedCommOperationException {
-		return nativeSetUartType(type.type(), test);
-	}
-
-	@Override
-	@Deprecated
-	public String getUARTType() throws UnsupportedCommOperationException {
-		return nativeGetUartType();
-	}
-
-	@Override
-	public UARTType uartType() throws UnsupportedCommOperationException {
-		return UARTType.typeFor(nativeGetUartType());
-	}
-
-	@Override
-	public boolean setBaudBase(int BaudBase) throws UnsupportedCommOperationException, IOException {
-		return nativeSetBaudBase(BaudBase);
-	}
-
-	@Override
-	public int getBaudBase() throws UnsupportedCommOperationException, IOException {
-		return nativeGetBaudBase();
-	}
-
-	/**
-	 * Extension to CommAPI. Set Baud Base to 38600 on Linux and W32 before using.
-	 */
-	@Override
-	public boolean setDivisor(int Divisor) throws UnsupportedCommOperationException, IOException {
-		return nativeSetDivisor(Divisor);
-	}
-
-	/**
-	 * Extension to CommAPI
-	 */
-	@Override
-	public int getDivisor() throws UnsupportedCommOperationException, IOException {
-		return nativeGetDivisor();
-	}
-
-	@Override
-	public boolean setLowLatency() throws UnsupportedCommOperationException {
-		return nativeSetLowLatency();
-	}
-
-	@Override
-	public boolean getLowLatency() throws UnsupportedCommOperationException {
-		return nativeGetLowLatency();
-	}
-
-	// return true on success
-	@Override
-	public boolean setCallOutHangup(boolean NoHup) throws UnsupportedCommOperationException {
-		return nativeSetCallOutHangup(NoHup);
-	}
-
-	// return true on success
-	@Override
-	public boolean getCallOutHangup() throws UnsupportedCommOperationException {
-		return nativeGetCallOutHangup();
-	}
-
-	// return true on success
-	public boolean clearCommInput() throws UnsupportedCommOperationException {
-		return nativeClearCommInput();
-	}
-
-	@Override
-	public synchronized void setSerialPortParams(int baudRate, DataBits dataBits, StopBits stopBits, Parity parity)
-			throws UnsupportedCommOperationException {
-		setSerialPortParams(baudRate, dataBits.value(), stopBits.value(), parity.value());
-	}
+    private int dataBits = DataBits.DATABITS_8.value();
+    private int speed = 9600;
+    private int stopBits = StopBits.STOPBITS_1.value();
+    private int parity = Parity.NONE.value();
+    private int flowmode = FlowControl.NONE.value();
+
+    private int timeout = -1;
+    private int threshold = 0;
+
+    private volatile boolean closed;
+
+    /**
+     * a pointer to the event info structure used to share information between threads so write threads can send output
+     * buffer empty from a pthread if need be.
+     * 
+     * long for 64 bit pointers.
+     */
+    long eis = 0;
+    /** pid for lock files */
+    int pid = 0;
+
+    static boolean dsrFlag = false;
+
+    private int InputBuffer = 0;
+    private int OutputBuffer = 0;
+
+    private SerialPortEventListener serialPortEventListener;
+
+    private MonitorThread monThread;
+
+    boolean MonitorThreadLock = true;
+
+    /**
+     * @return boolean true if monitor thread is interrupted
+     */
+    boolean monThreadisInterrupted = true;
+
+    /**
+     * Open the named port.
+     * 
+     * @param name
+     *            the name of the device to open
+     * @throws PortInUseException
+     *             if the file is already locked by an other application.
+     */
+    public RXTXPort(String name) throws PortInUseException {
+        fd = open(name);
+        this.name = name;
+
+        MonitorThreadLock = true;
+        monThread = new MonitorThread();
+        monThread.start();
+        waitForTheNativeCodeSilly();
+        MonitorThreadAlive = true;
+
+        this.is = new SerialInputStream();
+        this.os = new SerialOutputStream();
+
+        this.serialIS = new BetterSerialInputStream(is);
+        this.closed = false;
+    }
+
+    @Override
+    public OutputStream getOutputStream() {
+        return os;
+    }
+
+    @Override
+    public InputStream getInputStream() {
+        return is;
+    }
+
+    @Override
+    public OutputStream outputStream() {
+        return os; // TODO
+    }
+
+    @Override
+    public InputStream inputStream() {
+        return this.serialIS;
+    }
+
+    private native static void Initialize();
+
+    private native synchronized int open(String name) throws PortInUseException;
+
+    private native int nativeGetParity(int fd);
+
+    private native int nativeGetFlowControlMode(int fd);
+
+    native void setflowcontrol(int flowcontrol) throws IOException;
+
+    /**
+     * @return int the timeout
+     */
+    public native int NativegetReceiveTimeout();
+
+    private native boolean NativeisReceiveTimeoutEnabled();
+
+    /**
+     * @param time
+     * @param threshold
+     * @param InputBuffer
+     */
+    private native void NativeEnableReceiveTimeoutThreshold(int time, int threshold, int InputBuffer);
+
+    /**
+     * Set the native serial port parameters If speed is not a predifined speed it is assumed to be the actual speed
+     * desired.
+     */
+    private native boolean nativeSetSerialPortParams(int speed, int dataBits, int stopBits, int parity)
+            throws UnsupportedCommOperationException;
+
+    @Override
+    public synchronized void setSerialPortParams(int baudRate, int dataBits, int stopBits, int parity)
+            throws UnsupportedCommOperationException {
+        if (nativeSetSerialPortParams(baudRate, dataBits, stopBits, parity)) {
+            throw new UnsupportedCommOperationException("Invalid Parameter");
+        }
+        this.speed = baudRate;
+        if (stopBits == StopBits.STOPBITS_1_5.value()) {
+            this.dataBits = DataBits.DATABITS_5.value();
+        }
+        else {
+            this.dataBits = dataBits;
+        }
+        this.stopBits = stopBits;
+        this.parity = parity;
+    }
+
+    @Override
+    public int getBaudRate() {
+        return speed;
+    }
+
+    @Override
+    @Deprecated
+    public int getDataBits() {
+        return dataBits;
+    }
+
+    @Override
+    public DataBits dataBits() {
+        return Enu.enumFor(this.dataBits, DataBits.class);
+    }
+
+    @Override
+    @Deprecated
+    public int getStopBits() {
+        return stopBits;
+    }
+
+    @Override
+    public StopBits stopBits() {
+        return Enu.enumFor(this.stopBits, StopBits.class);
+    }
+
+    @Override
+    @Deprecated
+    public int getParity() {
+        return parity;
+    }
+
+    @Override
+    public Parity parity() {
+        return Enu.enumFor(this.parity, Parity.class);
+    }
+
+    @Override
+    @Deprecated
+    public void setFlowControlMode(int flowcontrol) {
+        if (monThreadisInterrupted) {
+            return;
+        }
+        try {
+            setflowcontrol(flowcontrol);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return;
+        }
+        flowmode = flowcontrol;
+    }
+
+    @Override
+    public void setFlowControlMode(FlowControl flowcontrol) throws UnsupportedCommOperationException {
+        setFlowControlMode(flowcontrol.value());
+    }
+
+    @Override
+    @Deprecated
+    public int getFlowControlMode() {
+        return flowmode;
+    }
+
+    @Override
+    public FlowControl flowControlMode() {
+        return Enu.enumFor(this.flowmode, FlowControl.class);
+    }
+
+    @Override
+    public void enableReceiveFraming(int f) throws UnsupportedCommOperationException {
+        throw new UnsupportedCommOperationException("Not supported");
+    }
+
+    @Override
+    public void disableReceiveFraming() {
+    }
+
+    @Override
+    public boolean isReceiveFramingEnabled() {
+        return false;
+    }
+
+    @Override
+    public int getReceiveFramingByte() {
+        return 0;
+    }
+
+    @Override
+    @Deprecated
+    public void disableReceiveTimeout() {
+        timeout = -1;
+        NativeEnableReceiveTimeoutThreshold(timeout, threshold, InputBuffer);
+    }
+
+    @Override
+    public synchronized int commPortTimeout() {
+        return this.timeout == -1 ? 0 : this.timeout;
+    }
+
+    @Override
+    @Deprecated
+    public void enableReceiveTimeout(int time) {
+        if (time >= 0) {
+            timeout = time;
+            NativeEnableReceiveTimeoutThreshold(time, threshold, InputBuffer);
+        }
+        else {
+            throw new IllegalArgumentException("Unexpected negative timeout value");
+        }
+    }
+
+    @Override
+    @Deprecated
+    public boolean isReceiveTimeoutEnabled() {
+        return (NativeisReceiveTimeoutEnabled());
+    }
+
+    @Override
+    @Deprecated
+    public int getReceiveTimeout() {
+        return (NativegetReceiveTimeout());
+    }
+
+    @Override
+    public void enableReceiveThreshold(int threshold) {
+        if (threshold >= 0) {
+            this.threshold = threshold;
+            NativeEnableReceiveTimeoutThreshold(timeout, threshold, InputBuffer);
+        }
+        else {
+            throw new IllegalArgumentException("Unexpected negative threshold value");
+        }
+    }
+
+    @Override
+    public void disableReceiveThreshold() {
+        enableReceiveThreshold(0);
+    }
+
+    @Override
+    public int getReceiveThreshold() {
+        return threshold;
+    }
+
+    @Override
+    public boolean isReceiveThresholdEnabled() {
+        return (threshold > 0);
+    }
+
+    @Override
+    public void setInputBufferSize(int size) {
+        if (size < 0) {
+            throw new IllegalArgumentException("Unexpected negative buffer size value");
+        }
+        else {
+            InputBuffer = size;
+        }
+    }
+
+    @Override
+    public int getInputBufferSize() {
+        return (InputBuffer);
+    }
+
+    @Override
+    public void setOutputBufferSize(int size) {
+        if (size < 0) {
+            throw new IllegalArgumentException("Unexpected negative buffer size value");
+        }
+        else {
+            OutputBuffer = size;
+        }
+    }
+
+    @Override
+    public int getOutputBufferSize() {
+        return (OutputBuffer);
+    }
+
+    // Line status methods
+
+    @Override
+    public native boolean isDTR();
+
+    @Override
+    public native void setDTR(boolean state);
+
+    @Override
+    public native void setRTS(boolean state);
+
+    private native void setDSR(boolean state);
+
+    @Override
+    public native boolean isCTS();
+
+    @Override
+    public native boolean isDSR();
+
+    @Override
+    public native boolean isCD();
+
+    @Override
+    public native boolean isRI();
+
+    @Override
+    public native boolean isRTS();
+
+    @Override
+    public native void sendBreak(int duration);
+
+    protected native void writeByte(int b, boolean i) throws IOException;
+
+    protected native void writeArray(byte b[], int off, int len, boolean i) throws IOException;
+
+    protected native boolean nativeDrain(boolean i) throws IOException;
+
+    protected native int nativeavailable() throws IOException;
+
+    protected native int readByte() throws IOException;
+
+    protected native int readArray(byte b[], int off, int len) throws IOException;
+
+    protected native int readTerminatedArray(byte b[], int off, int len, byte t[]) throws IOException;
+
+    /** Process SerialPortEvents */
+    /** DSR flag **/
+    native void eventLoop();
+
+    private native void interruptEventLoop();
+
+    /** Close the port */
+    private native void nativeClose(String name);
+
+    public boolean checkMonitorThread() {
+        if (monThread != null) {
+            return monThreadisInterrupted;
+        }
+        return (true);
+    }
+
+    /*
+     * Sends an event.
+     * 
+     * @param event the SerialPortEvent id. E.g. SerialPortEvent.DATA_AVAILABLE
+     * 
+     * @param state
+     * 
+     * @return boolean true if the port is closing
+     */
+    boolean sendEvent(int event, boolean state) {
+
+        if (fd == 0 || serialPortEventListener == null || monThread == null) {
+            return true;
+        }
+        EventType eventType = Enu.enumFor(event, EventType.class);
+        switch (eventType) {
+        case DATA_AVAILABLE:
+            if (monThread.Data) {
+                break;
+            }
+            return (false);
+        case OUTPUT_BUFFER_EMPTY:
+            if (monThread.Output) {
+                break;
+            }
+            return (false);
+        case CLEAR_TO_SEND:
+            if (monThread.CTS) {
+                break;
+            }
+            return (false);
+        case DATA_SET_READY:
+            if (monThread.DSR) {
+                break;
+            }
+            return (false);
+        case RING_INDICATOR:
+            if (monThread.RI) {
+                break;
+            }
+            return (false);
+        case CARRIER_DETECT:
+            if (monThread.CD) {
+                break;
+            }
+            return (false);
+        case OVERRUN_ERROR:
+            if (monThread.OE) {
+                break;
+            }
+            return (false);
+        case PARITY_ERROR:
+            if (monThread.PE) {
+                break;
+            }
+            return (false);
+        case FRAMING_ERROR:
+            if (monThread.FE) {
+                break;
+            }
+            return (false);
+        case BREAK_INTERRUPT:
+            if (monThread.BI) {
+                break;
+            }
+            return (false);
+        default:
+            System.err.println("unknown event: " + event);
+            return false;
+        }
+
+        SerialPortEvent e = new SerialPortEvent(this, event, !state, state);
+
+        if (monThreadisInterrupted) {
+            return true;
+        }
+
+        if (serialPortEventListener != null) {
+            serialPortEventListener.serialEvent(e);
+        }
+
+        return fd == 0 || serialPortEventListener == null || monThread == null;
+    }
+
+    @Override
+    public void addEventListener(SerialPortEventListener listener) throws TooManyListenersException {
+        /*
+         * Don't let and notification requests happen until the Eventloop is ready
+         */
+
+        if (serialPortEventListener != null) {
+            throw new TooManyListenersException();
+        }
+
+        this.serialPortEventListener = listener;
+        if (!MonitorThreadAlive) {
+            MonitorThreadLock = true;
+            monThread = new MonitorThread();
+            monThread.start();
+            waitForTheNativeCodeSilly();
+            MonitorThreadAlive = true;
+        }
+    }
+
+    /**
+     * Remove the serial port event listener
+     */
+
+    @Override
+    public void removeEventListener() {
+        waitForTheNativeCodeSilly();
+        // if( monThread != null && monThread.isAlive() )
+        if (monThreadisInterrupted == true) {
+            monThread = null;
+            serialPortEventListener = null;
+            return;
+        }
+        else if (monThread != null && monThread.isAlive()) {
+            monThreadisInterrupted = true;
+            /*
+             * Notify all threads in this PID that something is up They will call back to see if its their thread using
+             * isInterrupted().
+             */
+            interruptEventLoop();
+
+            try {
+
+                // wait a reasonable moment for the death of the monitor thread
+                monThread.join(3000);
+            } catch (InterruptedException ex) {
+                // somebody called interrupt() on us (ie wants us to abort)
+                // we dont propagate InterruptedExceptions so lets re-set the flag
+                Thread.currentThread().interrupt();
+                return;
+            }
+
+        }
+        monThread = null;
+        serialPortEventListener = null;
+        MonitorThreadLock = false;
+        MonitorThreadAlive = false;
+        monThreadisInterrupted = true;
+    }
+
+    /**
+     * Give the native code a chance to start listening to the hardware or should we say give the native code control of
+     * the issue.
+     *
+     * This is important for applications that flicker the Monitor thread while keeping the port open. In worst case
+     * test cases this loops once or twice every time.
+     */
+    protected void waitForTheNativeCodeSilly() {
+        while (MonitorThreadLock) {
+            try {
+                Thread.sleep(5);
+            } catch (Exception e) {
+            }
+        }
+    }
+
+    private native void nativeSetEventFlag(int fd, int event, boolean flag);
+
+    @Override
+    public void notifyOnDataAvailable(boolean enable) {
+
+        waitForTheNativeCodeSilly();
+
+        MonitorThreadLock = true;
+        nativeSetEventFlag(fd, EventType.DATA_AVAILABLE.value(), enable);
+        monThread.Data = enable;
+        MonitorThreadLock = false;
+    }
+
+    @Override
+    public void notifyOnOutputEmpty(boolean enable) {
+        waitForTheNativeCodeSilly();
+        MonitorThreadLock = true;
+        nativeSetEventFlag(fd, EventType.OUTPUT_BUFFER_EMPTY.value(), enable);
+        monThread.Output = enable;
+        MonitorThreadLock = false;
+    }
+
+    @Override
+    public void notifyOnCTS(boolean enable) {
+        waitForTheNativeCodeSilly();
+        MonitorThreadLock = true;
+        nativeSetEventFlag(fd, EventType.CLEAR_TO_SEND.value(), enable);
+        monThread.CTS = enable;
+        MonitorThreadLock = false;
+    }
+
+    @Override
+    public void notifyOnDSR(boolean enable) {
+        waitForTheNativeCodeSilly();
+        MonitorThreadLock = true;
+        nativeSetEventFlag(fd, EventType.DATA_SET_READY.value(), enable);
+        monThread.DSR = enable;
+        MonitorThreadLock = false;
+    }
+
+    @Override
+    public void notifyOnRingIndicator(boolean enable) {
+        waitForTheNativeCodeSilly();
+        MonitorThreadLock = true;
+        nativeSetEventFlag(fd, EventType.RING_INDICATOR.value(), enable);
+        monThread.RI = enable;
+        MonitorThreadLock = false;
+    }
+
+    @Override
+    public void notifyOnCarrierDetect(boolean enable) {
+        waitForTheNativeCodeSilly();
+        MonitorThreadLock = true;
+        nativeSetEventFlag(fd, EventType.CARRIER_DETECT.value(), enable);
+        monThread.CD = enable;
+        MonitorThreadLock = false;
+    }
+
+    @Override
+    public void notifyOnOverrunError(boolean enable) {
+        waitForTheNativeCodeSilly();
+        MonitorThreadLock = true;
+        nativeSetEventFlag(fd, EventType.OVERRUN_ERROR.value(), enable);
+        monThread.OE = enable;
+        MonitorThreadLock = false;
+    }
+
+    @Override
+    public void notifyOnParityError(boolean enable) {
+        waitForTheNativeCodeSilly();
+        MonitorThreadLock = true;
+        nativeSetEventFlag(fd, EventType.PARITY_ERROR.value(), enable);
+        monThread.PE = enable;
+        MonitorThreadLock = false;
+    }
+
+    @Override
+    public void notifyOnFramingError(boolean enable) {
+        waitForTheNativeCodeSilly();
+        MonitorThreadLock = true;
+        nativeSetEventFlag(fd, EventType.FRAMING_ERROR.value(), enable);
+        monThread.FE = enable;
+        MonitorThreadLock = false;
+    }
+
+    @Override
+    public void notifyOnBreakInterrupt(boolean enable) {
+        waitForTheNativeCodeSilly();
+        MonitorThreadLock = true;
+        nativeSetEventFlag(fd, EventType.BREAK_INTERRUPT.value(), enable);
+        monThread.BI = enable;
+        MonitorThreadLock = false;
+    }
+
+    boolean closeLock = false;
+
+    @Override
+    public void close() {
+        try {
+            synchronized (this) {
+
+                while (IOLocked > 0) {
+                    try {
+                        this.wait(500);
+                    } catch (InterruptedException ie) {
+                        // somebody called interrupt() on us
+                        // we obbey and return without without closing the socket
+                        Thread.currentThread().interrupt();
+                        return;
+                    }
+                }
+
+                // we set the closeLock after the above check because we might
+                // have returned without proceeding
+                if (closeLock) {
+                    return;
+                }
+                closeLock = true;
+            }
+
+            if (fd <= 0) {
+                return;
+            }
+            setDTR(false);
+            setDSR(false);
+            if (!monThreadisInterrupted) {
+                removeEventListener();
+            }
+
+            nativeClose(this.name);
+
+            super.close();
+            fd = 0;
+            closeLock = false;
+        } finally {
+            try {
+                this.serialIS.close();
+            } catch (IOException e) {
+            }
+            this.closed = true;
+        }
+    }
+
+    /** Finalize the port */
+    @Override
+    protected void finalize() {
+        if (fd > 0) {
+            close();
+        }
+    }
+
+    /** Inner class for SerialOutputStream */
+    private class SerialOutputStream extends OutputStream {
+        /**
+         * @param b
+         * @throws IOException
+         */
+        @Override
+        public void write(int b) throws IOException {
+            if (speed == 0) {
+                return;
+            }
+            if (monThreadisInterrupted) {
+                return;
+            }
+            synchronized (IOLockedMutex) {
+                IOLocked++;
+            }
+            try {
+                waitForTheNativeCodeSilly();
+                if (fd == 0) {
+                    throw new IOException();
+                }
+                writeByte(b, monThreadisInterrupted);
+            } finally {
+                synchronized (IOLockedMutex) {
+                    IOLocked--;
+                }
+            }
+        }
+
+        /**
+         * @param b[]
+         * @throws IOException
+         */
+        @Override
+        public void write(byte b[]) throws IOException {
+            if (speed == 0) {
+                return;
+            }
+            if (monThreadisInterrupted) {
+                return;
+            }
+            if (fd == 0) {
+                throw new IOException();
+            }
+            synchronized (IOLockedMutex) {
+                IOLocked++;
+            }
+            try {
+                waitForTheNativeCodeSilly();
+                writeArray(b, 0, b.length, monThreadisInterrupted);
+            } finally {
+                synchronized (IOLockedMutex) {
+                    IOLocked--;
+                }
+            }
+
+        }
+
+        @Override
+        public void close() throws IOException {
+            try {
+                super.close();
+            } finally {
+                RXTXPort.this.close();
+            }
+        }
+
+        /**
+         * @param b[]
+         * @param off
+         * @param len
+         * @throws IOException
+         */
+        @Override
+        public void write(byte b[], int off, int len) throws IOException {
+            if (speed == 0) {
+                return;
+            }
+            if (off + len > b.length) {
+                throw new IndexOutOfBoundsException("Invalid offset/length passed to read");
+            }
+
+            byte send[] = new byte[len];
+            System.arraycopy(b, off, send, 0, len);
+
+            if (fd == 0) {
+                throw new IOException();
+            }
+            if (monThreadisInterrupted) {
+                return;
+            }
+            synchronized (IOLockedMutex) {
+                IOLocked++;
+            }
+            try {
+                waitForTheNativeCodeSilly();
+                writeArray(send, 0, len, monThreadisInterrupted);
+            } finally {
+                synchronized (IOLockedMutex) {
+                    IOLocked--;
+                }
+            }
+        }
+
+        /**
+        */
+        @Override
+        public void flush() throws IOException {
+            if (speed == 0) {
+                return;
+            }
+            if (fd == 0) {
+                throw new IOException();
+            }
+            if (monThreadisInterrupted) {
+                return;
+            }
+            synchronized (IOLockedMutex) {
+                IOLocked++;
+            }
+            try {
+                waitForTheNativeCodeSilly();
+                /*
+                 * this is probably good on all OS's but for now just sendEvent from java on Sol
+                 */
+                if (nativeDrain(monThreadisInterrupted)) {
+                    sendEvent(EventType.OUTPUT_BUFFER_EMPTY.value(), true);
+                }
+            } finally {
+                synchronized (IOLockedMutex) {
+                    IOLocked--;
+                }
+            }
+        }
+    }
+
+    /**
+     * This class is a wrapper for the {@link SerialInputStream}.
+     */
+    private class BetterSerialInputStream extends InputStream {
+        private static final long SLEEP_TIME = 10L;// TODO: sleep appropriate time
+        private final SerialInputStream serialInputStream;
+
+        public BetterSerialInputStream(SerialInputStream serialInputStream) {
+            this.serialInputStream = serialInputStream;
+        }
+
+        @Override
+        public synchronized int read() throws IOException {
+            long elapsedTime = 0;
+            do {
+                if (serialInputStream.available() > 0) {
+                    return serialInputStream.read();
+                }
+                try {
+                    Thread.sleep(SLEEP_TIME);
+                    elapsedTime += SLEEP_TIME;
+                } catch (InterruptedException e) {
+                    // ignore
+                }
+
+                if (closed) {
+                    throw new CommPortException("Connection has been closed..");
+                }
+            } while (timeout <= 0 || elapsedTime <= timeout);
+
+            throw new CommPortTimeoutException("Timed out, while reading the serial port.");
+        }
+
+        @Override
+        public int available() throws IOException {
+            return this.serialInputStream.available();
+        }
+
+        @Override
+        public void close() throws IOException {
+            serialInputStream.close();
+        }
+    }
+
+    private class SerialInputStream extends InputStream {
+        /**
+         * @return int the int read
+         * @throws IOException
+         * @see java.io.InputStream
+         *
+         *      timeout threshold Behavior ------------------------------------------------------------------------ 0 0
+         *      blocks until 1 byte is available timeout > 0, threshold = 0, blocks until timeout occurs, returns -1 on
+         *      timeout >0 >0 blocks until timeout, returns - 1 on timeout, magnitude of threshold doesn't play a role.
+         *      0 >0 Blocks until 1 byte, magnitude of threshold doesn't play a role
+         */
+        @Override
+        public synchronized int read() throws IOException {
+
+            if (fd == 0) {
+                throw new IOException();
+            }
+            synchronized (IOLockedMutex) {
+                IOLocked++;
+            }
+            try {
+
+                waitForTheNativeCodeSilly();
+
+                int result = readByte();
+                return result;
+            } finally {
+                synchronized (IOLockedMutex) {
+                    IOLocked--;
+                }
+            }
+        }
+
+        /**
+         * @param b[]
+         * @return int number of bytes read
+         * @throws IOException
+         *
+         *             timeout threshold Behavior
+         *             ------------------------------------------------------------------------ 0 0 blocks until 1 byte
+         *             is available >0 0 blocks until timeout occurs, returns 0 on timeout >0 >0 blocks until timeout or
+         *             reads threshold bytes, returns 0 on timeout 0 >0 blocks until reads threshold bytes
+         */
+        @Override
+        public synchronized int read(byte b[]) throws IOException {
+            int result;
+
+            if (monThreadisInterrupted) {
+                return (0);
+            }
+            synchronized (IOLockedMutex) {
+                IOLocked++;
+            }
+            try {
+                waitForTheNativeCodeSilly();
+                result = read(b, 0, b.length);
+
+                return result;
+            } finally {
+                synchronized (IOLockedMutex) {
+                    IOLocked--;
+                }
+            }
+        }
+
+        /**
+         * @see InputStream#read(byte[], int, int)
+         * 
+         * @param b
+         *            the bytes
+         * @param off
+         *            the offset
+         * @param len
+         *            the length
+         * @return the numbernumber of bytes read
+         * @throws IOException
+         *             timeout threshold Behavior
+         *             ------------------------------------------------------------------------ 0 0 blocks until 1 byte
+         *             is available >0 0 blocks until timeout occurs, returns 0 on timeout >0 >0 blocks until timeout or
+         *             reads threshold bytes, returns 0 on timeout 0 >0 blocks until either threshold # of bytes or len
+         *             bytes, whichever was lower.
+         */
+        @Override
+        public synchronized int read(byte b[], int off, int len) throws IOException {
+            int result;
+            /*
+             * Some sanity checks
+             */
+            if (fd == 0) {
+                throw new IOException();
+            }
+
+            if (b == null) {
+                throw new NullPointerException();
+            }
+
+            if ((off < 0) || (len < 0) || (off + len > b.length)) {
+                throw new IndexOutOfBoundsException();
+            }
+
+            /*
+             * Return immediately if len==0
+             */
+            if (len == 0) {
+                return 0;
+            }
+            /*
+             * See how many bytes we should read
+             */
+            int Minimum = len;
+
+            if (threshold == 0) {
+                /*
+                 * If threshold is disabled, read should return as soon as data are available (up to the amount of
+                 * available bytes in order to avoid blocking) Read may return earlier depending of the receive time
+                 * out.
+                 */
+                int a = nativeavailable();
+                if (a == 0) {
+                    Minimum = 1;
+                }
+                else {
+                    Minimum = Math.min(Minimum, a);
+                }
+            }
+            else {
+                /*
+                 * Threshold is enabled. Read should return when 'threshold' bytes have been received (or when the
+                 * receive timeout expired)
+                 */
+                Minimum = Math.min(Minimum, threshold);
+            }
+            if (monThreadisInterrupted == true) {
+                return (0);
+            }
+            synchronized (IOLockedMutex) {
+                IOLocked++;
+            }
+            try {
+                waitForTheNativeCodeSilly();
+                result = readArray(b, off, Minimum);
+                return (result);
+            } finally {
+                synchronized (IOLockedMutex) {
+                    IOLocked--;
+                }
+            }
+        }
+
+        /**
+         * @param b[]
+         * @param off
+         * @param len
+         * @param t[]
+         * @return int number of bytes read
+         * @throws IOException
+         * 
+         *             We are trying to catch the terminator in the native code Right now it is assumed that t[] is an
+         *             array of 2 bytes.
+         * 
+         *             if the read encounters the two bytes, it will return and the array will contain the terminator.
+         *             Otherwise read behavior should be the same as read( b[], off, len ). Timeouts have not been well
+         *             tested.
+         */
+
+        public synchronized int read(byte b[], int off, int len, byte t[]) throws IOException {
+            int result;
+            /*
+             * Some sanity checks
+             */
+            if (fd == 0) {
+                throw new IOException();
+            }
+
+            if (b == null) {
+                throw new NullPointerException();
+            }
+
+            if ((off < 0) || (len < 0) || (off + len > b.length)) {
+                throw new IndexOutOfBoundsException();
+            }
+
+            /*
+             * Return immediately if len==0
+             */
+            if (len == 0) {
+                return 0;
+            }
+            /*
+             * See how many bytes we should read
+             */
+            int Minimum = len;
+
+            if (threshold == 0) {
+                /*
+                 * If threshold is disabled, read should return as soon as data are available (up to the amount of
+                 * available bytes in order to avoid blocking) Read may return earlier depending of the receive time
+                 * out.
+                 */
+                int a = nativeavailable();
+                if (a == 0) {
+                    Minimum = 1;
+                }
+                else {
+                    Minimum = Math.min(Minimum, a);
+                }
+            }
+            else {
+                /*
+                 * Threshold is enabled. Read should return when 'threshold' bytes have been received (or when the
+                 * receive timeout expired)
+                 */
+                Minimum = Math.min(Minimum, threshold);
+            }
+
+            if (monThreadisInterrupted) {
+                return 0;
+            }
+            synchronized (IOLockedMutex) {
+                IOLocked++;
+            }
+            try {
+                waitForTheNativeCodeSilly();
+                result = readTerminatedArray(b, off, Minimum, t);
+                return (result);
+            } finally {
+                synchronized (IOLockedMutex) {
+                    IOLocked--;
+                }
+            }
+        }
+
+        /**
+         * @return int bytes available
+         * @throws IOException
+         */
+        @Override
+        public synchronized int available() throws IOException {
+            if (monThreadisInterrupted) {
+                return (0);
+            }
+            synchronized (IOLockedMutex) {
+                IOLocked++;
+            }
+            try {
+                int r = nativeavailable();
+                return r;
+            } finally {
+                synchronized (IOLockedMutex) {
+                    IOLocked--;
+                }
+            }
+        }
+    }
+
+    /**
+    */
+    class MonitorThread extends Thread {
+        /**
+         * Note: these have to be separate boolean flags because the SerialPortEvent constants are NOT bit-flags, they
+         * are just defined as integers from 1 to 10 -DPL
+         */
+        private volatile boolean CTS = false;
+        private volatile boolean DSR = false;
+        private volatile boolean RI = false;
+        private volatile boolean CD = false;
+        private volatile boolean OE = false;
+        private volatile boolean PE = false;
+        private volatile boolean FE = false;
+        private volatile boolean BI = false;
+        private volatile boolean Data = false;
+        private volatile boolean Output = false;
+
+        MonitorThread() {
+            setDaemon(true);
+        }
+
+        /**
+         * run the thread and call the event loop.
+         */
+        @Override
+        public void run() {
+            monThreadisInterrupted = false;
+            eventLoop();
+        }
+
+        @Override
+        protected void finalize() throws Throwable {
+        }
+    }
+
+    /*------------------------  END OF CommAPI -----------------------------*/
+
+    private native static void nativeStaticSetSerialPortParams(String f, int b, int d, int s, int p)
+            throws UnsupportedCommOperationException;
+
+    private native static boolean nativeStaticSetDSR(String port, boolean flag)
+            throws UnsupportedCommOperationException;
+
+    private native static boolean nativeStaticSetDTR(String port, boolean flag)
+            throws UnsupportedCommOperationException;
+
+    private native static boolean nativeStaticSetRTS(String port, boolean flag)
+            throws UnsupportedCommOperationException;
+
+    private native static boolean nativeStaticIsDSR(String port) throws UnsupportedCommOperationException;
+
+    private native static boolean nativeStaticIsDTR(String port) throws UnsupportedCommOperationException;
+
+    private native static boolean nativeStaticIsRTS(String port) throws UnsupportedCommOperationException;
+
+    private native static boolean nativeStaticIsCTS(String port) throws UnsupportedCommOperationException;
+
+    private native static boolean nativeStaticIsCD(String port) throws UnsupportedCommOperationException;
+
+    private native static boolean nativeStaticIsRI(String port) throws UnsupportedCommOperationException;
+
+    private native static int nativeStaticGetBaudRate(String port) throws UnsupportedCommOperationException;
+
+    private native static int nativeStaticGetDataBits(String port) throws UnsupportedCommOperationException;
+
+    private native static int nativeStaticGetParity(String port) throws UnsupportedCommOperationException;
+
+    private native static int nativeStaticGetStopBits(String port) throws UnsupportedCommOperationException;
+
+    private native byte nativeGetParityErrorChar() throws UnsupportedCommOperationException;
+
+    private native boolean nativeSetParityErrorChar(byte b) throws UnsupportedCommOperationException;
+
+    private native byte nativeGetEndOfInputChar() throws UnsupportedCommOperationException;
+
+    private native boolean nativeSetEndOfInputChar(byte b) throws UnsupportedCommOperationException;
+
+    private native boolean nativeSetUartType(String type, boolean test) throws UnsupportedCommOperationException;
+
+    native String nativeGetUartType() throws UnsupportedCommOperationException;
+
+    private native boolean nativeSetBaudBase(int BaudBase) throws UnsupportedCommOperationException;
+
+    private native int nativeGetBaudBase() throws UnsupportedCommOperationException;
+
+    private native boolean nativeSetDivisor(int Divisor) throws UnsupportedCommOperationException;
+
+    private native int nativeGetDivisor() throws UnsupportedCommOperationException;
+
+    private native boolean nativeSetLowLatency() throws UnsupportedCommOperationException;
+
+    private native boolean nativeGetLowLatency() throws UnsupportedCommOperationException;
+
+    private native boolean nativeSetCallOutHangup(boolean NoHup) throws UnsupportedCommOperationException;
+
+    private native boolean nativeGetCallOutHangup() throws UnsupportedCommOperationException;
+
+    private native boolean nativeClearCommInput() throws UnsupportedCommOperationException;
+
+    /**
+     * Retrieve the baud rate.
+     * <p>
+     * This is only accurate up to 38600 baud currently.
+     * </p>
+     *
+     * @param port
+     *            the name of the port thats been preopened
+     * @return BaudRate on success
+     * @throws UnsupportedCommOperationException
+     *             if this operation is not supported for the OS by the underlying native library.
+     *
+     */
+    public static int staticGetBaudRate(String port) throws UnsupportedCommOperationException {
+        return (nativeStaticGetBaudRate(port));
+    }
+
+    /**
+     * Retrieve the data bits.
+     *
+     * @param port
+     *            the name of the port thats been preopened
+     * @return DataBits on success
+     * @throws UnsupportedCommOperationException
+     *             if this operation is not supported for the OS by the underlying native library.
+     *
+     */
+    public static int staticGetDataBits(String port) throws UnsupportedCommOperationException {
+        return nativeStaticGetDataBits(port);
+    }
+
+    /**
+     * Retrieve the parity.
+     * 
+     * @param port
+     *            the name of the port thats been preopened
+     * @return Parity on success
+     * @throws UnsupportedCommOperationException
+     *             if this operation is not supported for the OS by the underlying native library.
+     *
+     */
+    public static int staticGetParity(String port) throws UnsupportedCommOperationException {
+        return nativeStaticGetParity(port);
+    }
+
+    /**
+     * Retrieve the stop bits.
+     * 
+     * @param port
+     *            the name of the port thats been preopened
+     * @return StopBits on success
+     * @throws UnsupportedCommOperationException
+     *             if this operation is not supported for the OS by the underlying native library.
+     *
+     */
+    public static int staticGetStopBits(String port) throws UnsupportedCommOperationException {
+        return (nativeStaticGetStopBits(port));
+    }
+
+    /**
+     * Set the SerialPort parameters 1.5 stop bits requires 5 databits
+     * 
+     * @see gnu.io.UnsupportedCommOperationException
+     * 
+     * @param filename
+     *            filename
+     * @param baudrate
+     *            baudrate
+     * @param databits
+     *            databits
+     * @param stopbits
+     *            stopbits
+     * @param parity
+     *            parity
+     *
+     * @throws UnsupportedCommOperationException
+     *             if this operation is not supported for the OS by the underlying native library.
+     */
+    public static void staticSetSerialPortParams(String filename, int baudrate, int databits, int stopbits, int parity)
+            throws UnsupportedCommOperationException {
+        nativeStaticSetSerialPortParams(filename, baudrate, databits, stopbits, parity);
+    }
+
+    /**
+     * Open the port and set DSR. remove lockfile and do not close This is so some software can appear to set the DSR
+     * before 'opening' the port a second time later on.
+     * 
+     * @param port
+     *            the port name
+     * @param flag
+     *            boolean DSR FLAG.
+     * @return true if the operation was successful
+     * @throws UnsupportedCommOperationException
+     *             if this operation is not supported for the OS by the underlying native library.
+     */
+    public static boolean staticSetDSR(String port, boolean flag) throws UnsupportedCommOperationException {
+        return (nativeStaticSetDSR(port, flag));
+    }
+
+    /**
+     * Open the port and set DTR. remove lockfile and do not close This is so some software can appear to set the DTR
+     * before 'opening' the port a second time later on.
+     *
+     * @param port
+     *            the port name
+     * @param flag
+     *            boolean DTR FLAG.
+     * @return true if the operation was successful
+     * @throws UnsupportedCommOperationException
+     *             if this operation is not supported for the OS by the underlying native library.
+     *
+     */
+    public static boolean staticSetDTR(String port, boolean flag) throws UnsupportedCommOperationException {
+        return (nativeStaticSetDTR(port, flag));
+    }
+
+    /**
+     * Open the port and set RTS. remove lockfile and do not close This is so some software can appear to set the RTS
+     * before 'opening' the port a second time later on.
+     *
+     * @param port
+     *            the port name
+     * @param flag
+     *            boolean RTS FLAG.
+     * @return true if the operation was successful
+     * @throws UnsupportedCommOperationException
+     *             if this operation is not supported for the OS by the underlying native library.
+     *
+     */
+    public static boolean staticSetRTS(String port, boolean flag) throws UnsupportedCommOperationException {
+        return nativeStaticSetRTS(port, flag);
+    }
+
+    /**
+     * find the fd and return RTS without using a Java open() call
+     *
+     * @param port
+     *            the port name
+     * @return true if asserted
+     * @throws UnsupportedCommOperationException
+     *             if this operation is not supported for the OS by the underlying native library.
+     *
+     */
+    public static boolean staticIsRTS(String port) throws UnsupportedCommOperationException {
+        return (nativeStaticIsRTS(port));
+    }
+
+    /**
+     * find the fd and return CD without using a Java open() call
+     *
+     * @param port
+     *            the port name
+     * @return true if asserted
+     * @throws UnsupportedCommOperationException
+     *             if this operation is not supported for the OS by the underlying native library.
+     *
+     */
+    public static boolean staticIsCD(String port) throws UnsupportedCommOperationException {
+        return (nativeStaticIsCD(port));
+    }
+
+    /**
+     * find the fd and return CTS without using a Java open() call
+     *
+     * @param port
+     *            the port name
+     * @return true if asserted
+     * @throws UnsupportedCommOperationException
+     *             if this operation is not supported for the OS by the underlying native library.
+     *
+     */
+    public static boolean staticIsCTS(String port) throws UnsupportedCommOperationException {
+        return nativeStaticIsCTS(port);
+    }
+
+    /**
+     * find the fd and return DSR without using a Java open() call
+     *
+     * @param port
+     *            the port name
+     * @return true if asserted
+     * @throws UnsupportedCommOperationException
+     *             if this operation is not supported for the OS by the underlying native library.
+     *
+     */
+    public static boolean staticIsDSR(String port) throws UnsupportedCommOperationException {
+        return (nativeStaticIsDSR(port));
+    }
+
+    /**
+     * Extension to CommAPI This is an extension to CommAPI. It may not be supported on all operating systems.
+     *
+     * find the fd and return DTR without using a Java open() call
+     *
+     * @param port
+     *            the port name
+     * @return true if asserted
+     * @throws UnsupportedCommOperationException
+     *             if this operation is not supported for the OS by the underlying native library.
+     *
+     */
+    public static boolean staticIsDTR(String port) throws UnsupportedCommOperationException {
+        return nativeStaticIsDTR(port);
+    }
+
+    /**
+     * Find the fd and return RI without using a Java open() call
+     *
+     * @param port
+     *            the port name
+     * @return true if asserted
+     * @throws UnsupportedCommOperationException
+     *             if this operation is not supported for the OS by the underlying native library.
+     */
+    public static boolean staticIsRI(String port) throws UnsupportedCommOperationException {
+        return nativeStaticIsRI(port);
+    }
+
+    @Override
+    public byte getParityErrorChar() throws UnsupportedCommOperationException {
+        // TODO: Anyone know how to do this in Unix?
+        return nativeGetParityErrorChar();
+    }
+
+    @Override
+    public boolean setParityErrorChar(byte b) throws UnsupportedCommOperationException {
+        // TODO: Anyone know how to do this in Unix?
+        return nativeSetParityErrorChar(b);
+    }
+
+    @Override
+    public byte getEndOfInputChar() throws UnsupportedCommOperationException {
+        // TODO: Anyone know how to do this in Unix?
+        return nativeGetEndOfInputChar();
+    }
+
+    @Override
+    public boolean setEndOfInputChar(byte b) throws UnsupportedCommOperationException {
+        return (nativeSetEndOfInputChar(b));
+    }
+
+    @Override
+    @Deprecated
+    public boolean setUARTType(String type, boolean test) throws UnsupportedCommOperationException {
+        return nativeSetUartType(type, test);
+    }
+
+    @Override
+    public boolean setUARTType(UARTType type, boolean test) throws UnsupportedCommOperationException {
+        return nativeSetUartType(type.type(), test);
+    }
+
+    @Override
+    @Deprecated
+    public String getUARTType() throws UnsupportedCommOperationException {
+        return nativeGetUartType();
+    }
+
+    @Override
+    public UARTType uartType() throws UnsupportedCommOperationException {
+        return UARTType.typeFor(nativeGetUartType());
+    }
+
+    @Override
+    public boolean setBaudBase(int BaudBase) throws UnsupportedCommOperationException, IOException {
+        return nativeSetBaudBase(BaudBase);
+    }
+
+    @Override
+    public int getBaudBase() throws UnsupportedCommOperationException, IOException {
+        return nativeGetBaudBase();
+    }
+
+    /**
+     * Extension to CommAPI. Set Baud Base to 38600 on Linux and W32 before using.
+     */
+    @Override
+    public boolean setDivisor(int Divisor) throws UnsupportedCommOperationException, IOException {
+        return nativeSetDivisor(Divisor);
+    }
+
+    /**
+     * Extension to CommAPI
+     */
+    @Override
+    public int getDivisor() throws UnsupportedCommOperationException, IOException {
+        return nativeGetDivisor();
+    }
+
+    @Override
+    public boolean setLowLatency() throws UnsupportedCommOperationException {
+        return nativeSetLowLatency();
+    }
+
+    @Override
+    public boolean getLowLatency() throws UnsupportedCommOperationException {
+        return nativeGetLowLatency();
+    }
+
+    // return true on success
+    @Override
+    public boolean setCallOutHangup(boolean NoHup) throws UnsupportedCommOperationException {
+        return nativeSetCallOutHangup(NoHup);
+    }
+
+    // return true on success
+    @Override
+    public boolean getCallOutHangup() throws UnsupportedCommOperationException {
+        return nativeGetCallOutHangup();
+    }
+
+    // return true on success
+    public boolean clearCommInput() throws UnsupportedCommOperationException {
+        return nativeClearCommInput();
+    }
+
+    @Override
+    public synchronized void setSerialPortParams(int baudRate, DataBits dataBits, StopBits stopBits, Parity parity)
+            throws UnsupportedCommOperationException {
+        setSerialPortParams(baudRate, dataBits.value(), stopBits.value(), parity.value());
+    }
 
 }

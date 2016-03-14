@@ -27,38 +27,38 @@ import java.util.EventObject;
 /* Non functional contact tjarvi@qbang.org for details */
 
 public class RS485PortEvent extends EventObject {
-	public static final int DATA_AVAILABLE = 1;
-	public static final int OUTPUT_BUFFER_EMPTY = 2;
-	public static final int CTS = 3;
-	public static final int DSR = 4;
-	public static final int RI = 5;
-	public static final int CD = 6;
-	public static final int OE = 7;
-	public static final int PE = 8;
-	public static final int FE = 9;
-	public static final int BI = 10;
+    public static final int DATA_AVAILABLE = 1;
+    public static final int OUTPUT_BUFFER_EMPTY = 2;
+    public static final int CTS = 3;
+    public static final int DSR = 4;
+    public static final int RI = 5;
+    public static final int CD = 6;
+    public static final int OE = 7;
+    public static final int PE = 8;
+    public static final int FE = 9;
+    public static final int BI = 10;
 
-	private final boolean OldValue;
-	private final boolean NewValue;
-	private final int eventType;
-	/* public int eventType =0; depricated */
+    private final boolean OldValue;
+    private final boolean NewValue;
+    private final int eventType;
+    /* public int eventType =0; depricated */
 
-	public RS485PortEvent(RS485Port srcport, int eventtype, boolean oldvalue, boolean newvalue) {
-		super(srcport);
-		OldValue = oldvalue;
-		NewValue = newvalue;
-		eventType = eventtype;
-	}
+    public RS485PortEvent(RS485Port srcport, int eventtype, boolean oldvalue, boolean newvalue) {
+        super(srcport);
+        OldValue = oldvalue;
+        NewValue = newvalue;
+        eventType = eventtype;
+    }
 
-	public int getEventType() {
-		return (eventType);
-	}
+    public int getEventType() {
+        return (eventType);
+    }
 
-	public boolean getNewValue() {
-		return (NewValue);
-	}
+    public boolean getNewValue() {
+        return (NewValue);
+    }
 
-	public boolean getOldValue() {
-		return (OldValue);
-	}
+    public boolean getOldValue() {
+        return (OldValue);
+    }
 }

@@ -27,5 +27,5 @@ import java.util.EventListener;
 /* Non functional contact tjavi@qbang.org for details */
 
 public interface RawPortEventListener extends EventListener {
-	void RawEvent(RawPortEvent ev);
+    void RawEvent(RawPortEvent ev);
 }

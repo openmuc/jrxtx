@@ -12,11 +12,11 @@ import org.powermock.modules.junit4.PowerMockRunner;
 @PrepareForTest(RXTXPort.class)
 public class RXTXPortTest {
 
-	@Test
-	public void test_inputStream() throws Exception {
+    @Test
+    public void test_inputStream() throws Exception {
 
-		RXTXPort rxtxPort = PowerMockito.mock(RXTXPort.class);
+        RXTXPort rxtxPort = PowerMockito.mock(RXTXPort.class);
 
-	}
+    }
 
 }

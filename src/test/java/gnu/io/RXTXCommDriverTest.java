@@ -41,57 +41,57 @@ import org.powermock.modules.junit4.PowerMockRunner;
 @SuppressStaticInitializationFor({ "gnu.io.CommPortIdentifier", "gnu.io.RXTXCommDriver" })
 public class RXTXCommDriverTest {
 
-	private String fOldPropSerial;
-	private String fOldPropParallel;
-	private String fPathSep;
+    private String fOldPropSerial;
+    private String fOldPropParallel;
+    private String fPathSep;
 
-	@Before
-	public void setUp() {
-		fPathSep = System.getProperty("path.separator", ":");
-		fOldPropSerial = System.getProperty("gnu.io.rxtx.SerialPorts");
-		fOldPropParallel = System.getProperty("gnu.io.rxtx.ParallelPorts");
-	}
+    @Before
+    public void setUp() {
+        fPathSep = System.getProperty("path.separator", ":");
+        fOldPropSerial = System.getProperty("gnu.io.rxtx.SerialPorts");
+        fOldPropParallel = System.getProperty("gnu.io.rxtx.ParallelPorts");
+    }
 
-	@Ignore
-	@After
-	public void tearDown() {
-		System.setProperty("gnu.io.rxtx.SerialPorts", fOldPropSerial == null ? "" : fOldPropSerial);
-		System.setProperty("gnu.io.rxtx.ParallelPorts", fOldPropParallel == null ? "" : fOldPropParallel);
-	}
+    @Ignore
+    @After
+    public void tearDown() {
+        System.setProperty("gnu.io.rxtx.SerialPorts", fOldPropSerial == null ? "" : fOldPropSerial);
+        System.setProperty("gnu.io.rxtx.ParallelPorts", fOldPropParallel == null ? "" : fOldPropParallel);
+    }
 
-	/*
-	 * Check that ports can be specified (i.e. removed) by means of a Java Property
-	 */
-	@Ignore
-	@Test
-	public void testRegisterSpecifiedPorts() throws Exception {
-		// First, find all serial ports
-		List<String> serialPorts = new ArrayList<String>();
-		Enumeration<CommPortIdentifier> e = CommPortIdentifier.getPortIdentifiers();
-		while (e.hasMoreElements()) {
-			CommPortIdentifier port = e.nextElement();
-			if (port.getPortType() == CommPortIdentifier.PORT_SERIAL) {
-				serialPorts.add(port.getName());
-			}
-		}
-		System.out.println(serialPorts);
-		// Now, get rid of the first one
-		StringBuffer buf = new StringBuffer();
-		for (int i = 1; i < serialPorts.size(); i++) {
-			buf.append(serialPorts.get(i));
-			buf.append(fPathSep);
-		}
-		System.setProperty("gnu.io.rxtx.SerialPorts", buf.toString());
-		e = CommPortIdentifier.getPortIdentifiers();
-		int nNew = 0;
-		while (e.hasMoreElements()) {
-			CommPortIdentifier port = e.nextElement();
-			if (port.getPortType() == CommPortIdentifier.PORT_SERIAL) {
-				nNew++;
-				assertTrue("hasPort", serialPorts.contains(port.getName()));
-			}
-		}
-		assertEquals("1 port removed", serialPorts.size() - 1, nNew);
-	}
+    /*
+     * Check that ports can be specified (i.e. removed) by means of a Java Property
+     */
+    @Ignore
+    @Test
+    public void testRegisterSpecifiedPorts() throws Exception {
+        // First, find all serial ports
+        List<String> serialPorts = new ArrayList<String>();
+        Enumeration<CommPortIdentifier> e = CommPortIdentifier.getPortIdentifiers();
+        while (e.hasMoreElements()) {
+            CommPortIdentifier port = e.nextElement();
+            if (port.getPortType() == CommPortIdentifier.PORT_SERIAL) {
+                serialPorts.add(port.getName());
+            }
+        }
+        System.out.println(serialPorts);
+        // Now, get rid of the first one
+        StringBuffer buf = new StringBuffer();
+        for (int i = 1; i < serialPorts.size(); i++) {
+            buf.append(serialPorts.get(i));
+            buf.append(fPathSep);
+        }
+        System.setProperty("gnu.io.rxtx.SerialPorts", buf.toString());
+        e = CommPortIdentifier.getPortIdentifiers();
+        int nNew = 0;
+        while (e.hasMoreElements()) {
+            CommPortIdentifier port = e.nextElement();
+            if (port.getPortType() == CommPortIdentifier.PORT_SERIAL) {
+                nNew++;
+                assertTrue("hasPort", serialPorts.contains(port.getName()));
+            }
+        }
+        assertEquals("1 port removed", serialPorts.size() - 1, nNew);
+    }
 
 }

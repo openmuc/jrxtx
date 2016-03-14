@@ -41,40 +41,40 @@ import org.powermock.reflect.Whitebox;
 @SuppressStaticInitializationFor({ "gnu.io.CommPortIdentifier", "gnu.io.RXTXCommDriver" })
 public class CommPortIdentifierTest {
 
-	@Ignore
-	@Test(expected = NoSuchPortException.class)
-	public void testGetPortIdentifier() throws Exception {
-		List<CommPortIdentifier> l = getPortIdentifiers();
+    @Ignore
+    @Test(expected = NoSuchPortException.class)
+    public void testGetPortIdentifier() throws Exception {
+        List<CommPortIdentifier> l = getPortIdentifiers();
 
-		assertFalse("The List is empty.", l.isEmpty());
+        assertFalse("The List is empty.", l.isEmpty());
 
-		CommPortIdentifier first = l.get(0);
-		CommPortIdentifier last = l.get(l.size() - 1);
-		// first find by name
-		CommPortIdentifier p = CommPortIdentifier.getPortIdentifier(first.getName());
+        CommPortIdentifier first = l.get(0);
+        CommPortIdentifier last = l.get(l.size() - 1);
+        // first find by name
+        CommPortIdentifier p = CommPortIdentifier.getPortIdentifier(first.getName());
 
-		assertEquals("first found", p, first);
+        assertEquals("first found", p, first);
 
-		p = CommPortIdentifier.getPortIdentifier(last.getName());
+        p = CommPortIdentifier.getPortIdentifier(last.getName());
 
-		assertEquals("last found", p, last);
-		// now the non-existent case
+        assertEquals("last found", p, last);
+        // now the non-existent case
 
-		p = CommPortIdentifier.getPortIdentifier("wuzziwuzz");
-	}
+        p = CommPortIdentifier.getPortIdentifier("wuzziwuzz");
+    }
 
-	private List<CommPortIdentifier> getPortIdentifiers() {
-		Enumeration<CommPortIdentifier> e = CommPortIdentifier.getPortIdentifiers();
-		List<CommPortIdentifier> l = new ArrayList<CommPortIdentifier>();
+    private List<CommPortIdentifier> getPortIdentifiers() {
+        Enumeration<CommPortIdentifier> e = CommPortIdentifier.getPortIdentifiers();
+        List<CommPortIdentifier> l = new ArrayList<CommPortIdentifier>();
 
-		while (e.hasMoreElements()) {
-			l.add(e.nextElement());
-		}
-		return l;
-	}
+        while (e.hasMoreElements()) {
+            l.add(e.nextElement());
+        }
+        return l;
+    }
 
-	@BeforeClass
-	public static void setUp() {
-		Whitebox.setInternalState(CommPortIdentifier.class, "sync", new Object());
-	}
+    @BeforeClass
+    public static void setUp() {
+        Whitebox.setInternalState(CommPortIdentifier.class, "sync", new Object());
+    }
 }

@@ -26,11 +26,11 @@ package gnu.io;
  * Thrown when a driver doesn't allow the specified operation.
  */
 public class UnsupportedCommOperationException extends Exception {
-	UnsupportedCommOperationException() {
-		super();
-	}
+    UnsupportedCommOperationException() {
+        super();
+    }
 
-	UnsupportedCommOperationException(String message) {
-		super(message);
-	}
+    UnsupportedCommOperationException(String message) {
+        super(message);
+    }
 }

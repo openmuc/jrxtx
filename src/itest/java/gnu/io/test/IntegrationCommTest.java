@@ -10,45 +10,45 @@ import gnu.io.SerialPort;
 
 public class IntegrationCommTest {
 
-	SerialTransceiver serialTransceiver;
+    SerialTransceiver serialTransceiver;
 
-	public IntegrationCommTest() {
-		serialTransceiver = new SerialTransceiver("/dev/ttyS99", 2400, SerialPort.DATABITS_8, SerialPort.STOPBITS_1,
-				SerialPort.PARITY_EVEN);
-	}
+    public IntegrationCommTest() {
+        serialTransceiver = new SerialTransceiver("/dev/ttyS99", 2400, SerialPort.DATABITS_8, SerialPort.STOPBITS_1,
+                SerialPort.PARITY_EVEN);
+    }
 
-	@Test
-	public void testComm() throws IOException, InterruptedException {
+    @Test
+    public void testComm() throws IOException, InterruptedException {
 
-		RxtxServer rxtxServer = new RxtxServer();
-		rxtxServer.start();
+        RxtxServer rxtxServer = new RxtxServer();
+        rxtxServer.start();
 
-		System.out.println("opening client serial port");
+        System.out.println("opening client serial port");
 
-		serialTransceiver.open();
+        serialTransceiver.open();
 
-		System.out.println("opening client done");
+        System.out.println("opening client done");
 
-		DataInputStream is = serialTransceiver.getInputStream();
+        DataInputStream is = serialTransceiver.getInputStream();
 
-		DataOutputStream os = serialTransceiver.getOutputStream();
+        DataOutputStream os = serialTransceiver.getOutputStream();
 
-		System.out.println("client writing 2");
+        System.out.println("client writing 2");
 
-		os.write(2);
-		os.flush();
+        os.write(2);
+        os.flush();
 
-		Thread.sleep(4000);
+        Thread.sleep(4000);
 
-		System.out.println("client writing 2");
+        System.out.println("client writing 2");
 
-		os.write(2);
-		os.flush();
+        os.write(2);
+        os.flush();
 
-		Thread.sleep(4000);
+        Thread.sleep(4000);
 
-		serialTransceiver.close();
+        serialTransceiver.close();
 
-	}
+    }
 
 }
