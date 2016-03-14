@@ -6,8 +6,9 @@ maintainers.
 
 jRxTx is licensed under the LGPLv2.1 or later
 
-jRxTx has the goal to maintain full backward compatibility to RXTX
-while embracing future bug fixes by the community.
+The development team the goal to maintain full backward compatibility
+to RXTX while adding a more convenient API and embracing future bug
+fixes by the community.
 
 The following lists some of the improvements added to the original RXTX:
 
@@ -21,5 +22,5 @@ The following lists some of the improvements added to the original RXTX:
 
 - The Java build system has been moved to Gradle.
 
-- Improve the input and output stream implementations that behave like
+- Improved input and output stream implementations so they behave like
   the streams that the Java TCP socket API provides.

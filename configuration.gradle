@@ -36,15 +36,19 @@ tasks.withType(Tar) {
     from('./') {
       include 'build.gradle'
       include 'configuration.gradle'
-      include 'README'
       include 'license/**'
-      include 'doc/**'
-      include 'native/**'
+      include 'doc/*.txt'
+      include 'doc/userguide/' + project.name + '-doc*.html'
+      include 'doc/userguide/' + project.name + '-doc_img/**'
+      include 'run-scripts/**'
       include 'build/libs/**'
       include 'build/docs/javadoc/**'
       include 'src/**'
+      include 'gradle/**'
+      include 'gradle*'
+      include 'native/**'
+      include 'README'
     }
-
   }
 }
 
