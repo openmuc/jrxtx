@@ -3,7 +3,7 @@ project.ext {
 
   cfgJavaVersion = '1.5'
 
-  cfgVersion = '0.0.1-SNAPSHOT'
+  cfgVersion = '0.0.1'
   
   cfgGroup = 'org.openmuc'
 
