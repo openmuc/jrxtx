@@ -13,13 +13,13 @@ project.ext {
 
   cfgSignPom = false
 
-  cfgRepository = project.properties.repository
+  cfgRepository = project.properties.sonatypeRepository
 
-  cfgSnapshotRepository = project.properties.snapshotRepository
+  cfgSnapshotRepository = project.properties.sonatypeSnapshotRepository
 
-  cfgRepositoryUser = project.properties.artifactoryUser
+  cfgRepositoryUser = project.properties.sonatypeUser
 
-  cfgRepositoryPass = project.properties.artifactoryPass
+  cfgRepositoryPass = project.properties.sonatypePass
 
   javaProjects = allprojects
 
