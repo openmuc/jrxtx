@@ -39,7 +39,7 @@ tasks.withType(Tar) {
       include 'license/**'
       include 'doc/*.txt'
       include 'doc/userguide/' + project.name + '-doc*.html'
-      include 'doc/userguide/' + project.name + '-doc_img/**'
+      include 'doc/userguide/' + project.name + '-doc-img/**'
       include 'run-scripts/**'
       include 'gradle/wrapper/**'
       include 'gradlew'
