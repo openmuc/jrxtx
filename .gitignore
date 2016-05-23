@@ -15,3 +15,6 @@ gradle.properties
 doc/userguide/*.html
 doc/userguide/*.pdf
 *.hprof
+gradle-app.setting
+.factorypath
+.apt_generated/

@@ -3,7 +3,7 @@ project.ext {
 
   cfgJavaVersion = '1.5'
 
-  cfgVersion = '0.0.1-SNAPSHOT'
+  cfgVersion = '0.0.2-SNAPSHOT'
   
   cfgGroup = 'org.openmuc'
 
@@ -11,15 +11,15 @@ project.ext {
 
   cfgCopyToRoot = false
 
-  cfgSignPom = false
+  cfgSignPom = true
 
-  cfgRepository = project.properties.repository
+  cfgRepository = project.properties.sonatypeRepository
 
-  cfgSnapshotRepository = project.properties.snapshotRepository
+  cfgSnapshotRepository = project.properties.sonatypeSnapshotRepository
 
-  cfgRepositoryUser = project.properties.artifactoryUser
+  cfgRepositoryUser = project.properties.sonatypeUser
 
-  cfgRepositoryPass = project.properties.artifactoryPass
+  cfgRepositoryPass = project.properties.sonatypePass
 
   javaProjects = allprojects
 
@@ -39,13 +39,14 @@ tasks.withType(Tar) {
       include 'license/**'
       include 'doc/*.txt'
       include 'doc/userguide/' + project.name + '-doc*.html'
-      include 'doc/userguide/' + project.name + '-doc_img/**'
+      include 'doc/userguide/' + project.name + '-doc-img/**'
       include 'run-scripts/**'
+      include 'gradle/wrapper/**'
+      include 'gradlew'
+      include 'gradlew.bat'
       include 'build/libs/**'
       include 'build/docs/javadoc/**'
       include 'src/**'
-      include 'gradle/**'
-      include 'gradle*'
       include 'native/**'
       include 'README'
     }
