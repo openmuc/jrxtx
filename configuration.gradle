@@ -106,6 +106,27 @@ dependencies {
 
 }
 
+sourceSets {
+	main {
+		resources {
+			includes = ["**/*.so","**/*.dll", "**/*.jnilib","**/*.properties"]
+		}
+	}
+}
+
+
+task nativeLibsToJar(type: Zip, description: 'create a jar archive of the native libs') {
+    destinationDir file("$buildDir/native-libs")
+    baseName 'native-libs'
+    extension 'jar'
+    from fileTree(dir: 'libs', include: '**/*.so')
+    into 'native/'
+}
+
+tasks.withType(JavaCompile) {
+    compileTask -> compileTask.dependsOn(nativeLibsToJar)
+}
+
 task javah(dependsOn: compileJava) << {
   def Nclasses = [	
     'gnu.io.RXTXCommDriver',

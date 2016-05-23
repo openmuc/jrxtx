@@ -11,6 +11,7 @@ public class CommPortException extends IOException {
     }
 
     public CommPortException(String message, Throwable cause) {
-        super(message, cause);
+        super(message);
+        super.initCause(cause);
     }
 }

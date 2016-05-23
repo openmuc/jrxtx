@@ -65,7 +65,9 @@ class SerialTransceiver {
         try {
             portIdentifier = CommPortIdentifier.getPortIdentifier(serialPortName);
         } catch (NoSuchPortException e) {
-            throw new IOException("Serial port with given name \"" + serialPortName + "\" does not exist", e);
+            IOException ioException = new IOException("Serial port is currently in use.");
+            ioException.initCause(e);
+            throw ioException;
         }
 
         if (portIdentifier.isCurrentlyOwned()) {
@@ -76,7 +78,9 @@ class SerialTransceiver {
         try {
             commPort = portIdentifier.open(this.getClass().getName(), 2000);
         } catch (PortInUseException e) {
-            throw new IOException("Serial port is currently in use.", e);
+            IOException ioException = new IOException("Serial port is currently in use.");
+            ioException.initCause(e);
+            throw ioException;
         }
 
         if (!(commPort instanceof SerialPort)) {
@@ -91,7 +95,9 @@ class SerialTransceiver {
         } catch (UnsupportedCommOperationException e) {
             serialPort.close();
             serialPort = null;
-            throw new IOException("Unable to set the baud rate or other serial port parameters", e);
+            IOException ioException = new IOException("Unable to set the baud rate or other serial port parameters");
+            ioException.initCause(e);
+            throw ioException;
         }
 
         try {
@@ -100,7 +106,9 @@ class SerialTransceiver {
         } catch (IOException e) {
             serialPort.close();
             serialPort = null;
-            throw new IOException("Error getting input or output or input stream from serial port", e);
+            IOException ioException = new IOException("Error getting input or output or input stream from serial port");
+            ioException.initCause(e);
+            throw ioException;
         }
 
     }
