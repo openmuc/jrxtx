@@ -11,9 +11,26 @@ buildscript {
 
 plugins {
   id "org.sonarqube" version "1.0"
+  id 'org.asciidoctor.convert' version '1.5.3'
 }
 
+apply plugin: "org.asciidoctor.convert"
+apply plugin: "java"
 apply from: "configuration.gradle"
+
+
+asciidoctor {
+
+  attributes	"stylesheet": "openmuc-asciidoc.css",
+  				"toc2": "left",
+				"sampleSrc": file("src/sample/java")
+
+  resources {
+    from("$sourceDir") {
+      include "images/**"
+    }	
+  }
+}
 
 configure(allprojects) {
   version = cfgVersion
@@ -122,8 +139,9 @@ configure(javaProjects) {
       }
     }
   }
-
-  build.dependsOn(jarAll)
+  
+  build.dependsOn {asciidoctor}
+  build.dependsOn {jarAll}
 
   eclipse.pathVariables([GRADLE_USER_HOME:file(gradle.gradleUserHomeDir)])
   tasks.eclipse.dependsOn(cleanEclipse)
@@ -158,7 +176,7 @@ configure(repositoryProjects) {
   if (cfgSignPom) {
     signing {
       if ( project.hasProperty('signing.keyId') ) {
-	sign configurations.archives
+        sign configurations.archives
       }
     }
   }
@@ -267,6 +285,7 @@ tasks.withType(Tar) {
   dependsOn(writeSettings)
   dependsOn(distributionProjects.build)
   dependsOn(javadocAll)
+  dependsOn(asciidoctor)
 
   compression = Compression.GZIP
   
