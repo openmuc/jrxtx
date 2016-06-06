@@ -6,24 +6,27 @@ buildscript {
   }
   dependencies {
     classpath "net.saliman:gradle-cobertura-plugin:2.2.8"
+    classpath group: "org.asciidoctor", name: "asciidoctorj-pdf", version: "1.5.0-alpha.11"
+
   }
 }
 
 plugins {
   id "org.sonarqube" version "1.0"
-  id 'org.asciidoctor.convert' version '1.5.3'
+  id "org.asciidoctor.convert" version "1.5.3"
 }
 
 apply plugin: "org.asciidoctor.convert"
 apply plugin: "java"
 apply from: "configuration.gradle"
 
-
 asciidoctor {
-
+  backends = ["pdf", "html5"]
   attributes	"stylesheet": "openmuc-asciidoc.css",
-  				"toc2": "left",
-				"sampleSrc": file("src/sample/java")
+  "toc2": "left",
+  "sampleSrc": file("src/sample/java"),
+  "pdf-stylesdir": "./",
+  "pdf-style": "pdf"
 
   resources {
     from("$sourceDir") {
@@ -238,6 +241,8 @@ task javadocAll(type: Javadoc) {
   }
 
   exclude '**/internal/**'
+  exclude '**/java-gen/**'
+  exclude '**/app/**'
 
   destinationDir = new File(buildDir, 'docs/javadoc-all')
 
