@@ -1,0 +1,30 @@
+jRxTx User Guide
+================
+
+:numbered:
+
+== Intro
+
+
+
+=== Distribution
+
+
+== Using jRxTx
+
+== Modifying and Compiling jRxTx
+
+We use the Gradle build automation tool. The distribution contains a
+fully functional gradle build file ("build.gradle"). Thus if you
+changed code and want to rebuild a library you can do it easily with
+Gradle. Also if you want to import our software into Eclipse you can
+easily create Eclipse project files using Gradle. Just follow the
+instructions on our FAQ site:
+http://www.openmuc.org/index.php?id=72#faq_gradle
+
+
+== Common Problems
+
+ToDo add some from original INSTALL or README.Debian files
+
+
