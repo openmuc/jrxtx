@@ -1,5 +1,6 @@
-jRxTx User Guide
-================
+= jRxTx User Guide
+include::common_settings.txt[]
+
 
 :numbered:
 

@@ -1,0 +1,24 @@
+ifndef::imagesdir[:imagesdir: images]
+ifdef::backend-pdf[]
+Fraunhofer Institute for Solar Energy Systems ISE
+openmuc.org
+//:doctype: book
+// Settings:
+:compat-mode:
+:experimental:
+:icons: font
+:listing-caption: Listing
+:sectnums:
+:toc:
+:toclevels: 3
+:title-logo-image: image:banner.png[pdfwidth=90%,align=center]
+
+:width80: 600
+
+endif::[]
+
+ifndef::backend-pdf[]
+
+:width80: "80%"
+
+endif::[]

@@ -25,6 +25,7 @@ asciidoctor {
   attributes	"stylesheet": "openmuc-asciidoc.css",
   "toc2": "left",
   "sampleSrc": file("src/sample/java"),
+  "source-highlighter" : "coderay",
   "pdf-stylesdir": "./",
   "pdf-style": "pdf"
 

@@ -9,47 +9,47 @@
 
 /* Default font. */
 body {
-  font-family: Georgia,"Times New Roman",Times,serif;
-
+  font-family: "Open Sans", Helvetica, sans-serif;
+  max-width:62.5em;
+  margin: auto;
 }
 
 /* Title font. */
 
-h3,h4, h5, h6 {
-  color: #010101;
-   size:12px;
+h1, h2, h3, h4, h5, h6 {
+    clear: both;
+    font-family: "Open Sans", Georgia, serif;
+    line-height: 1.3;
 }
 
-#toc a {
+a {
     border-bottom: 1px dotted #999999;
-    color: #04392C !important;
+    color: #378f03 !important;
     text-decoration: none !important;
 }
-#toc a:hover {
-    border-bottom: 1px solid #049674;
-    color: #049674 !important;
+a:hover {
+    border-bottom: 1px solid #378f03;
+    color: #378f03 !important;
     text-decoration: none !important;
 }
 
 em {
   font-style: italic;
-/*  color: #0D6C55;*/
   color: #4E4E4E;
 }
 
 strong {
   font-weight: bold;
-/*  color: #0D6C55;*/
- color: #000000;
+  color: #000000;
 }
 
 
 div.sectionbody {
-  margin-left: 0;
+/*  margin-left: 0;*/
 }
 
 hr {
-  border: 1px solid #0D6C55;
+  border: 1px solid #575757;
 }
 
 
@@ -59,7 +59,7 @@ pre {
 }
 
 #author {
-  color: #0D6C55;
+  color: #575757;
   font-weight: bold;
   font-size: 1.1em;
 }
@@ -99,12 +99,11 @@ div.admonitionblock {
 
 div.content { /* Block element content. */
   padding: 0;
-
 }
 
 /* Block element titles. */
 div.title, caption.title {
-  color: #0D6C55;
+  color: #575757;
   font-weight: bold;
   text-align: left;
   margin-top: 1.0em;
@@ -166,7 +165,7 @@ div.admonitionblock .icon {
   font-size: 1.1em;
   font-weight: bold;
   text-decoration: underline;
-  color: #0D6C55;
+  color: #575757;
   padding-right: 0.5em;
 }
 div.admonitionblock td.content {
@@ -191,7 +190,7 @@ dt {
   margin-top: 0.5em;
   margin-bottom: 0;
   font-style: normal;
-  color: #0D6C55;
+  color: #575757;
 }
 dd > *:first-child {
   margin-top: 0.1em;
@@ -224,11 +223,11 @@ div.compact div, div.compact div {
 }
 
 div.tableblock > table {
-  border: 3px solid #0D6C55;
+  border: 3px solid #575757;
 }
 thead {
   font-weight: bold;
-  color: #0D6C55;
+  color: #575757;
 }
 tfoot {
   font-weight: bold;
@@ -267,7 +266,7 @@ td.hdlist1 {
   vertical-align: top;
   font-style: normal;
   padding-right: 0.8em;
-  color: #0D6C55;
+  color: #575757;
 }
 td.hdlist2 {
   vertical-align: top;
@@ -286,7 +285,7 @@ div.hdlist.compact tr {
 }
 
 #toctitle {
-  color: #049674;
+  color: #575757;
   font-size: 1.2em;
   font-weight: bold;
   margin-top: 1.0em;
@@ -345,7 +344,7 @@ table.tableblock {
 }
 thead, p.tableblock.header {
   font-weight: bold;
-  color: #049674;
+  color: #575757;
 }
 p.tableblock {
   margin-top: 0;
@@ -354,14 +353,14 @@ table.tableblock {
   border-width: 3px;
   border-spacing: 0px;
   border-style: solid;
-  border-color: #0D6C55;
+  border-color: #575757;
   border-collapse: collapse;
 }
 th.tableblock, td.tableblock {
   border-width: 1px;
   padding: 4px;
   border-style: solid;
-  border-color: #0D6C55;
+  border-color: #575757;
 }
 
 table.tableblock.frame-topbot {
