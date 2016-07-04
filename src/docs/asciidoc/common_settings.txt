@@ -12,13 +12,22 @@ openmuc.org
 :toc:
 :toclevels: 3
 :title-logo-image: image:banner.png[pdfwidth=90%,align=center]
+:frame: none
 
+:width100: 750
 :width80: 600
+:width60: 450
+:width40: 300
+:width20: 150
 
 endif::[]
 
 ifndef::backend-pdf[]
 
+:width100: "100%"
 :width80: "80%"
+:width60: "60%"
+:width40: "40%"
+:width20: "20%"
 
 endif::[]
