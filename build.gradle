@@ -7,7 +7,7 @@ buildscript {
   dependencies {
     classpath "net.saliman:gradle-cobertura-plugin:2.2.8"
     classpath group: "org.asciidoctor", name: "asciidoctorj-pdf", version: "1.5.0-alpha.11"
-
+    classpath 'biz.aQute.bnd:biz.aQute.bnd.gradle:3.0.0'
   }
 }
 
@@ -47,6 +47,7 @@ configure(javaProjects) {
   apply plugin: 'maven'
   apply plugin: 'signing'
   apply plugin: 'net.saliman.cobertura'
+  apply plugin: 'biz.aQute.bnd.builder'
 
   group = cfgGroup
 
