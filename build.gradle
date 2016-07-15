@@ -108,22 +108,6 @@ configure(javaProjects) {
     //only the jar file created:
     from configurations.default.getAllArtifacts().getFiles()
 
-    ext.isDocProject = false;
-    docProjects.findAll {
-      if (it.getPath() == project.path) {
-        isDocProject = true;
-      }
-    }
-    
-    if (isDocProject) {
-      //configurations.archives also contains source and javadoc files
-      configurations.archives.getArtifacts().all {
-        if (it.file.name.endsWith("sources.jar") || it.file.name.endsWith("javadoc.jar")) {
-          from project.files(it.file)
-        }
-      }
-    }
-
     if (cfgCopyDependencies) {
       if (cfgCopyToRoot) {
         into rootDir.getPath() + "/build/libs-all"
@@ -228,11 +212,6 @@ configure(repositoryProjects) {
       }
     }
   }
-}
-
-configure(docProjects) {
-  jarAll.dependsOn sourcesJar
-  jarAll.dependsOn javadocJar
 }
 
 task javadocAll(type: Javadoc) {
