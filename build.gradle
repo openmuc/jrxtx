@@ -254,7 +254,7 @@ task writeSettings << {
   for (Project myproject: distributionProjects) {
     if (!myproject.getProjectDir().equals(getProjectDir())) {
       println myproject.name
-      out.write "project(":" + myproject.name + "").projectDir = file("" + myproject.getProjectDir().toString().substring((int)(getProjectDir().toString().size() + 1)) + "")\n";
+      out.write 'project(":' + myproject.name + '").projectDir = file("' + myproject.getProjectDir().toString().substring((int)(getProjectDir().toString().size() + 1)) + '")\n';
     }
   }
 
