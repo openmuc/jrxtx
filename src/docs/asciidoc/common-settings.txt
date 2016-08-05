@@ -1,4 +1,4 @@
-ifndef::imagesdir[:imagesdir: images]
+ifndef::imgdir[:imgdir: images]
 ifdef::backend-pdf[]
 Fraunhofer Institute for Solar Energy Systems ISE
 openmuc.org
