@@ -246,7 +246,7 @@ task writeSettings << {
       else {
         out.write ", ";
       }
-      out.write """ + myproject.name + """
+      out.write '"' + myproject.name + '"'
     }
   }
   out .write "\n\n";
@@ -277,11 +277,11 @@ tasks.withType(Tar) {
   destinationDir = file("build/distributions/")
 }
 
-task (tarFull, type: Tar) {
-  archiveName = project.name + "-" + project.version + "_full.tgz"
-}
-
-
 task (tar, type: Tar) {
   archiveName = project.name + "-" + project.version + ".tgz"
+}
+
+task (tarFull, type: Tar) {
+  dependsOn(tar)
+  archiveName = project.name + "-" + project.version + "_full.tgz"
 }
