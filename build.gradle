@@ -97,6 +97,7 @@ configure(javaProjects) {
 
   sonarqube {
     properties {
+      property "sonar.exclusions", "src/main/java-gen/**/*,**/app/**/*"
       property "sonar.java.coveragePlugin", "cobertura"
       property "sonar.cobertura.reportPath", "build/reports/cobertura/coverage.xml"
     }
