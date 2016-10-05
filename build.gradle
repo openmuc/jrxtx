@@ -49,6 +49,8 @@ configure(javaProjects) {
   apply plugin: "net.saliman.cobertura"
   apply plugin: "biz.aQute.bnd.builder"
 
+  uploadArchives.enabled = false
+  
   group = cfgGroup
 
   if (!project.properties.containsKey("cfgJavaVersion")) {
@@ -161,6 +163,8 @@ configure(javaProjects) {
 
 
 configure(repositoryProjects) {
+
+  uploadArchives.enabled = true
 
   if (cfgSignPom) {
     signing {
