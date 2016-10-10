@@ -40,10 +40,15 @@ footer:
   height: 0.75in
   line_height: 1
   recto_content:
-    right: '{chapter-title} | *{page-number}*'
+    right: '*{page-number}*'
   verso_content:
-    left: '*{page-number}* | {chapter-title}'
+    left: '*{page-number}*'
+
 caption:
-  align: center
+  align: left
   font_color: #000000
   font_size: 9
+
+code:
+    border_color: #cccccc
+    
