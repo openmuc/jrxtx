@@ -1,6 +1,8 @@
 before_install:
   - sudo apt-get -qq update
-  - sudo apt-get install cmake g++ gcc 
+  - sudo apt-get install cmake g++ gcc
+  - g++ -v
+  - gcc -v
 
 language: java
 jdk: openjdk7
