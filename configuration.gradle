@@ -1,7 +1,7 @@
 
 project.ext {
 
-  cfgJavaVersion = "1.5"
+  cfgJavaVersion = "7"
 
   cfgVersion = "0.0.2-SNAPSHOT"
   
