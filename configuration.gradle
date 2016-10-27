@@ -130,16 +130,7 @@ tasks.withType(JavaCompile) {
 
 task javah(dependsOn: compileJava) << {
   def Nclasses = [	
-    "gnu.io.RXTXCommDriver",
-    "gnu.io.CommPortIdentifier",
-    "gnu.io.RXTXVersion",
-    "gnu.io.I2C",
-    "gnu.io.LPRPort",
-    "gnu.io.RXTXPort",
-    "gnu.io.Zystem",
-    "gnu.io.Raw",
-    "gnu.io.RS485",
-    "gnu.io.ParallelPort"
+    'org.openmuc.serialio.SerialPort',
   ];
     
   def nativeIncludes = "native/src/include"
