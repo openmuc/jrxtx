@@ -133,7 +133,7 @@ task javah(dependsOn: compileJava) << {
     'org.openmuc.serialio.SerialPort',
   ];
     
-  def nativeIncludes = "native/src/include"
+  def nativeIncludes = "native/src/jni"
   def classpath = sourceSets.main.output.classesDir
   for (Nclass in Nclasses) {
       

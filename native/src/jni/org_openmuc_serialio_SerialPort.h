@@ -9,19 +9,11 @@ extern "C" {
 #endif
 /*
  * Class:     org_openmuc_serialio_SerialPort
- * Method:    HellWorld
- * Signature: (Ljava/lang/String;)I
+ * Method:    getPortNames
+ * Signature: ()Ljava/util/List;
  */
-JNIEXPORT jint JNICALL Java_org_openmuc_serialio_SerialPort_HellWorld
-  (JNIEnv *, jobject, jstring);
-
-/*
- * Class:     org_openmuc_serialio_SerialPort
- * Method:    Bla
- * Signature: (I)I
- */
-JNIEXPORT jint JNICALL Java_org_openmuc_serialio_SerialPort_Bla
-  (JNIEnv *, jobject, jint);
+JNIEXPORT jobject JNICALL Java_org_openmuc_serialio_SerialPort_getPortNames
+  (JNIEnv *, jclass);
 
 #ifdef __cplusplus
 }
