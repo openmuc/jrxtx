@@ -1,187 +1,104 @@
-/*
- * Copyright 1997-2009 by Trent Jarvi and others
- * Copyright 1998 Kevin Hester, kevinh@acm.org
- * Copyright 2016 Fraunhofer ISE and others
- *
- * This file is part of jRxTx.
- * jRxTx is a fork of RXTX originally maintained by Trent Jarvi.
- *
- * jRxTx is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 2.1 of the License, or
- * (at your option) any later version.
- *
- * jRxTx is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with jRxTx.  If not, see <http://www.gnu.org/licenses/>.
- *
- */
+/*-------------------------------------------------------------------------
+|   RXTX License v 2.1 - LGPL v 2.1 + Linking Over Controlled Interface.
+|   RXTX is a native interface to serial ports in java.
+|   Copyright 1997-2007 by Trent Jarvi tjarvi@qbang.org and others who
+|   actually wrote it.  See individual source files for more information.
+|
+|   A copy of the LGPL v 2.1 may be found at
+|   http://www.gnu.org/licenses/lgpl.txt on March 4th 2007.  A copy is
+|   here for your convenience.
+|
+|   This library is free software; you can redistribute it and/or
+|   modify it under the terms of the GNU Lesser General Public
+|   License as published by the Free Software Foundation; either
+|   version 2.1 of the License, or (at your option) any later version.
+|
+|   This library is distributed in the hope that it will be useful,
+|   but WITHOUT ANY WARRANTY; without even the implied warranty of
+|   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+|   Lesser General Public License for more details.
+|
+|   An executable that contains no derivative of any portion of RXTX, but
+|   is designed to work with RXTX by being dynamically linked with it,
+|   is considered a "work that uses the Library" subject to the terms and
+|   conditions of the GNU Lesser General Public License.
+|
+|   The following has been added to the RXTX License to remove
+|   any confusion about linking to RXTX.   We want to allow in part what
+|   section 5, paragraph 2 of the LGPL does not permit in the special
+|   case of linking over a controlled interface.  The intent is to add a
+|   Java Specification Request or standards body defined interface in the 
+|   future as another exception but one is not currently available.
+|
+|   http://www.fsf.org/licenses/gpl-faq.html#LinkingOverControlledInterface
+|
+|   As a special exception, the copyright holders of RXTX give you
+|   permission to link RXTX with independent modules that communicate with
+|   RXTX solely through the Sun Microsytems CommAPI interface version 2,
+|   regardless of the license terms of these independent modules, and to copy
+|   and distribute the resulting combined work under terms of your choice,
+|   provided that every copy of the combined work is accompanied by a complete
+|   copy of the source code of RXTX (the version of RXTX used to produce the
+|   combined work), being distributed under the terms of the GNU Lesser General
+|   Public License plus this exception.  An independent module is a
+|   module which is not derived from or based on RXTX.
+|
+|   Note that people who make modified versions of RXTX are not obligated
+|   to grant this special exception for their modified versions; it is
+|   their choice whether to do so.  The GNU Lesser General Public License
+|   gives permission to release a modified version without this exception; this
+|   exception also makes it possible to release a modified version which
+|   carries forward this exception.
+|
+|   You should have received a copy of the GNU Lesser General Public
+|   License along with this library; if not, write to the Free
+|   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+|   All trademarks belong to their respective owners.
+--------------------------------------------------------------------------*/
 package gnu.io;
+import java.util.*;
 
-import java.util.EventObject;
+/**
+* @author Trent Jarvi
+* @version %I%, %G%
+* @since JDK1.0
+*/
 
-public class SerialPortEvent extends EventObject {
-    /**
-     * @deprecated use {@link EventType#DATA_AVAILABLE} instead
-     */
-    @Deprecated
-    public static final int DATA_AVAILABLE = 1;
-    /**
-     * @deprecated use {@link EventType#OUTPUT_BUFFER_EMPTY} instead
-     */
-    @Deprecated
-    public static final int OUTPUT_BUFFER_EMPTY = 2;
-    /**
-     * @deprecated use {@link EventType#CLEAR_TO_SEND} instead
-     */
-    @Deprecated
-    public static final int CTS = 3;
-    /**
-     * @deprecated use {@link EventType#DATA_SET_READY} instead
-     */
-    @Deprecated
-    public static final int DSR = 4;
-    /**
-     * @deprecated use {@link EventType#RING_INDICATOR} instead
-     */
-    @Deprecated
-    public static final int RI = 5;
-    /**
-     * @deprecated use {@link EventType#CARRIER_DETECT} instead
-     */
-    @Deprecated
-    public static final int CD = 6;
-    /**
-     * @deprecated use {@link EventType#OVERRUN_ERROR} instead
-     */
-    @Deprecated
-    public static final int OE = 7;
-    /**
-     * @deprecated use {@link EventType#PARITY_ERROR} instead
-     */
-    @Deprecated
-    public static final int PE = 8;
-    /**
-     * @deprecated use {@link EventType#FRAMING_ERROR} instead
-     */
-    @Deprecated
-    public static final int FE = 9;
-    /**
-     * @deprecated use {@link EventType#BREAK_INTERRUPT} instead
-     */
-    @Deprecated
-    public static final int BI = 10;
+public class SerialPortEvent extends EventObject
+{
+	public static final int DATA_AVAILABLE      =1;
+	public static final int OUTPUT_BUFFER_EMPTY =2;
+	public static final int CTS                 =3;
+	public static final int DSR                 =4;
+	public static final int RI                  =5;
+	public static final int CD                  =6;
+	public static final int OE                  =7;
+	public static final int PE                  =8;
+	public static final int FE                  =9;
+	public static final int BI                 =10;
 
-    public enum EventType implements CommPortEnum {
-        /**
-         * Data available at the serial port.
-         */
-        DATA_AVAILABLE(1),
-        /**
-         * Output buffer is empty.
-         */
-        OUTPUT_BUFFER_EMPTY(2),
-        /**
-         * Clear to send.
-         */
-        CLEAR_TO_SEND(3),
-        /**
-         * Data set ready.
-         */
-        DATA_SET_READY(4),
-        /**
-         * Ring indicator.
-         */
-        RING_INDICATOR(5),
-        /**
-         * Carrier detect.
-         */
-        CARRIER_DETECT(6),
-        /**
-         * Overrun error.
-         */
-        OVERRUN_ERROR(7),
-        /**
-         * Parity error.
-         */
-        PARITY_ERROR(8),
-        /**
-         * Framing error.
-         */
-        FRAMING_ERROR(9),
-        /**
-         * Break interrupt.
-         */
-        BREAK_INTERRUPT(10);
+	private boolean OldValue;
+	private boolean NewValue;
+	private int eventType;
+	/*public int eventType           =0; depricated */
 
-        private int value;
-
-        private EventType(int value) {
-            this.value = value;
-        }
-
-        public int value() {
-            return this.value;
-        }
-
-    }
-
-    private final boolean oldValue;
-    private final boolean newValue;
-    private final int eventType;
-
-    SerialPortEvent(SerialPort srcport, int eventtype, boolean oldvalue, boolean newvalue) {
-        super(srcport);
-        oldValue = oldvalue;
-        newValue = newvalue;
-        eventType = eventtype;
-    }
-
-    /**
-     * 
-     * Data available at the serial port. This event will be generated once when new data arrive at the serial port.
-     * Even if the user doesn't read the data, it won't be generated again until next time new data arrive.
-     * 
-     * @return field constant.
-     * 
-     * @deprecated use {@link #eventType()} instead.
-     */
-    @Deprecated
-    public int getEventType() {
-        return eventType;
-    }
-
-    /**
-     * Data available at the serial port. This event will be generated once when new data arrive at the serial port.
-     * Even if the user doesn't read the data, it won't be generated again until next time new data arrive.
-     * 
-     * @return the event type.
-     */
-    public EventType eventType() {
-        return Enu.enumFor(this.eventType, EventType.class);
-    }
-
-    /**
-     * Gets the new value of the state change that caused the SerialPortEvent to be propagated. For example, when the CD
-     * bit changes, newValue reflects the new value of the CD bit.
-     * 
-     * @return the flag
-     */
-    public boolean getNewValue() {
-        return newValue;
-    }
-
-    /**
-     * Gets the old value of the state change that caused the SerialPortEvent to be propagated. For example, when the CD
-     * bit changes, oldValue reflects the old value of the CD bit.
-     * 
-     * @return the flag
-     */
-    public boolean getOldValue() {
-        return oldValue;
-    }
+	public SerialPortEvent(SerialPort srcport, int eventtype, boolean oldvalue, boolean newvalue)
+	{
+		super( srcport );	
+		OldValue=oldvalue;
+		NewValue=newvalue;
+		eventType=eventtype;
+	}
+	public int getEventType()
+	{
+		return(eventType);
+	}
+	public boolean getNewValue()
+	{
+		return( NewValue );
+	}
+	public boolean getOldValue()
+	{
+		return( OldValue );
+	}
 }
