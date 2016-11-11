@@ -1,4 +1,4 @@
-= A Java serial communication library.
+= jRxTx: Java serial communication library.
 
 The development team the goal to maintain full backward compatibility
 to RXTX while adding a more convenient API and embracing future bug
