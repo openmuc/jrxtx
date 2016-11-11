@@ -1,11 +1,11 @@
 
 project.ext {
 
-  cfgJavaVersion = "1.5"
+  cfgJavaVersion = '1.5'
 
-  cfgVersion = "0.0.2-SNAPSHOT"
+  cfgVersion = '0.0.2-SNAPSHOT'
   
-  cfgGroup = "org.openmuc"
+  cfgGroup = 'org.openmuc'
 
   cfgCopyDependencies = false
 
@@ -33,60 +33,66 @@ project.ext {
 tasks.withType(Tar) {
 
   into(project.name) {
-    from("./") {
-      include "build.gradle"
-      include "configuration.gradle"
-      include "license/**"
-      include "doc/*.txt"
-      include "doc/userguide/" + project.name + "-doc*.html"
-      include "doc/userguide/" + project.name + "-doc-img/**"
-      include "run-scripts/**"
-      include "gradle/wrapper/**"
-      include "gradlew"
-      include "gradlew.bat"
-      include "build/libs/**"
-      include "build/docs/javadoc/**"
-      include "src/**"
-      include "native/**"
-      include "README"
+    from('./') {
+      include 'build.gradle'
+      include 'configuration.gradle'
+      include 'license/**'
+      include 'doc/*.txt'
+      include 'doc/userguide/' + project.name + '-doc*.html'
+      include 'doc/userguide/' + project.name + '-doc-img/**'
+      include 'run-scripts/**'
+      include 'gradle/wrapper/**'
+      include 'gradlew'
+      include 'gradlew.bat'
+      include 'build/libs/**'
+      include 'build/docs/javadoc/**'
+      include 'src/**'
+      include 'native/**'
+      include 'README'
     }
   }
 }
 
 tasks.withType(Test) {
-  systemProperty "java.library.path", "native/x86_64-unknown-linux-gnu/.libs/:/usr/lib/jni/"
+  systemProperty 'java.library.path', 'native/x86_64-unknown-linux-gnu/.libs/:/usr/lib/jni/'
 }
 
 
 
 //------------------project specific configurations--------------------
 
-apply plugin: "java"
-apply plugin: "eclipse"
-apply plugin: "osgi"
-apply plugin: "maven"
-apply plugin: "signing"
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'osgi'
+apply plugin: 'maven'
+apply plugin: 'signing'
 
 
 jar {
   manifest {
-    name = "jRxTx"
-    instruction "Export-Package", "!*.internal.*,*"
+    name = 'jRxTx'
+    instruction 'Export-Package', '!*.internal.*,*'
   }
+}
+
+eclipse {
+	jdt {
+		javaRuntimeName = 'J2SE-1.5'
+	}
 }
 
 uploadArchives {
   repositories {
     mavenDeployer {
       pom.project {
-        name "jRxTx"
-        description "jRxTx is a library for Java serial communication."
+        name 'jRxTx'
+        description 'jRxTx is a library for Java serial communication.'
         
         licenses {
           license {
-            name "GNU Lesser General Public License"
-            url "http://www.gnu.org/licenses/lgpl-2.1.html"
-            distribution "repo"
+            name 'GNU Lesser General Public License'
+            url 'http://www.gnu.org/licenses/lgpl-2.1.html'
+            distribution 'repo'
           }
         }
       }
@@ -96,32 +102,41 @@ uploadArchives {
 
 jar {
   manifest { // the manifest of the default jar is of type OsgiManifest
-    instruction "Import-Package", "!gnu.io.internal.*, *"
+    instruction 'Import-Package', '!gnu.io.internal.*, *'
   }
 }
 
 dependencies {
-  testCompile "org.mockito:mockito-core:1.10.19"
-  testCompile "org.powermock:powermock-api-mockito:1.6.4" 
-  testCompile "org.powermock:powermock-module-junit4:1.6.2" 
+  testCompile 'org.mockito:mockito-core:1.10.19'
+  testCompile 'org.powermock:powermock-api-mockito:1.6.4' 
+  testCompile 'org.powermock:powermock-module-junit4:1.6.2' 
 
 }
 
 sourceSets {
 	main {
+		java {
+			srcDirs = ['src/old-main/java', 'src/main/java']
+		}
 		resources {
-			includes = ["**/*.so","**/*.dll", "**/*.jnilib","**/*.properties"]
+			includes = ['**/*.so','**/*.dll', '**/*.jnilib','**/*.properties']
+		}
+	}
+	
+	test {
+		java {
+			srcDirs = ['src/old-test/java', 'src/test/java']
 		}
 	}
 }
 
 
-task nativeLibsToJar(type: Zip, description: "create a jar archive of the native libs") {
-    destinationDir file("$buildDir/native-libs")
-    baseName "native-libs"
-    extension "jar"
-    from fileTree(dir: "libs", include: "**/*.so")
-    into "native/"
+task nativeLibsToJar(type: Zip, description: 'create a jar archive of the native libs') {
+    destinationDir file('$buildDir/native-libs')
+    baseName 'native-libs'
+    extension 'jar'
+    from fileTree(dir: 'libs', include: '**/*.so')
+    into 'native/'
 }
 
 tasks.withType(JavaCompile) {
@@ -130,27 +145,27 @@ tasks.withType(JavaCompile) {
 
 task javah(dependsOn: compileJava) << {
   def Nclasses = [	
-    "gnu.io.RXTXCommDriver",
-    "gnu.io.CommPortIdentifier",
-    "gnu.io.RXTXVersion",
-    "gnu.io.I2C",
-    "gnu.io.LPRPort",
-    "gnu.io.RXTXPort",
-    "gnu.io.Zystem",
-    "gnu.io.Raw",
-    "gnu.io.RS485",
-    "gnu.io.ParallelPort"
+    'gnu.io.RXTXCommDriver',
+    'gnu.io.CommPortIdentifier',
+    'gnu.io.RXTXVersion',
+    'gnu.io.I2C',
+    'gnu.io.LPRPort',
+    'gnu.io.RXTXPort',
+    'gnu.io.Zystem',
+    'gnu.io.Raw',
+    'gnu.io.RS485',
+    'gnu.io.ParallelPort'
   ];
     
-  def nativeIncludes = "native/src/include"
+  def nativeIncludes = 'native/src/include'
   def classpath = sourceSets.main.output.classesDir
   for (Nclass in Nclasses) {
       
-    logger.info("Generating header for " + Nclass)
+    logger.info('Generating header for ' + Nclass)
       
     exec {
-	  executable "javah"
-	  args "-d", "$nativeIncludes", "-classpath", "$classpath" , Nclass
+	  executable 'javah'
+	  args '-d', '$nativeIncludes', '-classpath', '$classpath' , Nclass
     }
   }
 }
