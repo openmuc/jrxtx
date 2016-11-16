@@ -1,5 +1,6 @@
 package org.openmuc.jrxtx.config;
 
+import org.openmuc.jrxtx.DataBits;
 import org.openmuc.jrxtx.FlowControl;
 import org.openmuc.jrxtx.Parity;
 import org.openmuc.jrxtx.StopBits;
@@ -8,13 +9,6 @@ import org.openmuc.jrxtx.StopBits;
  * A SerialPort configuration.
  */
 public interface SerialPortConfig {
-
-    /**
-     * Get the serial port name.
-     * 
-     * @return the serial port name.
-     */
-    String getPortName();
 
     /**
      * Get the parity.
@@ -50,5 +44,12 @@ public interface SerialPortConfig {
      * @return the setting for socket timout
      */
     int getSerialPortTimeout();
+
+    /**
+     * Get the data bits.
+     * 
+     * @return the data bits.
+     */
+    DataBits getDatBits();
 
 }

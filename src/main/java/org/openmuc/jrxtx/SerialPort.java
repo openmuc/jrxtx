@@ -14,7 +14,9 @@ interface SerialPort extends Closeable {
      * 
      * @return the serial port configuration.
      */
-    SerialPortConfig getSerialPortConfig();
+    SerialPortConfig getConfig();
+
+    void updateConfig(SerialPortConfig serialPortConfig) throws SerialPortException;
 
     /**
      * Opens a new serial port connection.

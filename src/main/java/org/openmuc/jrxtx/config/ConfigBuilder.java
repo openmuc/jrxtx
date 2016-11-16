@@ -1,22 +1,22 @@
 package org.openmuc.jrxtx.config;
 
+import org.openmuc.jrxtx.DataBits;
 import org.openmuc.jrxtx.FlowControl;
 import org.openmuc.jrxtx.Parity;
 import org.openmuc.jrxtx.StopBits;
 
 public class ConfigBuilder {
-    private String portName;
     private Parity parity;
     private StopBits stopBits;
     private FlowControl flowControl;
     private int socketTimout;
     private int baudRate;
+    private DataBits dataBits;
 
     public ConfigBuilder(SerialPortConfig oldConfig) {
     }
 
-    public ConfigBuilder(String portName) {
-        this.portName = portName;
+    public ConfigBuilder() {
 
         this.parity = null;
         this.stopBits = null;
@@ -33,7 +33,6 @@ public class ConfigBuilder {
      * @return the configuration builder itself.
      */
     public ConfigBuilder setPortName(String portName) {
-        this.portName = portName;
         return this;
     }
 
@@ -46,6 +45,18 @@ public class ConfigBuilder {
      */
     public ConfigBuilder setParity(Parity parity) {
         this.parity = parity;
+        return this;
+    }
+
+    /**
+     * Set the data bits.
+     * 
+     * @param dataBits
+     *            the data bits.
+     * @return the configuration builder itself.
+     */
+    public ConfigBuilder setDataBits(DataBits dataBits) {
+        this.dataBits = dataBits;
         return this;
     }
 
@@ -90,12 +101,12 @@ public class ConfigBuilder {
      * is still valid. The option must be enabled prior to entering the blocking operation to have effect. The timeout
      * must be > 0. A timeout of zero is interpreted as an infinite timeout.
      * 
-     * @param socketTimeout
+     * @param socketTiemout
      *            the socket timeout,
      * @return the configuration builder itself.
      */
-    public ConfigBuilder setSocketTimeout(int socketTimout) {
-        this.socketTimout = socketTimout;
+    public ConfigBuilder setSocketTimeout(int socketTiemout) {
+        this.socketTimout = socketTiemout;
         return this;
     }
 
@@ -109,11 +120,6 @@ public class ConfigBuilder {
     }
 
     private class SerialPortConfigImpl implements SerialPortConfig {
-
-        public String getPortName() {
-            // TODO Auto-generated method stub
-            return null;
-        }
 
         public Parity getParity() {
             // TODO Auto-generated method stub
@@ -138,6 +144,11 @@ public class ConfigBuilder {
         public int getSerialPortTimeout() {
             // TODO Auto-generated method stub
             return 0;
+        }
+
+        public DataBits getDatBits() {
+            // TODO Auto-generated method stub
+            return null;
         }
 
     }

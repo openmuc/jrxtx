@@ -118,11 +118,7 @@ sourceSets {
 		java {
 			srcDirs = ['src/old-main/java', 'src/main/java']
 		}
-		resources {
-			includes = ['**/*.so','**/*.dll', '**/*.jnilib','**/*.properties']
-		}
 	}
-	
 	test {
 		java {
 			srcDirs = ['src/old-test/java', 'src/test/java']
@@ -130,18 +126,34 @@ sourceSets {
 	}
 }
 
+task buildLibs(type:Exec) {
+  workingDir 'native'
 
-task nativeLibsToJar(type: Zip, description: 'create a jar archive of the native libs') {
-    destinationDir file('$buildDir/native-libs')
-    baseName 'native-libs'
-    extension 'jar'
-    from fileTree(dir: 'libs', include: '**/*.so')
-    into 'native/'
+  //on windows:
+  // commandLine 'cmd', '/c', 'stop.bat'
+
+  //on linux
+  commandLine './configure'
+  commandLine 'make'
+  commandLine 'make'
+  //store the output instead of printing to the console:
+  standardOutput = new ByteArrayOutputStream()
+
+  //extension method stopTomcat.output() can be used to obtain the output:
+  ext.output = {
+    return standardOutput.toString()
+  }
 }
 
-tasks.withType(JavaCompile) {
-    compileTask -> compileTask.dependsOn(nativeLibsToJar)
+task copyLibs(type: Copy, dependsOn: compileJava) {
+    from fileTree('native').files
+    
+    include 'librxtxSerial.*'
+    def resDir = project.sourceSets.main.output.resourcesDir
+    
+    into resDir.absolutePath + '/libs'
 }
+
 
 task javah(dependsOn: compileJava) << {
   def Nclasses = [	

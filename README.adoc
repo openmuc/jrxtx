@@ -1,18 +1,18 @@
-= jRxTx: Java serial communication library.
+= jRxTx - The Java Serial Communication Library
 
 The development team the goal to maintain full backward compatibility
-to RXTX while adding a more convenient API and embracing future bug
+to RXTX while adding a more convenient and embracing future bug
 fixes by the community.
 
 The following lists some of the improvements added to the original RXTX:
 
-* Javadoc added
 * Cleaned up the code and file structure to make it more maintainable.
 * The jar file is now a bundle that can run in OSGi.
 * The jar file is published on maven central.
 * The Java build system has been moved to Gradle.
 * Improved input and output stream implementations so they behave like
   the streams that the Java TCP socket API provides.
+* Optionally add the native libs to the jar and load the libs from the jar.
 
 == Licence
 
