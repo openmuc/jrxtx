@@ -1,16 +1,14 @@
 package org.openmuc.jrxtx;
 
+import static java.text.MessageFormat.format;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
-import org.openmuc.jrxtx.config.SerialPortConfig;
-
+import gnu.io.CommPort;
 import gnu.io.CommPortException;
 import gnu.io.CommPortIdentifier;
 import gnu.io.NoSuchPortException;
@@ -19,7 +17,11 @@ import gnu.io.RXTXPort;
 import gnu.io.UnsupportedCommOperationException;
 
 /**
- * This class implements RXTX port. The class is a wrapper around the RXTXPort.
+ * This class implements RXTX port.
+ * 
+ * <p>
+ * The class is a wrapper around the RXTXPort.
+ * </p>
  */
 public class RxTxPort implements SerialPort {
 
@@ -27,13 +29,13 @@ public class RxTxPort implements SerialPort {
      * Only access the config via {@link #getConfig()}.
      */
     private SerialPortConfig serialPortConfig;
-    private Lock configLock = new ReentrantLock();
 
-    private boolean closed;
+    private volatile boolean closed;
 
     private RXTXPort wrappedPort;
 
     private SerialInputStream serialIs;
+    private SerialOutputStream serial0s;
 
     /**
      * Get the serial port names on the host system.
@@ -55,127 +57,210 @@ public class RxTxPort implements SerialPort {
             result.add(identifier.getName());
         }
         String[] res = new String[result.size()];
-        result.toArray(res);
-        return res;
+        return result.toArray(res);
     }
 
-    /**
-     * Allocates an new Serial port on the given port name.
-     * 
-     * @param portName
-     * @return a new serial port object.
-     * @throws SerialPortException
-     *             ex if fails to allocate
-     */
-    public static RxTxPort allocateSerialPort(String portName) throws SerialPortException {
+    public static RxTxPort openSerialPort(String portName, int baudRate) throws SerialPortException {
+        Parity parity = Parity.EVEN;
+        return openSerialPort(portName, baudRate, parity);
+    }
+
+    public static RxTxPort openSerialPort(String portName) throws SerialPortException {
+        int baudRate = 9600;
+        return openSerialPort(portName, baudRate);
+    }
+
+    public static RxTxPort openSerialPort(String portName, int baudRate, Parity parity) throws SerialPortException {
+        return openSerialPort(portName, baudRate, parity, DataBits.DATABITS_8);
+    }
+
+    public static RxTxPort openSerialPort(String portName, int baudRate, Parity parity, DataBits dataBits)
+            throws SerialPortException {
+        StopBits stopbits = StopBits.STOPBITS_1;
+        return openSerialPort(portName, baudRate, parity, dataBits, stopbits);
+    }
+
+    public static RxTxPort openSerialPort(String portName, int baudRate, Parity parity, DataBits dataBits,
+            StopBits stopBits) throws SerialPortException {
         try {
             CommPortIdentifier portIdentifier = CommPortIdentifier.getPortIdentifier(portName);
 
-            if (portIdentifier.getPortType() != CommPortIdentifier.PORT_SERIAL) {
-                // TODO throw exception
+            CommPort comPort = portIdentifier.open(RxTxPort.class.getCanonicalName() + System.currentTimeMillis(),
+                    2000);
+
+            if (!(comPort instanceof RXTXPort)) {
+                throw new SerialPortException("Unable to open the serial port.");
             }
 
+            RXTXPort rxtxPort = (RXTXPort) comPort;
+
             try {
-                return new RxTxPort(new RXTXPort(portName));
-            } catch (PortInUseException e) {
-                String message = MessageFormat.format("Port {0} is already in use.", portName);
+                rxtxPort.setSerialPortParams(baudRate, dataBits.getOldValue(), stopBits.getOldValue(),
+                        parity.getOldValue());
+            } catch (UnsupportedCommOperationException e) {
+                String message = format("Not able to apply config on serial port.\n{0}", e.getMessage());
                 throw new SerialPortException(message);
             }
+
+            return new RxTxPort(rxtxPort);
         } catch (NoSuchPortException e) {
-            String errMessage = MessageFormat.format("Serial Port {0} not found.\n{1}", portName, e.getMessage());
+            String errMessage = format("Serial Port {0} not found.\n{1}", portName, e.getMessage());
+            throw new PortNotFoundException(errMessage);
+        } catch (PortInUseException e) {
+            String errMessage = format("Serial Port {0} is already in use.\n{1}", portName, e.getMessage());
             throw new PortNotFoundException(errMessage);
         }
 
     }
 
-    private RxTxPort(RXTXPort rxtxPort) {
-        this.wrappedPort = rxtxPort;
-        this.closed = true;
+    private RxTxPort(RXTXPort comPort) {
+        this.wrappedPort = comPort;
+        this.closed = false;
+
+        this.serial0s = new SerialOutputStream(this.wrappedPort.getOutputStream());
+        this.serialIs = new SerialInputStream(this.wrappedPort.getInputStream());
+
+        this.serialPortConfig = initConfig();
+    }
+
+    private SerialPortConfigImpl initConfig() {
+        String portName = wrappedPort.getName();
+        int baudRate = wrappedPort.getBaudRate();
+        Parity parity = Parity.forValue(wrappedPort.getParity());
+        StopBits stopBits = null;
+        DataBits dataBits = null;
+        int serialPortTimeout = 0;
+        return new SerialPortConfigImpl(portName, baudRate, parity, stopBits, dataBits, serialPortTimeout);
     }
 
     public InputStream getInputStream() throws IOException {
-        if (!isOpen()) {
+        if (!isClosed()) {
             throw new SerialPortException("Open the serial port first i.o. to access the input stream.");
         }
         return this.serialIs;
     }
 
     public OutputStream getOutputStream() throws IOException {
-        if (!isOpen()) {
+        if (!isClosed()) {
             throw new SerialPortException("Open the serial port first i.o. to access the output stream.");
         }
 
-        // TODO Auto-generated method stub
-        return null;
+        return this.serial0s;
     }
 
-    public void updateConfig(SerialPortConfig serialPortConfig) throws SerialPortException {
-        if (!isOpen()) {
-            throw new SerialPortException("Port has to be opened to update config.");
+    public synchronized void close() throws IOException {
+        if (closed) {
+            throw new SerialPortException("Serial Port is already closed.");
         }
 
         try {
-            this.configLock.lock();
-            this.serialPortConfig = serialPortConfig;
+            this.serial0s.closeStreams();
+            this.serialIs.closeStreams();
+            this.wrappedPort.close();
+            this.serial0s = null;
+            this.serialIs = null;
+            this.wrappedPort = null;
         } finally {
-            this.configLock.unlock();
+            this.closed = true;
         }
-        loadConfig(serialPortConfig);
     }
 
-    /**
-     * Closes the port connection, sets the status to closed, and disposes of the internal streams.
-     */
-    public void close() throws IOException {
-        // TODO Auto-generated method stub
-
-        this.serialIs.closeStreams();
-        this.wrappedPort.close();
-        this.wrappedPort = null;
-    }
-
-    /**
-     * Get the current serial port configuration.
-     */
     public SerialPortConfig getConfig() {
-        try {
-            this.configLock.lock();
-            return this.serialPortConfig;
-        } finally {
-            this.configLock.unlock();
+        return this.serialPortConfig;
+    }
+
+    public boolean isClosed() {
+        return this.closed;
+    }
+
+    private class SerialPortConfigImpl implements SerialPortConfig {
+
+        private Parity parity;
+        private StopBits stopBits;
+        private DataBits dataBits;
+        private int baudRate;
+        private int serialPortTimeout;
+        private String portName;
+
+        public SerialPortConfigImpl(String portName, int baudRate, Parity parity, StopBits stopBits, DataBits dataBits,
+                int serialPortTimeout) {
+            this.parity = parity;
+            this.stopBits = stopBits;
+            this.dataBits = dataBits;
+            this.baudRate = baudRate;
+            this.serialPortTimeout = serialPortTimeout;
         }
-    }
 
-    public void open() throws IOException {
-        this.wrappedPort;
+        public synchronized DataBits getDataBits() {
+            return dataBits;
+        }
 
-        this.closed = false;
-        
-    }
+        public synchronized void setDataBits(DataBits dataBits) {
+            this.dataBits = dataBits;
+        }
 
-    public boolean isOpen() {
-        return !this.closed;
-    }
+        public synchronized Parity getParity() {
+            return parity;
+        }
 
-    private void loadConfig(SerialPortConfig serialPortConfig) throws SerialPortException {
-        try {
-            this.configLock.lock();
-            int baudRate = serialPortConfig.getBaudRate();
-            int dataBits = serialPortConfig.getDatBits().getOldValue();
-            int s = serialPortConfig.getStopBits().getOldValue();
-            int p = serialPortConfig.getParity().getOldValue();
-            try {
-                this.wrappedPort.setSerialPortParams(baudRate, dataBits, s, p);
-            } catch (UnsupportedCommOperationException e) {
-                throw new SerialPortException("This operation is not supported on your serial port.\n" + e);
+        public synchronized void setParity(Parity parity) {
+            this.parity = parity;
+        }
+
+        public synchronized StopBits getStopBits() {
+            return stopBits;
+        }
+
+        public synchronized void setStopBits(StopBits stopBits) {
+            this.stopBits = stopBits;
+        }
+
+        public synchronized int getBaudRate() {
+            return baudRate;
+        }
+
+        public synchronized void setBaudRate(int baudRate) throws IOException {
+            this.baudRate = baudRate;
+
+            reloadSettings();
+        }
+
+        public synchronized int getSerialPortTimeout() {
+            return serialPortTimeout;
+        }
+
+        public synchronized void setSerialPortTimeout(int serialPortTimeout) {
+            if (serialPortTimeout < 0) {
+                // TODO error must be greater or equal 0
             }
-        } finally {
-            this.configLock.unlock();
+
+            this.serialPortTimeout = serialPortTimeout;
+            if (this.serialPortTimeout == 0) {
+                RxTxPort.this.wrappedPort.disableReceiveTimeout();
+            }
+            else {
+                RxTxPort.this.wrappedPort.enableReceiveTimeout(this.serialPortTimeout);
+            }
         }
+
+        private void reloadSettings() throws IOException {
+            try {
+                RxTxPort.this.wrappedPort.setSerialPortParams(this.baudRate, this.dataBits.getOldValue(),
+                        this.stopBits.getOldValue(), this.parity.getOldValue());
+            } catch (UnsupportedCommOperationException e) {
+                // ignore.. should not occur here
+                throw new IOException(e.getMessage());
+            }
+        }
+
+        public String getPortName() {
+            return this.portName;
+        }
+
     }
 
     private class SerialInputStream extends InputStream {
-        private static final long SLEEP_TIME = 10L;// TODO: sleep appropriate time
+        private static final long SLEEP_TIME = 10L; // sleep appropriate time
         private final InputStream serialInputStream;
 
         public SerialInputStream(InputStream serialInputStream) {
@@ -196,7 +281,7 @@ public class RxTxPort implements SerialPort {
                     // ignore
                 }
 
-                if (closed) {
+                if (!isClosed()) {
                     throw new CommPortException("Connection has been closed..");
                 }
             } while (serialPortConfig.getSerialPortTimeout() <= 0
@@ -207,7 +292,7 @@ public class RxTxPort implements SerialPort {
 
         @Override
         public int read(byte[] b, int off, int len) throws IOException {
-            if (closed) {
+            if (!isClosed()) {
                 throw new CommPortException("Connection has been closed..");
             }
             return this.serialInputStream.read(b, off, Math.min(available(), len));
@@ -225,6 +310,55 @@ public class RxTxPort implements SerialPort {
 
         private void closeStreams() throws IOException {
             this.serialInputStream.close();
+        }
+
+        @Override
+        public void close() throws IOException {
+            RxTxPort.this.close();
+        }
+    }
+
+    private class SerialOutputStream extends OutputStream {
+
+        private OutputStream serialOutputStream;
+
+        public SerialOutputStream(OutputStream serialOutputStream) {
+            this.serialOutputStream = serialOutputStream;
+        }
+
+        @Override
+        public void write(int b) throws IOException {
+            checkIfOpen();
+
+            this.serialOutputStream.write(b);
+        }
+
+        private void checkIfOpen() throws SerialPortException {
+            if (!isClosed()) {
+                throw new SerialPortException("Port has been closed.");
+            }
+        }
+
+        @Override
+        public void write(byte[] b, int off, int len) throws IOException {
+            checkIfOpen();
+            this.serialOutputStream.write(b, off, len);
+        }
+
+        @Override
+        public void write(byte[] b) throws IOException {
+            checkIfOpen();
+            this.serialOutputStream.write(b);
+        }
+
+        @Override
+        public void flush() throws IOException {
+            checkIfOpen();
+            this.serialOutputStream.flush();
+        }
+
+        private void closeStreams() throws IOException {
+            this.serialOutputStream.close();
         }
 
         @Override

@@ -33,4 +33,14 @@ public enum Parity {
     int getOldValue() {
         return this.odlValue;
     }
+
+    static Parity forValue(int parity) {
+        for (Parity p : values()) {
+            if (p.odlValue == parity) {
+                return p;
+            }
+        }
+
+        throw new RuntimeException("Error.");
+    }
 }

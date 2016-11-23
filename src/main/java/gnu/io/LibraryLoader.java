@@ -16,7 +16,6 @@ import java.util.regex.Pattern;
 
 class LibraryLoader {
     public static final Pattern FILE_NAME_PATTERN = Pattern.compile("^(.+)(\\.[^\\.]+)$");
-    public static final Pattern JAR_PATTERN = Pattern.compile("^jar:.+:(.+)!(.*)$");
 
     public static boolean loadLibsFromJar(String... toResPaths) {
         for (String toResPath : toResPaths) {
