@@ -57,34 +57,35 @@
 --------------------------------------------------------------------------*/
 package gnu.io;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-
-import junit.framework.TestCase;
 
 /**
  * Main class bundling all single specialized test suites into a overall complete one.
  */
-public class RXTXCommDriverTest extends TestCase {
+public class RXTXCommDriverTest {
 
     private String fOldPropSerial;
     private String fOldPropParallel;
     private String fPathSep;
 
-    public RXTXCommDriverTest(String testName) {
-        super(testName);
-    }
-
+    @Before
     public void setUp() {
         fPathSep = System.getProperty("path.separator", ":");
         fOldPropSerial = System.getProperty("gnu.io.rxtx.SerialPorts");
         fOldPropParallel = System.getProperty("gnu.io.rxtx.ParallelPorts");
     }
 
+    @After
     public void tearDown() {
         System.setProperty("gnu.io.rxtx.SerialPorts", fOldPropSerial == null ? "" : fOldPropSerial);
         System.setProperty("gnu.io.rxtx.ParallelPorts", fOldPropParallel == null ? "" : fOldPropParallel);

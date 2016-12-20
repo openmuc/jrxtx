@@ -24,6 +24,7 @@ public enum Parity {
      * SPACE parity scheme.
      */
     SPACE(4),;
+    private static final Parity[] VALUES = values();
     private int odlValue;
 
     private Parity(int oldValue) {
@@ -35,7 +36,7 @@ public enum Parity {
     }
 
     static Parity forValue(int parity) {
-        for (Parity p : values()) {
+        for (Parity p : VALUES) {
             if (p.odlValue == parity) {
                 return p;
             }

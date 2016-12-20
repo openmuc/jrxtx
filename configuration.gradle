@@ -53,12 +53,6 @@ tasks.withType(Tar) {
   }
 }
 
-tasks.withType(Test) {
-  systemProperty 'java.library.path', 'native/x86_64-unknown-linux-gnu/.libs/:/usr/lib/jni/'
-}
-
-
-
 //------------------project specific configurations--------------------
 
 apply plugin: 'java'
@@ -115,27 +109,24 @@ dependencies {
 
 sourceSets {
 	main {
-		java {
-			srcDirs = ['src/old-main/java', 'src/main/java']
-		}
+		java.srcDirs = ['src/old-main/java', 'src/main/java']
+			
 	}
 	test {
-		java {
-			srcDirs = ['src/old-test/java', 'src/test/java']
-		}
+		java.srcDirs = ['src/old-test/java', 'src/test/java']
 	}
 }
 
 task buildLibs(type:Exec) {
   workingDir 'native'
 
-  //on windows:
-  // commandLine 'cmd', '/c', 'stop.bat'
-
+  def args = project.hasProperty('libTarget') ? project.property('libTarget') : ''
+  
   //on linux
-  commandLine './configure'
+  commandLine './configure ' + args
   commandLine 'make'
   commandLine 'make'
+  
   //store the output instead of printing to the console:
   standardOutput = new ByteArrayOutputStream()
 
@@ -143,41 +134,62 @@ task buildLibs(type:Exec) {
   ext.output = {
     return standardOutput.toString()
   }
-}
-
-task copyLibs(type: Copy, dependsOn: compileJava) {
+  
+  task copyLibs(type: Copy, dependsOn: compileJava) {
     from fileTree('native').files
+    def libName = 'librxtxSerial';
     
-    include 'librxtxSerial.*'
+    include libName + '.so'
+    include libName + '.dll'
     def resDir = project.sourceSets.main.output.resourcesDir
     
     into resDir.absolutePath + '/libs'
+  }
+  tasks.copyLibs.execute()
 }
 
 
-task javah(dependsOn: compileJava) << {
-  def Nclasses = [	
-    'gnu.io.RXTXCommDriver',
-    'gnu.io.CommPortIdentifier',
-    'gnu.io.RXTXVersion',
-    'gnu.io.I2C',
-    'gnu.io.LPRPort',
-    'gnu.io.RXTXPort',
-    'gnu.io.Zystem',
-    'gnu.io.Raw',
-    'gnu.io.RS485',
-    'gnu.io.ParallelPort'
-  ];
-    
-  def nativeIncludes = 'native/src/include'
-  def classpath = sourceSets.main.output.classesDir
-  for (Nclass in Nclasses) {
-      
-    logger.info('Generating header for ' + Nclass)
-      
-    exec {
-	  executable 'javah'
-	  args '-d', '$nativeIncludes', '-classpath', '$classpath' , Nclass
-    }
+clean {
+  file('native').listFiles().each{
+  	File f ->  
+  		if (f.getName().contains('unknown')) {
+  			delete f
+  		}
+  	}
+  
+}
+compileJava {
+	options.encoding = 'UTF-8'
+    options.compilerArgs << "-Xlint:unchecked"
+}
+
+
+
+task javah(dependsOn: compileJava) {
+  doLast{
+	  def Nclasses = [	
+	    'gnu.io.RXTXCommDriver',
+	    'gnu.io.CommPortIdentifier',
+	    'gnu.io.RXTXVersion',
+	    'gnu.io.I2C',
+	    'gnu.io.LPRPort',
+	    'gnu.io.RXTXPort',
+	    'gnu.io.Zystem',
+	    'gnu.io.Raw',
+	    'gnu.io.RS485',
+	    'gnu.io.ParallelPort'
+	  ];
+	    
+	  def nativeIncludes = 'native/src/include'
+	  def classpath = sourceSets.main.output.classesDir
+	  for (Nclass in Nclasses) {
+	      
+	    logger.info('Generating header for ' + Nclass)
+	      
+	    exec {
+		  executable 'javah'
+		  args '-d', '$nativeIncludes', '-classpath', '$classpath' , Nclass
+	    }
+	  }
   }
 }

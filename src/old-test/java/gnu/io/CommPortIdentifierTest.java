@@ -57,6 +57,10 @@
 --------------------------------------------------------------------------*/
 package gnu.io;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -64,13 +68,7 @@ import java.util.List;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import junit.framework.TestCase;
-
-public class CommPortIdentifierTest extends TestCase {
-
-    public CommPortIdentifierTest(String testName) {
-        super(testName);
-    }
+public class CommPortIdentifierTest {
 
     public List getPortIdentifiers() {
         Enumeration e = CommPortIdentifier.getPortIdentifiers();
