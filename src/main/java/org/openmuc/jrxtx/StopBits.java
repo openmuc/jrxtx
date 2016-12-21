@@ -5,17 +5,18 @@ package org.openmuc.jrxtx;
  */
 public enum StopBits {
     /**
-     * Number of STOP bits - 1.
+     * 1 stop bit will be sent at the end of every character.
      */
     STOPBITS_1(1),
     /**
-     * Number of STOP bits - 2.
+     * 1.5 stop bits will be sent at the end of every character
      */
-    STOPBITS_2(2),
+    STOPBITS_1_5(3),
     /**
-     * Number of STOP bits - 1-1/2.
+     * 2 stop bits will be sent at the end of every character
      */
-    STOPBITS_1_5(3),;
+    STOPBITS_2(2);
+
     private int odlValue;
 
     private StopBits(int oldValue) {

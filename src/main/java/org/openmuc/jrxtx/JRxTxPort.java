@@ -1,5 +1,10 @@
 package org.openmuc.jrxtx;
 
+import static gnu.io.SerialPort.FLOWCONTROL_NONE;
+import static gnu.io.SerialPort.FLOWCONTROL_RTSCTS_IN;
+import static gnu.io.SerialPort.FLOWCONTROL_RTSCTS_OUT;
+import static gnu.io.SerialPort.FLOWCONTROL_XONXOFF_IN;
+import static gnu.io.SerialPort.FLOWCONTROL_XONXOFF_OUT;
 import static java.text.MessageFormat.format;
 
 import java.io.IOException;
@@ -18,7 +23,7 @@ class JRxTxPort implements SerialPort {
 
     private volatile boolean closed;
 
-    private RXTXPort wrappedPort;
+    private RXTXPort rxtxPort;
 
     private SerialInputStream serialIs;
     private SerialOutputStream serial0s;
@@ -35,8 +40,10 @@ class JRxTxPort implements SerialPort {
 
     private int serialPortTimeout;
 
+    private FlowControl flowControl;
+
     public static JRxTxPort openSerialPort(String portName, int baudRate, Parity parity, DataBits dataBits,
-            StopBits stopBits) throws SerialPortException {
+            StopBits stopBits, FlowControl flowControl) throws SerialPortException {
         try {
             CommPortIdentifier portIdentifier = CommPortIdentifier.getPortIdentifier(portName);
 
@@ -53,12 +60,14 @@ class JRxTxPort implements SerialPort {
             try {
                 rxtxPort.setSerialPortParams(baudRate, dataBits.getOldValue(), stopBits.getOldValue(),
                         parity.getOldValue());
+
+                setFlowControl(flowControl, rxtxPort);
             } catch (UnsupportedCommOperationException e) {
                 String message = format("Not able to apply config on serial port.\n{0}", e.getMessage());
                 throw new SerialPortException(message);
             }
 
-            return new JRxTxPort(rxtxPort);
+            return new JRxTxPort(rxtxPort, portName, baudRate, parity, dataBits, stopBits, flowControl);
         } catch (NoSuchPortException e) {
             String errMessage = format("Serial Port {0} not found.\n{1}", portName, e.getMessage());
             throw new PortNotFoundException(errMessage);
@@ -69,12 +78,42 @@ class JRxTxPort implements SerialPort {
 
     }
 
-    private JRxTxPort(RXTXPort comPort) {
-        this.wrappedPort = comPort;
+    private static void setFlowControl(FlowControl flowControl, RXTXPort rxtxPort) {
+        switch (flowControl) {
+        case DSR_DTR:
+            rxtxPort.setDTR(true);
+            // rxtxPort.setDSR(true);
+            break;
+
+        case RTS_CTS:
+            rxtxPort.setFlowControlMode(FLOWCONTROL_RTSCTS_IN | FLOWCONTROL_RTSCTS_OUT);
+            break;
+        case XON_XOFF:
+            rxtxPort.setFlowControlMode(FLOWCONTROL_XONXOFF_IN | FLOWCONTROL_XONXOFF_OUT);
+
+            break;
+
+        case NONE:
+        default:
+            rxtxPort.setFlowControlMode(FLOWCONTROL_NONE);
+            break;
+        }
+    }
+
+    private JRxTxPort(RXTXPort comPort, String portName, int baudRate, Parity parity, DataBits dataBits,
+            StopBits stopBits, FlowControl flowControl) {
+        this.rxtxPort = comPort;
+        this.portName = portName;
+        this.baudRate = baudRate;
+        this.parity = parity;
+        this.dataBits = dataBits;
+        this.stopBits = stopBits;
+        this.flowControl = flowControl;
+
         this.closed = false;
 
-        this.serial0s = new SerialOutputStream(this.wrappedPort.getOutputStream());
-        this.serialIs = new SerialInputStream(this.wrappedPort.getInputStream());
+        this.serial0s = new SerialOutputStream(this.rxtxPort.getOutputStream());
+        this.serialIs = new SerialInputStream(this.rxtxPort.getInputStream());
 
     }
 
@@ -101,10 +140,10 @@ class JRxTxPort implements SerialPort {
         try {
             this.serial0s.closeStreams();
             this.serialIs.closeStreams();
-            this.wrappedPort.close();
+            this.rxtxPort.close();
             this.serial0s = null;
             this.serialIs = null;
-            this.wrappedPort = null;
+            this.rxtxPort = null;
         } finally {
             this.closed = true;
         }
@@ -259,8 +298,8 @@ class JRxTxPort implements SerialPort {
 
     private void updateWrappedPort() throws IOException {
         try {
-            this.wrappedPort.setSerialPortParams(this.baudRate, this.dataBits.getOldValue(),
-                    this.stopBits.getOldValue(), this.parity.getOldValue());
+            this.rxtxPort.setSerialPortParams(this.baudRate, this.dataBits.getOldValue(), this.stopBits.getOldValue(),
+                    this.parity.getOldValue());
         } catch (UnsupportedCommOperationException e) {
             throw new IOException(e.getMessage());
         }
@@ -273,11 +312,20 @@ class JRxTxPort implements SerialPort {
     public void setSerialPortTimeout(int serialPortTimeout) throws IOException {
         this.serialPortTimeout = serialPortTimeout;
         if (serialPortTimeout == 0) {
-            this.wrappedPort.disableReceiveTimeout();
+            this.rxtxPort.disableReceiveTimeout();
         }
         else {
-            this.wrappedPort.enableReceiveTimeout(serialPortTimeout);
+            this.rxtxPort.enableReceiveTimeout(serialPortTimeout);
         }
+    }
+
+    public void setFlowControl(FlowControl flowControl) throws IOException {
+        setFlowControl(flowControl, this.rxtxPort);
+        this.flowControl = flowControl;
+    }
+
+    public FlowControl getFlowControl() {
+        return this.flowControl;
     }
 
 }

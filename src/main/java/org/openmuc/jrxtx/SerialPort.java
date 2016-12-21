@@ -60,38 +60,53 @@ public interface SerialPort extends Closeable {
     String getPortName();
 
     /**
-     * @return the dataBits
+     * Get the current data bits config.
+     * 
+     * @return the dataBits the data bits.
      */
     DataBits getDataBits();
 
     /**
+     * Set the data bits.
+     * 
      * @param dataBits
-     *            the dataBits to set
+     *            the new dataBits.
      * @throws IOException
+     *             if an I/O exception occurred when setting the new data bits..
      */
     void setDataBits(DataBits dataBits) throws IOException;
 
     /**
-     * @return the parity
+     * Get the parity.
+     * 
+     * @return the new parity.
      */
     Parity getParity();
 
     /**
+     * Set the new parity.
+     * 
      * @param parity
-     *            the parity to set
+     *            the new parity.
      * @throws IOException
+     *             if an I/O exception occurred when setting the new parity.
      */
     void setParity(Parity parity) throws IOException;
 
     /**
-     * @return the stopBits
+     * Get the current stop bits settings.
+     * 
+     * @return the stopBits the stop bits.
      */
     StopBits getStopBits();
 
     /**
+     * Set the stop bits.
+     * 
      * @param stopBits
      *            the stopBits to set
      * @throws IOException
+     *             if an I/O exception occurred when setting the new stop bits.
      */
     void setStopBits(StopBits stopBits) throws IOException;
 
@@ -140,4 +155,20 @@ public interface SerialPort extends Closeable {
      */
     void setSerialPortTimeout(int serialPortTimeout) throws IOException;
 
+    /**
+     * Set the flow control type.
+     * 
+     * @param flowControl
+     *            the flow control.
+     * @throws IOException
+     *             if an I/O exception occurred when setting the new baud rate.
+     */
+    void setFlowControl(FlowControl flowControl) throws IOException;
+
+    /**
+     * Get the current flow control settings.
+     * 
+     * @return the flow control.
+     */
+    FlowControl getFlowControl();
 }

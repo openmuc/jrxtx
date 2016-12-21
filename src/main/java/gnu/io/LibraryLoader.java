@@ -14,6 +14,9 @@ import java.util.jar.JarFile;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * LibraryLoader to load a nested binary from a jar.
+ */
 class LibraryLoader {
     public static final Pattern FILE_NAME_PATTERN = Pattern.compile("^(.+)(\\.[^\\.]+)$");
 

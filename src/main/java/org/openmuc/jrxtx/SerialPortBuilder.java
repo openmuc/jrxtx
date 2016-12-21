@@ -32,6 +32,7 @@ public class SerialPortBuilder {
     private DataBits dataBits;
     private Parity parity;
     private StopBits stopBits;
+    private FlowControl flowControl;
 
     /**
      * Get the serial port names on the host system.
@@ -87,6 +88,7 @@ public class SerialPortBuilder {
     }
 
     /**
+     * Set the baud rate for the serial port. Values such as 9600 or 115200.
      * 
      * @param baudRate
      *            the baud rate.
@@ -99,12 +101,20 @@ public class SerialPortBuilder {
         return this;
     }
 
+    /**
+     * Set the number of data bits transfered with the serial port.
+     * 
+     * @param dataBits
+     *            the number of dataBits.
+     * @return the serial port builder.
+     */
     public SerialPortBuilder setDataBits(DataBits dataBits) {
         this.dataBits = dataBits;
         return this;
     }
 
     /**
+     * Set the parity of the serial port.
      * 
      * @param parity
      *            the parity.
@@ -116,12 +126,27 @@ public class SerialPortBuilder {
     }
 
     /**
-     * Set the stop bits.
+     * Set the number of stop bits after each data bits.
      * 
      * @param stopBits
+     *            the number of stop bits.
+     * @return the serial port builder.
      */
-    public void setStopBits(StopBits stopBits) {
+    public SerialPortBuilder setStopBits(StopBits stopBits) {
         this.stopBits = stopBits;
+        return this;
+    }
+
+    /**
+     * Set the flow control type.
+     * 
+     * @param flowControl
+     *            the flow control.
+     * @return the serial port builder.
+     */
+    public SerialPortBuilder setFlowControl(FlowControl flowControl) {
+        this.flowControl = flowControl;
+        return this;
     }
 
     /**
@@ -132,6 +157,6 @@ public class SerialPortBuilder {
      *             if an I/O exception occurred while opening the serial port.
      */
     public SerialPort build() throws IOException {
-        return JRxTxPort.openSerialPort(portName, baudRate, parity, dataBits, stopBits);
+        return JRxTxPort.openSerialPort(portName, baudRate, parity, dataBits, stopBits, flowControl);
     }
 }

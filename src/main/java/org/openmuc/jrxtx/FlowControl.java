@@ -2,36 +2,39 @@ package org.openmuc.jrxtx;
 
 /**
  * The flow control.
+ * 
+ * <p>
+ * See: <a href= "https://en.wikipedia.org/wiki/Flow_control_(data)#Transmit_flow_control">
+ * https://en.wikipedia.org/wiki/Flow_control_(data)#Transmit_flow_control </a>
+ * </p>
  */
 public enum FlowControl {
     /**
-     * Flow control off.
+     * No flow control.
      */
-    NONE(0),
-    /**
-     * RTS/CTS flow control on input.
-     */
-    RTSCTS_IN(1),
-    /**
-     * RTS/CTS flow control on output.
-     */
-    RTSCTS_OUT(2),
-    /**
-     * XON/XOFF flow control on input.
-     */
-    XONXOFF_IN(4),
-    /**
-     * XON/XOFF flow control on output.
-     */
-    XONXOFF_OUT(8),;
+    NONE,
 
-    private int odlValue;
+    /**
+     * Hardware flow control on input and output (RTS/CTS).
+     * 
+     * <p>
+     * Sets <b>RFR</b> (ready for receiving) formally known as <b>RTS</b> and the <b>CTS</b> (clear to send) flag.
+     * </p>
+     */
+    RTS_CTS,
 
-    private FlowControl(int oldValue) {
-        this.odlValue = oldValue;
-    }
+    /**
+     * Hardware flow control on input and output (DSR/DTR).
+     * 
+     * <p>
+     * Sets <b>DSR</b> (data set ready) (ready for receiving) and the <b>DTR</b> (data terminal ready) flag.
+     * </p>
+     */
+    DSR_DTR,
 
-    int getOldValue() {
-        return this.odlValue;
-    }
+    /**
+     * Software flow control on input and output.
+     */
+    XON_XOFF
+
 }
