@@ -55,64 +55,64 @@
 |   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 |   All trademarks belong to their respective owners.
 --------------------------------------------------------------------------*/
-package  gnu.io;
+package gnu.io;
 
 import java.util.Enumeration;
 
 /**
-* @author Trent Jarvi
-* @version %I%, %G%
-* @since JDK1.0
-*/
+ * @author Trent Jarvi
+ * @version %I%, %G%
+ * @since JDK1.0
+ */
 
+class CommPortEnumerator implements Enumeration<CommPortIdentifier> {
+    private CommPortIdentifier index;
+    private final static boolean debug = false;
+    static {
+        if (debug)
+            System.out.println("CommPortEnumerator:{}");
+    }
 
-class CommPortEnumerator implements Enumeration
-{
-	private CommPortIdentifier index;
-	private final static boolean debug = false;
-	static
-	{
-		if (debug)
-			System.out.println("CommPortEnumerator:{}");
-	}
+    CommPortEnumerator() {
+    }
 
-	CommPortEnumerator()
-	{
-	}
-/*------------------------------------------------------------------------------
+    /*------------------------------------------------------------------------------
         nextElement()
         accept:
         perform:
         return:
         exceptions:
         comments:
-------------------------------------------------------------------------------*/
-	public Object nextElement()
-	{
-		if(debug) System.out.println("CommPortEnumerator:nextElement()");
-		synchronized (CommPortIdentifier.Sync)
-		{
-			if(index != null) index = index.next;
-			else index=CommPortIdentifier.CommPortIndex;
-			return(index);
-		}
-	}
-/*------------------------------------------------------------------------------
+    ------------------------------------------------------------------------------*/
+    public CommPortIdentifier nextElement() {
+        if (debug)
+            System.out.println("CommPortEnumerator:nextElement()");
+        synchronized (CommPortIdentifier.Sync) {
+            if (index != null)
+                index = index.next;
+            else
+                index = CommPortIdentifier.CommPortIndex;
+            return (index);
+        }
+    }
+
+    /*------------------------------------------------------------------------------
         hasMoreElements()
         accept:
         perform:
         return:
         exceptions:
         comments:
-------------------------------------------------------------------------------*/
-	public boolean hasMoreElements()
-	{
-		if(debug) System.out.println("CommPortEnumerator:hasMoreElements() " + CommPortIdentifier.CommPortIndex == null ? false : true );
-		synchronized (CommPortIdentifier.Sync)
-		{
-			if(index != null) return index.next == null ? false : true;
-			else return CommPortIdentifier.CommPortIndex == null ?
-				false : true;
-		}
-	}
+    ------------------------------------------------------------------------------*/
+    public boolean hasMoreElements() {
+        if (debug)
+            System.out.println(
+                    "CommPortEnumerator:hasMoreElements() " + CommPortIdentifier.CommPortIndex == null ? false : true);
+        synchronized (CommPortIdentifier.Sync) {
+            if (index != null)
+                return index.next == null ? false : true;
+            else
+                return CommPortIdentifier.CommPortIndex == null ? false : true;
+        }
+    }
 }

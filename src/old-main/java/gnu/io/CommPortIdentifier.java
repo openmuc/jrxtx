@@ -85,7 +85,7 @@ public class CommPortIdentifier extends Object /* extends Vector? */
     private int PortType;
     private final static boolean debug = false;
     static Object Sync;
-    Vector ownershipListener;
+    Vector<CommPortOwnershipListener> ownershipListener;
 
     /*------------------------------------------------------------------------------
     	static {}   aka initialization
@@ -189,7 +189,7 @@ public class CommPortIdentifier extends Object /* extends Vector? */
         /* is the Vector instantiated? */
 
         if (ownershipListener == null) {
-            ownershipListener = new Vector();
+            ownershipListener = new Vector<CommPortOwnershipListener>();
         }
 
         /* is the ownership listener already in the list? */
@@ -301,14 +301,14 @@ public class CommPortIdentifier extends Object /* extends Vector? */
     	exceptions:
     	comments:
     ------------------------------------------------------------------------------*/
-    static public Enumeration getPortIdentifiers() {
+    static public Enumeration<CommPortIdentifier> getPortIdentifiers() {
         if (debug)
             System.out.println("static CommPortIdentifier:getPortIdentifiers()");
         // Do not allow anybody get any ports while we are re-initializing
         // because the CommPortIndex points to invalid instances during that time
         synchronized (Sync) {
             // Remember old ports in order to restore them for ownership events later
-            HashMap oldPorts = new HashMap();
+            HashMap<String, CommPortIdentifier> oldPorts = new HashMap<String, CommPortIdentifier>();
             CommPortIdentifier p = CommPortIndex;
             while (p != null) {
                 oldPorts.put(p.PortName, p);
@@ -328,7 +328,7 @@ public class CommPortIdentifier extends Object /* extends Vector? */
                 CommPortIdentifier curPort = CommPortIndex;
                 CommPortIdentifier prevPort = null;
                 while (curPort != null) {
-                    CommPortIdentifier matchingOldPort = (CommPortIdentifier) oldPorts.get(curPort.PortName);
+                    CommPortIdentifier matchingOldPort = oldPorts.get(curPort.PortName);
                     if (matchingOldPort != null && matchingOldPort.PortType == curPort.PortType) {
                         // replace new port by old one
                         matchingOldPort.RXTXDriver = curPort.RXTXDriver;
@@ -519,8 +519,8 @@ public class CommPortIdentifier extends Object /* extends Vector? */
             System.out.println("CommPortIdentifier:fireOwnershipEvent( " + eventType + " )");
         if (ownershipListener != null) {
             CommPortOwnershipListener c;
-            for (Enumeration e = ownershipListener.elements(); e.hasMoreElements(); c.ownershipChange(eventType))
-                c = (CommPortOwnershipListener) e.nextElement();
+            for (Enumeration<CommPortOwnershipListener> e = ownershipListener.elements(); e.hasMoreElements(); c.ownershipChange(eventType))
+                c = e.nextElement();
         }
     }
 }
