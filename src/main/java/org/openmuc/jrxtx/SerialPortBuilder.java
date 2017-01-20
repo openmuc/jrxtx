@@ -39,7 +39,7 @@ public class SerialPortBuilder {
      *
      * @return the serial ports names.
      */
-    public static String[] getRxTxPorts() {
+    public static String[] getSerialPortNames() {
         Enumeration<CommPortIdentifier> identifiers = (Enumeration<CommPortIdentifier>) CommPortIdentifier
                 .getPortIdentifiers();
         List<String> result = new ArrayList<String>(20);
