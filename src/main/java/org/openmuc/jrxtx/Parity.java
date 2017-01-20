@@ -44,6 +44,7 @@ public enum Parity {
             }
         }
 
+        // should not occur
         throw new RuntimeException("Error.");
     }
 }

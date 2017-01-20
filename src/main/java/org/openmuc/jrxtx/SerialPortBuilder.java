@@ -15,11 +15,11 @@ import gnu.io.CommPortIdentifier;
  * 
  * <pre>
  * <code>
- * SerialPort port = newBuilder("/dev/ttyUSB")
+ * SerialPort port = newBuilder("/dev/ttyS0")
  *                   .setBaudRate(19200)
  *                   .setParity(Parity.EVEN)
  *                   .build();
- * ImputStream is = port.getInputStream();
+ * InputStream is = port.getInputStream();
  * ..
  * </code>
  * </pre>
@@ -40,7 +40,6 @@ public class SerialPortBuilder {
      * @return the serial ports names.
      */
     public static String[] getRxTxPorts() {
-        @SuppressWarnings("unchecked")
         Enumeration<CommPortIdentifier> identifiers = (Enumeration<CommPortIdentifier>) CommPortIdentifier
                 .getPortIdentifiers();
         List<String> result = new ArrayList<String>(20);
@@ -68,7 +67,7 @@ public class SerialPortBuilder {
      * Constructs a new SerialPortBuilder with the default values.
      * 
      * @param portName
-     *            the serial port name. E.g. <code>"/dev/ttyUSB0"</code>
+     *            the serial port name. E.g. on Unix systems: <code>"/dev/ttyUSB0"</code> and on Unix
      * @return returns the new builder.
      */
     public static SerialPortBuilder newBuilder(String portName) {
@@ -107,6 +106,7 @@ public class SerialPortBuilder {
      * @param dataBits
      *            the number of dataBits.
      * @return the serial port builder.
+     * @see SerialPort#setDataBits(DataBits)
      */
     public SerialPortBuilder setDataBits(DataBits dataBits) {
         this.dataBits = dataBits;
@@ -119,6 +119,7 @@ public class SerialPortBuilder {
      * @param parity
      *            the parity.
      * @return the serial port builder.
+     * @see SerialPort#setParity(Parity)
      */
     public SerialPortBuilder setParity(Parity parity) {
         this.parity = parity;
@@ -131,6 +132,8 @@ public class SerialPortBuilder {
      * @param stopBits
      *            the number of stop bits.
      * @return the serial port builder.
+     * 
+     * @see SerialPort#setStopBits(StopBits)
      */
     public SerialPortBuilder setStopBits(StopBits stopBits) {
         this.stopBits = stopBits;
@@ -142,7 +145,10 @@ public class SerialPortBuilder {
      * 
      * @param flowControl
      *            the flow control.
+     * 
      * @return the serial port builder.
+     * 
+     * @see SerialPort#setFlowControl(FlowControl)
      */
     public SerialPortBuilder setFlowControl(FlowControl flowControl) {
         this.flowControl = flowControl;

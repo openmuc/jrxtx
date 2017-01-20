@@ -80,11 +80,6 @@ class JRxTxPort implements SerialPort {
 
     private static void setFlowControl(FlowControl flowControl, RXTXPort rxtxPort) {
         switch (flowControl) {
-        case DSR_DTR:
-            rxtxPort.setDTR(true);
-            // rxtxPort.setDSR(true);
-            break;
-
         case RTS_CTS:
             rxtxPort.setFlowControlMode(FLOWCONTROL_RTSCTS_IN | FLOWCONTROL_RTSCTS_OUT);
             break;
