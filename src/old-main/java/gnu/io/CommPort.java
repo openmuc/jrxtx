@@ -57,9 +57,9 @@
 --------------------------------------------------------------------------*/
 package gnu.io;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.IOException;
 
 /**
 * @author Trent Jarvi
@@ -67,60 +67,70 @@ import java.io.IOException;
 * @since JDK1.0
 */
 
-
 /**
-  * CommPort
-  */
+ * CommPort
+ */
 public abstract class CommPort extends Object {
-	protected String name;
-	private final static boolean debug = false;
+    protected String name;
+    private final static boolean debug = false;
 
-	public abstract void enableReceiveFraming( int f ) 
-		throws UnsupportedCommOperationException;
-	public abstract void disableReceiveFraming();
-	public abstract boolean isReceiveFramingEnabled();
-	public abstract int getReceiveFramingByte();
-	public abstract void disableReceiveTimeout();
-	public abstract void enableReceiveTimeout( int time )
-		throws UnsupportedCommOperationException;
-	public abstract boolean isReceiveTimeoutEnabled();
-	public abstract int getReceiveTimeout();
-	public abstract void enableReceiveThreshold( int thresh )
-		throws UnsupportedCommOperationException;
-	public abstract void disableReceiveThreshold();
-	public abstract int getReceiveThreshold();
-	public abstract boolean isReceiveThresholdEnabled();
-	public abstract void setInputBufferSize( int size );
-	public abstract int getInputBufferSize();
-	public abstract void setOutputBufferSize( int size );
-	public abstract int getOutputBufferSize();
-	public void close() 
-	{
-		if (debug) System.out.println("CommPort:close()");
+    public abstract void enableReceiveFraming(int f) throws UnsupportedCommOperationException;
 
-		try
-		{
-			CommPortIdentifier cp = 
-				CommPortIdentifier.getPortIdentifier(this);
-			if ( cp != null )
-				cp.getPortIdentifier(this).internalClosePort();
-		}
-		catch (NoSuchPortException e)
-		{
-		}
-	};
+    public abstract void disableReceiveFraming();
 
-	public abstract InputStream getInputStream() throws IOException;
-	public abstract OutputStream getOutputStream() throws IOException;
+    public abstract boolean isReceiveFramingEnabled();
 
-	public String getName()
-	{
-		if (debug) System.out.println("CommPort:getName()");
-		return( name );
-	}
-	public String toString()
-	{
-		if (debug) System.out.println("CommPort:toString()");
-		return( name );
-	}
+    public abstract int getReceiveFramingByte();
+
+    public abstract void disableReceiveTimeout();
+
+    public abstract void enableReceiveTimeout(int time) throws UnsupportedCommOperationException;
+
+    public abstract boolean isReceiveTimeoutEnabled();
+
+    public abstract int getReceiveTimeout();
+
+    public abstract void enableReceiveThreshold(int thresh) throws UnsupportedCommOperationException;
+
+    public abstract void disableReceiveThreshold();
+
+    public abstract int getReceiveThreshold();
+
+    public abstract boolean isReceiveThresholdEnabled();
+
+    public abstract void setInputBufferSize(int size);
+
+    public abstract int getInputBufferSize();
+
+    public abstract void setOutputBufferSize(int size);
+
+    public abstract int getOutputBufferSize();
+
+    public void close() {
+        if (debug)
+            System.out.println("CommPort:close()");
+
+        try {
+            CommPortIdentifier cp = CommPortIdentifier.getPortIdentifier(this);
+            if (cp != null)
+                CommPortIdentifier.getPortIdentifier(this).internalClosePort();
+        } catch (NoSuchPortException e) {
+        }
+    };
+
+    public abstract InputStream getInputStream() throws IOException;
+
+    public abstract OutputStream getOutputStream() throws IOException;
+
+    public String getName() {
+        if (debug)
+            System.out.println("CommPort:getName()");
+        return (name);
+    }
+
+    public String toString() {
+        if (debug)
+            System.out.println("CommPort:toString()");
+        return (name);
+    }
 }

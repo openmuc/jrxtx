@@ -98,10 +98,10 @@ public class RXTXCommDriverTest {
     @Test
     public void testRegisterSpecifiedPorts() throws Exception {
         // First, find all serial ports
-        List serialPorts = new ArrayList();
-        Enumeration e = CommPortIdentifier.getPortIdentifiers();
+        List<String> serialPorts = new ArrayList<String>();
+        Enumeration<CommPortIdentifier> e = CommPortIdentifier.getPortIdentifiers();
         while (e.hasMoreElements()) {
-            CommPortIdentifier port = (CommPortIdentifier) e.nextElement();
+            CommPortIdentifier port = e.nextElement();
             if (port.getPortType() == CommPortIdentifier.PORT_SERIAL) {
                 serialPorts.add(port.getName());
             }

@@ -70,9 +70,9 @@ import org.junit.Test;
 
 public class CommPortIdentifierTest {
 
-    public List getPortIdentifiers() {
-        Enumeration e = CommPortIdentifier.getPortIdentifiers();
-        List l = new ArrayList();
+    public List<CommPortIdentifier> getPortIdentifiers() {
+        Enumeration<CommPortIdentifier> e = CommPortIdentifier.getPortIdentifiers();
+        List<CommPortIdentifier> l = new ArrayList<CommPortIdentifier>();
         while (e.hasMoreElements()) {
             l.add(e.nextElement());
         }
@@ -82,14 +82,14 @@ public class CommPortIdentifierTest {
     @Ignore
     @Test
     public void testGetPortIdentifiers() throws Exception {
-        List l = getPortIdentifiers();
+        List<CommPortIdentifier> l = getPortIdentifiers();
         assertFalse("has ports", l.isEmpty());
     }
 
     @Ignore
     @Test
     public void testGetPortIdentifier() throws Exception {
-        List l = getPortIdentifiers();
+        List<CommPortIdentifier> l = getPortIdentifiers();
         CommPortIdentifier first = (CommPortIdentifier) l.get(0);
         CommPortIdentifier last = (CommPortIdentifier) l.get(l.size() - 1);
         // first find by name

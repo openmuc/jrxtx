@@ -687,8 +687,8 @@ final public class RXTXPort extends SerialPort {
                 z.reportln("XXXXXXXXXXXXXX " + event + ")");
             break;
         }
-        if (debug_events && debug_verbose)
-            z.reportln("	checking flags ");
+        // if (debug_events && debug_verbose)
+        // z.reportln(" checking flags ");
 
         switch (event) {
         case SerialPortEvent.DATA_AVAILABLE:
@@ -735,11 +735,11 @@ final public class RXTXPort extends SerialPort {
             System.err.println("unknown event: " + event);
             return (false);
         }
-        if (debug_events && debug_verbose)
-            z.reportln("	getting event");
+        // if (debug_events && debug_verbose)
+        // z.reportln(" getting event");
         SerialPortEvent e = new SerialPortEvent(this, event, !state, state);
-        if (debug_events && debug_verbose)
-            z.reportln("	sending event");
+        // if (debug_events && debug_verbose)
+        // z.reportln(" sending event");
         if (monThreadisInterrupted) {
             if (debug_events)
                 z.reportln("	sendEvent return");
@@ -749,8 +749,8 @@ final public class RXTXPort extends SerialPort {
             SPEventListener.serialEvent(e);
         }
 
-        if (debug_events && debug_verbose)
-            z.reportln("	sendEvent return");
+        // if (debug_events && debug_verbose)
+        // z.reportln(" sendEvent return");
 
         if (fd == 0 || SPEventListener == null || monThread == null) {
             return (true);
@@ -831,10 +831,9 @@ final public class RXTXPort extends SerialPort {
                 return;
             }
 
-            if (debug && monThread.isAlive()) {
-                z.reportln("	MonThread is still alive!");
-
-            }
+            // if (debug && monThread.isAlive()) {
+            // z.reportln(" MonThread is still alive!");
+            // }
 
         }
         monThread = null;
