@@ -239,31 +239,33 @@ task javadocAll(type: Javadoc) {
 }
 
 
-task writeSettings << {
-  Writer out = new OutputStreamWriter(new FileOutputStream("build/settings.gradle"));
-  out.write("include ");
-  boolean first = true;
-  for (Project myproject: distributionProjects) {
-    if (!myproject.getProjectDir().equals(getProjectDir())) {
-      if (first == true) {
-        first = false;
+task writeSettings {
+  doLast {
+    Writer out = new OutputStreamWriter(new FileOutputStream("build/settings.gradle"));
+    out.write("include ");
+    boolean first = true;
+    for (Project myproject: distributionProjects) {
+      if (!myproject.getProjectDir().equals(getProjectDir())) {
+        if (first == true) {
+          first = false;
+        }
+        else {
+          out.write ", ";
+        }
+        out.write '"' + myproject.name + '"'
       }
-      else {
-        out.write ", ";
+    }
+    out .write "\n\n";
+
+    for (Project myproject: distributionProjects) {
+      if (!myproject.getProjectDir().equals(getProjectDir())) {
+        println myproject.name
+        out.write 'project(":' + myproject.name + '").projectDir = file("' + myproject.getProjectDir().toString().substring((int)(getProjectDir().toString().size() + 1)) + '")\n';
       }
-      out.write '"' + myproject.name + '"'
     }
-  }
-  out .write "\n\n";
 
-  for (Project myproject: distributionProjects) {
-    if (!myproject.getProjectDir().equals(getProjectDir())) {
-      println myproject.name
-      out.write 'project(":' + myproject.name + '").projectDir = file("' + myproject.getProjectDir().toString().substring((int)(getProjectDir().toString().size() + 1)) + '")\n';
-    }
+    out.close();
   }
-
-  out.close();
 }
 
 task buildDistProjects {
