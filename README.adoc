@@ -14,6 +14,16 @@ The following lists some of the improvements added to the original RXTX:
   the streams that the Java TCP socket API provides.
 * Optionally add the native libs to the jar and load the libs from the jar.
 
+
+== Build jRxTx on your host system
+
+To build jRxTx run the following command:
+
+----
+$ ./gradlew buildLibs build [-PlibTarget=<the build system e.g. i686-pc-linux-gnu>]
+----
+
+
 == Licence
 
 jRxTx is licensed under the LGPLv3.0 or later.
