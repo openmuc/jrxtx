@@ -61,6 +61,8 @@ public class SerialPortBuilder {
         this.baudRate = 9600;
         this.dataBits = DataBits.DATABITS_8;
         this.parity = Parity.EVEN;
+        this.stopBits = StopBits.STOPBITS_1;
+        this.flowControl = FlowControl.NONE;
     }
 
     /**
