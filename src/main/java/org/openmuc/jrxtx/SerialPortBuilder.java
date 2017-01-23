@@ -10,7 +10,6 @@ import gnu.io.CommPortIdentifier;
 /**
  * Builder class for SerialPorts. Provides a convenient way to set the various fields of a SerialPort.
  * 
- * <p>
  * Example:
  * 
  * <pre>
@@ -23,7 +22,6 @@ import gnu.io.CommPortIdentifier;
  * ..
  * </code>
  * </pre>
- * <p>
  */
 public class SerialPortBuilder {
 
@@ -40,8 +38,7 @@ public class SerialPortBuilder {
      * @return the serial ports names.
      */
     public static String[] getSerialPortNames() {
-        Enumeration<CommPortIdentifier> identifiers = (Enumeration<CommPortIdentifier>) CommPortIdentifier
-                .getPortIdentifiers();
+        Enumeration<CommPortIdentifier> identifiers = CommPortIdentifier.getPortIdentifiers();
         List<String> result = new ArrayList<String>(20);
 
         while (identifiers.hasMoreElements()) {

@@ -6,17 +6,17 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 /**
- * A RS-232 serial communications port.
+ * Serial port for communication using UARTs. Can be used for communication protocols such as RS-232 and RS-485.
  * 
  * <p>
- * SerialPort describes the low-level interface to a serial communications port made available by the underlying system.
- * SerialPort defines the minimum required functionality for serial communications ports.
+ * A SerialPort is created using {@link SerialPortBuilder}. Once closed it cannot be opened again but has to be
+ * recreated.
  * </p>
  */
 public interface SerialPort extends Closeable {
 
     /**
-     * Returns an input stream for this serial port. This is the only way to receive data from the communications port.
+     * Returns an input stream for this serial port. This is the only way to receive data from the communication port.
      * 
      * <p>
      * Closing the returned InputStream will close the associated serial port.
@@ -144,7 +144,7 @@ public interface SerialPort extends Closeable {
      * non-zero timeout, a read() call on the InputStream associated with this serial port will block for only this
      * amount of time. If the timeout expires, a org.openmuc.jrxtx.SerialPortTimeoutExcepption is raised, though the
      * serial port is still valid. The option must be enabled prior to entering the blocking operation to have effect.
-     * The timeout must be <ode>&gt; 0<code>. A timeout of zero is interpreted as an infinite timeout.
+     * The timeout must be <code>&gt; 0</code>. A timeout of zero is interpreted as an infinite timeout.
      * 
      * @param serialPortTimeout
      *            the specified timeout, in milliseconds.

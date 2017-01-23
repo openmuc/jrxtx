@@ -75,6 +75,10 @@ eclipse {
 	}
 }
 
+javadoc {
+  exclude "**/gnu/**"
+}
+
 uploadArchives {
   repositories {
     mavenDeployer {
