@@ -9,6 +9,8 @@ import java.io.IOException;
  */
 public class SerialPortException extends IOException {
 
+    private static final long serialVersionUID = -4848841747671551647L;
+
     /**
      * Constructs a new SerialPortException with the specified detail message.
      * 

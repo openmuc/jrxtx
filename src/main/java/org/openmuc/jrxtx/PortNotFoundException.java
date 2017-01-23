@@ -6,6 +6,8 @@ package org.openmuc.jrxtx;
  */
 public class PortNotFoundException extends SerialPortException {
 
+    private static final long serialVersionUID = 2766015292714524756L;
+
     /**
      * Constructs a new PortNotFoundException with the specified detail message.
      * 
