@@ -113,14 +113,14 @@ class JRxTxPort implements SerialPort {
     }
 
     public InputStream getInputStream() throws IOException {
-        if (!isClosed()) {
+        if (isClosed()) {
             throw new SerialPortException("Open the serial port first i.o. to access the input stream.");
         }
         return this.serialIs;
     }
 
     public OutputStream getOutputStream() throws IOException {
-        if (!isClosed()) {
+        if (isClosed()) {
             throw new SerialPortException("Open the serial port first i.o. to access the output stream.");
         }
 
@@ -181,7 +181,7 @@ class JRxTxPort implements SerialPort {
 
         @Override
         public int read(byte[] b, int off, int len) throws IOException {
-            if (!isClosed()) {
+            if (isClosed()) {
                 throw new CommPortException("Connection has been closed..");
             }
             return this.serialInputStream.read(b, off, Math.min(available(), len));
