@@ -6,9 +6,6 @@ UART-based serial protocols such as RS-232, RS-422 and RS-485. The
 goal of jRxTx is to provide a lightweight, intuitive and well
 documented API.
 
-
-== Legacy RXTX
-
 jRxTx wraps the popular http://rxtx.qbang.org/[RXTX library] for
 which development has been discontinued. In addition to the new API,
 the original RXTX API can be accessed through jRxTx. Thus jRxTx can be
@@ -16,10 +13,7 @@ used as drop-in replacement for RXTX.
 
 Improvements of jRxTx compared to RXTX:
 
-* Improved API
-
-** Most importantly it provides I/O streams that behave in conformance
-   to the java.net.Socket.InputStream/OutputStream interfaces.
+* Improved API (see explanation below)
 
 * Includes Javadoc
 
@@ -100,3 +94,23 @@ mentioned above:
 $ sudo apt-get install librxtx-java
 ----
 
+== API Improvements Over RXTX
+
+Most importantly jRxTx provides an InputStream that behaves in
+conformance to the java.io.InputStream interface. Thus it behaves like
+Java socket input stream used for IP communication.
+
+The streams provided by the original RXTX have the following
+non-conform behaviour:
+    
+* A timeout does not throw an exception but instead returns -1. But
+  according to the InputStream interface -1 should only be returned if
+  the stream is closed (i.e. the end of stream is reached).
+
+* A thread blocking in InputStream.read() cannot be interrupted by
+  closing the associated serial port. Trying to close the serial port
+  while another thread is blocking in read() causes the close()
+  function to block as well.
+
+The event listener available in RXTX was removed in jRxTx because it
+is not needed for data stream reading.
