@@ -19,6 +19,7 @@ import gnu.io.PortInUseException;
 import gnu.io.RXTXPort;
 import gnu.io.UnsupportedCommOperationException;
 
+@SuppressWarnings("deprecation")
 class JRxTxPort implements SerialPort {
 
     private volatile boolean closed;

@@ -23,6 +23,7 @@ import gnu.io.CommPortIdentifier;
  * </code>
  * </pre>
  */
+@SuppressWarnings("deprecation")
 public class SerialPortBuilder {
 
     private String portName;
