@@ -4111,7 +4111,7 @@ master_index = NULL;
  exceptions:  none
  comments:	please keep this function clean.
  ----------------------------------------------------------*/
-JNIEXPORT void /*JNICALL*/ RXTXPort(eventLoop)( JNIEnv *env, jobject jobj ) {
+JNIEXPORT void JNICALL RXTXPort(eventLoop)( JNIEnv *env, jobject jobj ) {
 	#ifdef WIN32
 		int i = 0;
 	#endif /* WIN32 */

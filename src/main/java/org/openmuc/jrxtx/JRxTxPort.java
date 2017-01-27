@@ -19,6 +19,7 @@ import gnu.io.PortInUseException;
 import gnu.io.RXTXPort;
 import gnu.io.UnsupportedCommOperationException;
 
+@SuppressWarnings("deprecation")
 class JRxTxPort implements SerialPort {
 
     private volatile boolean closed;
@@ -45,6 +46,8 @@ class JRxTxPort implements SerialPort {
     public static JRxTxPort openSerialPort(String portName, int baudRate, Parity parity, DataBits dataBits,
             StopBits stopBits, FlowControl flowControl) throws SerialPortException {
         try {
+            System.setProperty("gnu.io.rxtx.SerialPorts", portName);
+
             CommPortIdentifier portIdentifier = CommPortIdentifier.getPortIdentifier(portName);
 
             String theOwner = JRxTxPort.class.getCanonicalName() + System.currentTimeMillis();
