@@ -1,17 +1,17 @@
 = jRxTx - The Java Serial Communication Library
 
-The development team the goal to maintain full backward compatibility
-to RXTX while adding a more convenient and embracing future bug
-fixes by the community.
+jRxTx is a Java serial communication library, which provides a platform independent
+serial communication API. 
+The goal of jRxTx is to provide a light weight, intuitive, well documented, alternative 
+API in contrast to the original http://rxtx.qbang.org/[RXTX libaray].
 
-The following lists some of the improvements added to the original RXTX:
+Imporvements of jRxTx compared to RXTX:
 
-* Cleaned up the code and file structure to make it more maintainable.
-* The jar file is now a bundle that can run in OSGi.
-* The jar file is published on maven central.
+* light weight API.
+* The Jar file is is OSGi Bundle.
+* The Jar file is published on https://search.maven.org/#search%7Cga%7C1%7Ca%3A%22jrxtx%22[maven central].
 * The Java build system has been moved to Gradle.
-* Improved input and output stream implementations so they behave like
-  the streams that the Java TCP socket API provides.
+* Provide I/O streams as in java.net.Socket
 * Optionally add the native libs to the jar and load the libs from the jar.
 
 
@@ -20,19 +20,17 @@ The following lists some of the improvements added to the original RXTX:
 To build jRxTx run the following command:
 
 ----
-$ ./gradlew buildLibs build [-PlibTarget=<the build system e.g. i686-pc-linux-gnu>]
+$ ./gradlew [buildLibs [-PlibTarget=<the build system e.g. i686-pc-linux-gnu>]] build 
 ----
 
+The command build libs, packs the native library into the jar.
+
+Since jRxTx builds on RXTX, you can also install librxtx-java on Debian systems, instead of packing the library to the jar, as mentioned above:
+
+----
+$ sudo apt-get install librxtx-java
+----
 
 == Licence
 
-jRxTx is licensed under the LGPLv3.0 or later.
-
-== Notice
-
-jRxTx is a fork of RXTX which was originally maintained by Trent
-Jarvi but was discontinued. The starting point of development was RXTX
-v2.2-pre2 from 2009 + all patches by the Debian RXTX package
-maintainers.
-
-
+jRxTx is licensed under the https://raw.githubusercontent.com/openmuc/jrxtx/develop/LICENCE[LGPLv3.0] or later.
