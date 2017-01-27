@@ -1,10 +1,9 @@
 /*
  * Copyright 1997-2009 by Trent Jarvi and others
- * Copyright 1998 Kevin Hester, kevinh@acm.org
  * Copyright 2016 Fraunhofer ISE and others
  *
  * This file is part of jRxTx.
- * jRxTx is a fork of RXTX originally maintained by Trent Jarvi.
+ * jRxTx is based on RXTX originally maintained by Trent Jarvi.
  *
  * jRxTx is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
