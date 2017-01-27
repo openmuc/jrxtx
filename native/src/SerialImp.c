@@ -4002,58 +4002,56 @@ usleep(20000);
  comments:
  ----------------------------------------------------------*/
 int initialise_event_info_struct(struct event_info_struct *eis) {
-	int i;
 	jobject jobj = *eis->jobj;
 	JNIEnv *env = eis->env;
 
 	struct event_info_struct *index = master_index;
 
-	if (eis->initialised == 1) {
-		goto end;
-	}
+	if (eis->initialised != 1) {
+		#ifdef TIOCGICOUNT
+			memset(&eis->osis, 0, sizeof(eis->osis));
+		#endif /* TIOCGICOUNT */
 
-	#ifdef TIOCGICOUNT
-		memset(&eis->osis, 0, sizeof(eis->osis));
-	#endif /* TIOCGICOUNT */
-
-	if (index) {
-		while (index->next) {
-			index = index->next;
+		if (index) {
+			while (index->next) {
+				index = index->next;
+			}
+			index->next = eis;
+			eis->prev = index;
+			eis->next = NULL;
+		} else {
+			master_index = eis;
+			master_index->next = NULL;
+			master_index->prev = NULL;
 		}
-		index->next = eis;
-		eis->prev = index;
-		eis->next = NULL;
-	} else {
-		master_index = eis;
-		master_index->next = NULL;
-		master_index->prev = NULL;
+		for (int i = 0; i < 11; i++) {
+			eis->eventflags[i] = 0;
+		}
+
+		#if !defined(TIOCSERGETLSR) && !defined(WIN32)
+			eis->output_buffer_empty_flag = 0;
+			eis->writing = 0;
+		#endif /* TIOCSERGETLSR */
+
+		eis->eventloop_interrupted = 0;
+		eis->closing = 0;
+
+		eis->fd = get_java_var(env, jobj, "fd", "I");
+		eis->has_tiocsergetlsr = has_line_status_register_access(eis->fd);
+		eis->has_tiocgicount = driver_has_tiocgicount(eis);
+
+		if (ioctl(eis->fd, TIOCMGET, &eis->omflags) < 0) {
+			report("initialise_event_info_struct: Port does not support events\n");
+		}
+
+		eis->send_event = (*env)->GetMethodID(env, eis->jclazz, "sendEvent", "(IZ)Z");
+
+		if (eis->send_event == NULL) {
+			report_error("initialise_event_info_struct: initialise failed!\n");
+			finalize_event_info_struct(eis);
+			return 0;
+		}
 	}
-	for (i = 0; i < 11; i++) {
-		eis->eventflags[i] = 0;
-	}
-
-	#if !defined(TIOCSERGETLSR) && !defined(WIN32)
-		eis->output_buffer_empty_flag = 0;
-		eis->writing = 0;
-	#endif /* TIOCSERGETLSR */
-
-	eis->eventloop_interrupted = 0;
-	eis->closing = 0;
-
-	eis->fd = get_java_var(env, jobj, "fd", "I");
-	eis->has_tiocsergetlsr = has_line_status_register_access(eis->fd);
-	eis->has_tiocgicount = driver_has_tiocgicount(eis);
-
-	if (ioctl(eis->fd, TIOCMGET, &eis->omflags) < 0) {
-		report("initialise_event_info_struct: Port does not support events\n");
-	}
-
-	eis->send_event = (*env)->GetMethodID(env, eis->jclazz, "sendEvent", "(IZ)Z");
-	if (eis->send_event == NULL) {
-		goto fail;
-	}
-
-	end:
 
 	FD_ZERO(&eis->rfds);
 	FD_SET(eis->fd, &eis->rfds);
@@ -4062,9 +4060,6 @@ int initialise_event_info_struct(struct event_info_struct *eis) {
 	eis->initialised = 1;
 	return 1;
 
-	fail: report_error("initialise_event_info_struct: initialise failed!\n");
-	finalize_event_info_struct(eis);
-	return 0;
 }
 
 /*----------------------------------------------------------
