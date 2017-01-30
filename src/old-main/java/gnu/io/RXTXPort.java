@@ -128,12 +128,11 @@ final public class RXTXPort extends SerialPort {
         fd = open(name);
         this.name = name;
 
-        // don't start the thread here
-        // MonitorThreadLock = true;
-        // monThread = new MonitorThread();
-        // monThread.start();
-        // waitForTheNativeCodeSilly();
-        // MonitorThreadAlive = true;
+        MonitorThreadLock = true;
+        monThread = new MonitorThread();
+        monThread.start();
+        waitForTheNativeCodeSilly();
+        MonitorThreadAlive = true;
         // } catch ( PortInUseException e ){}
         timeout = -1; /* default disabled timeout */
         if (debug)
