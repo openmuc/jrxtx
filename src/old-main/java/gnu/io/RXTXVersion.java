@@ -58,34 +58,36 @@
 package gnu.io;
 
 /**
-A class to keep the current version in
-*/
+ * A class to keep the current version in
+ */
 
-public class RXTXVersion
-{
-/*------------------------------------------------------------------------------
-	RXTXVersion  
-	accept:       -
-	perform:      Set Version.
-	return:       -
-	exceptions:   Throwable
-	comments:     
-		      See INSTALL for details.
-------------------------------------------------------------------------------*/
-	private static String Version;
+public class RXTXVersion {
+    /*------------------------------------------------------------------------------
+    	RXTXVersion  
+    	accept:       -
+    	perform:      Set Version.
+    	return:       -
+    	exceptions:   Throwable
+    	comments:     
+    		      See INSTALL for details.
+    ------------------------------------------------------------------------------*/
+    private static String Version;
 
-	static {
-		System.loadLibrary( "rxtxSerial" );
-		Version = "RXTX-2.2pre2";
-	}
-	/**
-	*  static method to return the current version of RXTX
-	*  unique to RXTX.
-	*  @return a string representing the version  "RXTX-1.4-9"
-	*/
-	public static String getVersion()
-	{
-		return(Version);
-	}
-	public static native String nativeGetVersion();
+    static {
+        if (!LibraryLoader.loadLibsFromJar("/libs")) {
+            System.loadLibrary("rxtxSerial");
+        }
+        Version = "RXTX-2.2pre2";
+    }
+
+    /**
+     * static method to return the current version of RXTX unique to RXTX.
+     * 
+     * @return a string representing the version "RXTX-1.4-9"
+     */
+    public static String getVersion() {
+        return Version;
+    }
+
+    public static native String nativeGetVersion();
 }

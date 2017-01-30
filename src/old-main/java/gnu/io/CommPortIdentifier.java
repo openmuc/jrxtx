@@ -519,7 +519,8 @@ public class CommPortIdentifier extends Object /* extends Vector? */
             System.out.println("CommPortIdentifier:fireOwnershipEvent( " + eventType + " )");
         if (ownershipListener != null) {
             CommPortOwnershipListener c;
-            for (Enumeration<CommPortOwnershipListener> e = ownershipListener.elements(); e.hasMoreElements(); c.ownershipChange(eventType))
+            for (Enumeration<CommPortOwnershipListener> e = ownershipListener.elements(); e.hasMoreElements(); c
+                    .ownershipChange(eventType))
                 c = e.nextElement();
         }
     }

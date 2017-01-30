@@ -9,6 +9,8 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.regex.Matcher;
@@ -20,12 +22,19 @@ import java.util.regex.Pattern;
 class LibraryLoader {
     public static final Pattern FILE_NAME_PATTERN = Pattern.compile("^(.+)(\\.[^\\.]+)$");
 
-    public static boolean loadLibsFromJar(String... toResPaths) {
+    private static Set<String> successfullyLoaded = new HashSet<String>();
+
+    public synchronized static boolean loadLibsFromJar(String... toResPaths) {
         for (String toResPath : toResPaths) {
+
+            if (successfullyLoaded.contains(toResPath)) {
+                continue; // skip if loaded already
+            }
             try {
                 if (!loadLib(toResPath)) {
                     return false;
                 }
+                successfullyLoaded.add(toResPath);
             } catch (URISyntaxException e) {
                 return false;
             } catch (IOException e) {
