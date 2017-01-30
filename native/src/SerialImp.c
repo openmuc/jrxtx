@@ -4071,7 +4071,7 @@ int initialise_event_info_struct(struct event_info_struct *eis) {
 	FD_ZERO(&eis->rfds);
 	FD_SET(eis->fd, &eis->rfds);
 	eis->tv_sleep.tv_sec = 0;
-	eis->tv_sleep.tv_usec = 1000;
+	eis->tv_sleep.tv_usec = 100 * 1000;
 	eis->initialised = 1;
 	return 1;
 
