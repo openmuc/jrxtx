@@ -34,38 +34,51 @@ jRxTx consists of a Java library and a native library written in
 C. The Java library calls the native library through JNI. The Java
 library (jrxtx-<version>.jar) is published on
 https://search.maven.org/#search%7Cga%7C1%7Ca%3A%22jrxtx%22[maven
-central]. As published on maven central it does not include the native
-library which thus needs to be installed separately.
+central]. As published on maven central the Java jar file does not
+include the native library.
 
-=== Installation of Native Library
+While the Java library is platform independent, the native part of
+jRxTx needs to be compiled separately for different processor
+architectures and operating systems.  You thus have two options to use
+the native library:
+
+. You can install the native library so that the Java virtual machine
+  can find it.
+
+. You can rebuild the jrxtx jar file to include the native library of
+  your choice.
+
+== Installation of Native Library
     
-The native part of jRxTx is specific for a certain processor
-architecture and operating system. Before you can run an application
-that depends on jRxTx you have to install the correct native file for
-your OS.
-    
-==== Linux
+=== Linux
     
 The jRxTx native library is equivalent to the original RXTX native
 library. Therefore on Debian based distributions all you have to do is
-install the package ‘librxtx-java’ using your package manager. This
-will install the correct native library. Sometimes you might have to
-add a system property so that java finds the jni libs. e.g.:
+install the package ‘librxtx-java’:
+
+----
+$ sudo apt-get install librxtx-java
+----
+ 
+This will install the correct native library. Sometimes you might have
+to add a system property so that java finds the jni libs. e.g.:
 -Djava.library.path=/usr/lib/jni .
 
 The serial ports /dev/tty* are only accessible to members belonging to
 groups dialout and tty. You therefore have to add your user to those
 groups. E.g. using:
 
+----
 sudo adduser <yourUserName> dialout
 
 sudo adduser <yourUserName> tty
-
-Afterwards you have to log out and log back in in order for the
+----
+    
+Afterwards you have to log out and log back in in order for the group
 changes to become active.
         
 
-==== Windows
+=== Windows
 
 On Windows you need to copy the native library of RXTX for your
 specific system to the folder that is in the java.libary.path. To
@@ -81,18 +94,14 @@ it on your own from the source code as explained next.
 To build jRxTx run the following command:
 
 ----
-$ ./gradlew [buildLibs [-PlibTarget=<the build system e.g. i686-pc-linux-gnu>]] build 
+$ ./gradlew [buildNative [-PlibTarget=<the build system e.g. i686-pc-linux-gnu>]] build 
 ----
 
-The command build libs, packs the native library into the jar.
-
-Since jRxTx builds on RXTX, you can also install librxtx-java on
-Debian systems, instead of packing the library into the jar, as
-mentioned above:
-
-----
-$ sudo apt-get install librxtx-java
-----
+The command 'buildNative' will build the native library. The 'build'
+command builds the Java jar archive and automatically includes the
+native lib in the jar if it was previously built. The -PlibTarget
+option is only needed if you want to compile the native library for a
+platform other than your host platform.
 
 == API Improvements Over RXTX
 
@@ -101,7 +110,7 @@ conformance to the java.io.InputStream interface. Thus it behaves like
 Java socket input stream used for IP communication.
 
 The streams provided by the original RXTX have the following
-non-conform behaviour:
+non-conform behavior:
     
 * A timeout does not throw an exception but instead returns -1. But
   according to the InputStream interface -1 should only be returned if

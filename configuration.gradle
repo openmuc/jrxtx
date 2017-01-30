@@ -121,7 +121,7 @@ sourceSets {
 	}
 }
 
-task buildLibs(type:Exec) {
+task buildNative(type:Exec) {
   workingDir 'native'
 
   def args = project.hasProperty('libTarget') ? project.property('libTarget') : ''
