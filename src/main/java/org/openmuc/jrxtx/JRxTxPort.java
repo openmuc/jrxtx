@@ -12,7 +12,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import gnu.io.CommPort;
-import gnu.io.CommPortException;
 import gnu.io.CommPortIdentifier;
 import gnu.io.NoSuchPortException;
 import gnu.io.PortInUseException;
@@ -111,7 +110,7 @@ class JRxTxPort implements SerialPort {
         this.closed = false;
 
         this.serial0s = new SerialOutputStream(this.rxtxPort.getOutputStream());
-        this.serialIs = new SerialInputStream(this.rxtxPort.getInputStream());
+        this.serialIs = new SerialInputStream();
 
     }
 
@@ -153,18 +152,19 @@ class JRxTxPort implements SerialPort {
 
     private class SerialInputStream extends InputStream {
         private static final long SLEEP_TIME = 10L; // sleep appropriate time
-        private final InputStream serialInputStream;
-
-        public SerialInputStream(InputStream serialInputStream) {
-            this.serialInputStream = serialInputStream;
-        }
 
         @Override
         public synchronized int read() throws IOException {
             long elapsedTime = 0;
+
+            InputStream serialInputStream = rxtxPort.getInputStream();
             do {
                 if (serialInputStream.available() > 0) {
-                    return serialInputStream.read();
+                    int read = serialInputStream.read();
+                    if (read == -1) {
+                        throw new SerialPortTimeoutException("Read timed out.");
+                    }
+                    return read;
                 }
                 try {
                     Thread.sleep(SLEEP_TIME);
@@ -174,29 +174,20 @@ class JRxTxPort implements SerialPort {
                 }
 
                 if (isClosed()) {
-                    throw new CommPortException("Connection has been closed..");
+                    throw new SerialPortException("Serial port has been closed..");
                 }
-
-            } while (getSerialPortTimeout() <= 0 || elapsedTime <= getSerialPortTimeout());
+            } while (getSerialPortTimeout() == 0 || elapsedTime <= getSerialPortTimeout());
 
             throw new SerialPortTimeoutException("Timed out, while reading the serial port.");
         }
 
         @Override
-        public int read(byte[] b, int off, int len) throws IOException {
-            if (isClosed()) {
-                throw new CommPortException("Connection has been closed..");
-            }
-            return this.serialInputStream.read(b, off, Math.min(available(), len));
-        }
-
-        @Override
         public int available() throws IOException {
-            return this.serialInputStream.available();
+            return rxtxPort.getInputStream().available();
         }
 
         private void closeStreams() throws IOException {
-            this.serialInputStream.close();
+            rxtxPort.getInputStream().close();
         }
 
         @Override
@@ -310,7 +301,7 @@ class JRxTxPort implements SerialPort {
     public void setSerialPortTimeout(int serialPortTimeout) throws IOException {
         this.serialPortTimeout = serialPortTimeout;
         if (serialPortTimeout == 0) {
-            this.rxtxPort.disableReceiveTimeout();
+            this.rxtxPort.enableReceiveTimeout(Integer.MAX_VALUE);
         }
         else {
             this.rxtxPort.enableReceiveTimeout(serialPortTimeout);

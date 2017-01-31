@@ -1,27 +1,30 @@
 package org.openmuc.jrxtx;
 
+import gnu.io.SerialPort;
+
 /**
  * The parity.
  */
+@SuppressWarnings("deprecation")
 public enum Parity {
     /**
      * No parity bit will be sent with each data character at all.
      */
-    NONE(0),
+    NONE(SerialPort.PARITY_NONE),
     /**
      * An odd parity bit will be sent with each data character. I.e. will be set to 1 if the data character contains an
      * even number of bits set to 1.
      */
-    ODD(1),
+    ODD(SerialPort.PARITY_ODD),
     /**
      * An even parity bit will be sent with each data character. I.e. will be set to 1 if the data character contains an
      * odd number of bits set to 1.
      */
-    EVEN(2),
+    EVEN(SerialPort.PARITY_EVEN),
     /**
      * A mark parity bit (i.e. always 1) will be sent with each data character.
      */
-    MARK(3),
+    MARK(SerialPort.PARITY_MARK),
     /**
      * A space parity bit (i.e. always 0) will be sent with each data character
      */
