@@ -121,7 +121,23 @@ sourceSets {
 	}
 }
 
-task buildNative(type:Exec) {
+task copyNativeLibs(type: Copy, dependsOn: compileJava) {
+  
+  println "test: " +  project.sourceSets.main.output.resourcesDir
+  
+  from fileTree('native').files
+  def libName = 'librxtxSerial';
+  
+  include libName + '.so'
+  include libName + '.dll'
+  def resDir = project.sourceSets.main.output.resourcesDir
+  
+  into resDir.absolutePath + '/libs'
+}
+
+
+
+task compileNative(type:Exec) {
   workingDir 'native'
 
   def args = project.hasProperty('libTarget') ? project.property('libTarget') : ''
@@ -138,19 +154,13 @@ task buildNative(type:Exec) {
   ext.output = {
     return standardOutput.toString()
   }
-  
-  task copyLibs(type: Copy, dependsOn: compileJava) {
-    from fileTree('native').files
-    def libName = 'librxtxSerial';
-    
-    include libName + '.so'
-    include libName + '.dll'
-    def resDir = project.sourceSets.main.output.resourcesDir
-    
-    into resDir.absolutePath + '/libs'
-  }
-  tasks.copyLibs.execute()
 }
+
+task(buildNative) {
+  dependsOn(compileNative)
+  dependsOn(copyNativeLibs)
+}
+
 
 
 clean {
