@@ -2999,119 +2999,108 @@ return (now.tv_sec * 1000) + ceil(now.tv_usec / 1000);
  NativeEnableReceiveTimeoutThreshold()
  ----------------------------------------------------------*/
 
-int read_byte_array(JNIEnv *env, jobject *jobj, int fd, unsigned char *buffer, int length, int timeout) {
-	int ret;
-	int bytesRead = 0;
+int read_byte_array(JNIEnv *env, jobject *jobj, int fd, unsigned char *buffer,
+int length, int timeout) {
+int ret, left, bytes = 0;
+long timeLeft, now = 0, start = 0;
+/* char msg[80]; */
+struct timeval tv, *tvP;
+fd_set rset;
+/* TRENT */
+int flag, count = 0;
+struct event_info_struct *eis = (struct event_info_struct *) get_java_var_long(
+env, *jobj, "eis", "J");
 
-	long timeLeft;
-	long now = 0;
-	long start = 0;
+report_time_start();
+flag = eis->eventflags[SPE_DATA_AVAILABLE];
+eis->eventflags[SPE_DATA_AVAILABLE] = 0;
+/*
+ ENTER( "read_byte_array" );
+ sprintf(msg, "read_byte_array requests %i\n", length);
+ report( msg );
+ */
+left = length;
+if (timeout >= 0)
+start = GetTickCount();
+while (bytes < length && count++ < 20) /* && !is_interrupted( eis ) )*/
+{
+if (timeout >= 0) {
+now = GetTickCount();
+if (now - start >= timeout) {
+eis->eventflags[SPE_DATA_AVAILABLE] = flag;
+return bytes;
+}
+}
 
-	/* char msg[80]; */
-	struct timeval tv, *tvP;
-	fd_set rset;
+FD_ZERO(&rset);
+FD_SET(fd, &rset);
 
-	/* TRENT */
-	long address = get_java_var_long(env, *jobj, "eis", "J");
-	struct event_info_struct *eis = (struct event_info_struct *) address;
+if (timeout >= 0) {
+timeLeft = timeout - (now - start);
+tv.tv_sec = timeLeft / 1000;
+tv.tv_usec = 1000 * (timeLeft % 1000);
+tvP = &tv;
+} else {
+tvP = NULL;
+}
+/* FIXME HERE Trent */
+#ifndef WIN32
+do {
+ret = SELECT(fd + 1, &rset, NULL, NULL, tvP);
+} while (ret < 0 && errno == EINTR);
+#else
+ret = 1;
+#endif /* WIN32 */
+if (ret == -1) {
+report("read_byte_array: select returned -1\n");
+LEAVE( "read_byte_array" );
+eis->eventflags[SPE_DATA_AVAILABLE] = flag;
+return -1;
+} else if (ret > 0) {
+if ((ret = READ(fd, buffer + bytes, left)) < 0) {
+if (errno != EINTR && errno != EAGAIN) {
+report("read_byte_array: read returned -1\n");
+LEAVE( "read_byte_array" );
+eis->eventflags[SPE_DATA_AVAILABLE] = flag;
+return -1;
+}
+eis->eventflags[SPE_DATA_AVAILABLE] = flag;
+return -1;
+} else if (ret) {
+bytes += ret;
+left -= ret;
+}
+/*
+ The only thing that is bugging me with the new
+ version is the CPU usage when reading on the serial port.  I
+ looked at it today and find a quick fix.  It doesn't seems to
+ affect the performance for our apps (I mean in a negative way,
+ cause the CPU is back to normal, near 0-5%).  All I did is add
+ a usleep in the reading function.
 
-	report_time_start();
-	int flag = eis->eventflags[SPE_DATA_AVAILABLE];
-	eis->eventflags[SPE_DATA_AVAILABLE] = 0;
-	/*
-	 ENTER( "read_byte_array" );
-	 sprintf(msg, "read_byte_array requests %i\n", length);
-	 report( msg );
-	 */
-	int left = length;
+ Nicolas <ripley@8d.com>
+ */
+else {
+/* usleep(10); */
+usleep(1000);
+}
+}
+}
 
-	if (timeout >= 0) {
-		start = GetTickCount();
-	}
+/*
+ if( count > 19 )
+ {
+ throw_java_exception( env, IO_EXCEPTION, "read_byte_array",
+ "No data available" );
+ }
 
-	for (int count = 0; bytesRead < length && count < 20; ++count) {/* && !is_interrupted( eis ) )*/
-		if (timeout < 0) {
-			now = GetTickCount();
-			if (now - start >= timeout) {
-				eis->eventflags[SPE_DATA_AVAILABLE] = flag;
-				return bytesRead;
-			}
-		}
-
-		FD_ZERO(&rset);
-		FD_SET(fd, &rset);
-
-		if (timeout >= 0) {
-			timeLeft = timeout - (now - start);
-			tv.tv_sec = timeLeft / 1000;
-			tv.tv_usec = 1000 * (timeLeft % 1000);
-			tvP = &tv;
-		} else {
-			tvP = NULL;
-		}
-		/* FIXME HERE Trent */
-		#ifndef WIN32
-			do {
-				ret = SELECT(fd + 1, &rset, NULL, NULL, tvP);
-			} while (ret < 0 && errno == EINTR);
-		#else
-			ret = 1;
-		#endif /* WIN32 */
-
-		if (ret == -1) {
-			report("read_byte_array: select returned -1\n");
-			LEAVE( "read_byte_array" );
-			eis->eventflags[SPE_DATA_AVAILABLE] = flag;
-			return -1;
-
-		} else if (ret > 0) {
-			ret = READ(fd, buffer + bytesRead, left);
-			if (ret < 0) {
-				if (errno != EINTR && errno != EAGAIN) {
-					report("read_byte_array: read returned -1\n");
-					LEAVE( "read_byte_array" );
-					eis->eventflags[SPE_DATA_AVAILABLE] = flag;
-
-					return -1;
-				}
-
-				eis->eventflags[SPE_DATA_AVAILABLE] = flag;
-				return -1;
-
-			} else if (ret) { // ret != 0
-				bytesRead += ret;
-				left -= ret;
-			} else {
-				/*
-				 The only thing that is bugging me with the new
-				 version is the CPU usage when reading on the serial port.  I
-				 looked at it today and find a quick fix.  It doesn't seems to
-				 affect the performance for our apps (I mean in a negative way,
-				 cause the CPU is back to normal, near 0-5%).  All I did is add
-				 a usleep in the reading function.
-
-				 Nicolas <ripley@8d.com>
-				 */
-				/* usleep(10); */
-				usleep(1000);
-			}
-		}
-	}
-
-	/*
-	 if( count > 19 )
-	 {
-	 throw_java_exception( env, IO_EXCEPTION, "read_byte_array",
-	 "No data available" );
-	 }
-
-	 sprintf(msg, "read_byte_array returns %i\n", bytes);
-	 report( msg );
-	 LEAVE( "read_byte_array" );
-	 report_time_end();
-	 */
-	eis->eventflags[SPE_DATA_AVAILABLE] = flag;
-	return bytesRead;
+ sprintf(msg, "read_byte_array returns %i\n", bytes);
+ report( msg );
+ LEAVE( "read_byte_array" );
+ report_time_end();
+ */
+eis->eventflags[SPE_DATA_AVAILABLE] = flag;
+return bytes;
 }
 
 #ifdef asdf
@@ -3414,30 +3403,29 @@ return;
 
  ----------------------------------------------------------*/
 JNIEXPORT jint JNICALL RXTXPort(readByte)(JNIEnv *env, jobject jobj) {
-	int bytes;
-	unsigned char buffer[1];
-	int fd = get_java_var(env, jobj, "fd", "I");
-	int timeout = get_java_var(env, jobj, "timeout", "I");
-	/* char msg[80]; */
+int bytes;
+unsigned char buffer[1];
+int fd = get_java_var(env, jobj, "fd", "I");
+int timeout = get_java_var(env, jobj, "timeout", "I");
+/* char msg[80]; */
 
-	/*
-	 ENTER( "RXTXPort:readByte" );
-	 report_time_start( );
-	 */
-	bytes = read_byte_array(env, &jobj, fd, buffer, 1, timeout);
-
-	if (bytes < 0) {
-		LEAVE( "RXTXPort:readByte" );
-		throw_java_exception(env, IO_EXCEPTION, "readByte", strerror( errno));
-		return -1;
-	}
-	/*
-	 LEAVE( "RXTXPort:readByte" );
-	 sprintf( msg, "readByte return(%i)\n", bytes ? buffer[ 0 ] : -1 );
-	 report( msg );
-	 report_time_end( );
-	 */
-	return (bytes ? (jint) buffer[0] : -1);
+/*
+ ENTER( "RXTXPort:readByte" );
+ report_time_start( );
+ */
+bytes = read_byte_array(env, &jobj, fd, buffer, 1, timeout);
+if (bytes < 0) {
+LEAVE( "RXTXPort:readByte" );
+throw_java_exception(env, IO_EXCEPTION, "readByte", strerror( errno));
+return -1;
+}
+/*
+ LEAVE( "RXTXPort:readByte" );
+ sprintf( msg, "readByte return(%i)\n", bytes ? buffer[ 0 ] : -1 );
+ report( msg );
+ report_time_end( );
+ */
+return (bytes ? (jint) buffer[0] : -1);
 }
 
 /*----------------------------------------------------------
@@ -3968,43 +3956,40 @@ return (0);
  comments:    not supported on all devices/drivers.
  ----------------------------------------------------------*/
 void report_serial_events(struct event_info_struct *eis) {
-	/* JK00: work around for Multi IO cards without TIOCSERGETLSR */
-	/* if( eis->has_tiocsergetlsr ) we have a fix for output empty */
-	if (check_line_status_register(eis)){
-		return;
-	}
+/* JK00: work around for Multi IO cards without TIOCSERGETLSR */
+/* if( eis->has_tiocsergetlsr ) we have a fix for output empty */
+if (check_line_status_register(eis))
+return;
 
-	if (eis && eis->has_tiocgicount) {
-		check_cgi_count(eis);
-	}
+if (eis && eis->has_tiocgicount)
+check_cgi_count(eis);
+#ifndef WIN32 /* something is wrong here */
+#endif /* WIN32 */
 
-	//	#ifndef WIN32 /* something is wrong here */
-	//	#endif /* WIN32 */
-
-	check_tiocmget_changes(eis);
-	if (eis && port_has_changed_fionread(eis)) {
-		if (!eis->eventflags[SPE_DATA_AVAILABLE]) {
-			report_verbose("report_serial_events: ignoring DATA_AVAILABLE\n");
-			/*
-			 report(".");
-			 */
-			usleep(20000);
-			#if !defined(__sun__)
-			/* FIXME: No time to test on all OS's for production */
-			usleep(20000);
-			#endif /* !__sun__ */
-			return;
-		}
-		report("report_serial_events: sending DATA_AVAILABLE\n");
-		if (!send_event(eis, SPE_DATA_AVAILABLE, 1)) {
-			/* select wont block */
-			/* FIXME: No time to test on all OS's for production */
-			/* REMOVE goes around usleep */
-			#if !defined(__sun__)
-			#endif /* !__sun__ */
-		}
-		usleep(20000);
-	}
+check_tiocmget_changes(eis);
+if (eis && port_has_changed_fionread(eis)) {
+if (!eis->eventflags[SPE_DATA_AVAILABLE]) {
+report_verbose("report_serial_events: ignoring DATA_AVAILABLE\n");
+/*
+ report(".");
+ */
+usleep(20000);
+#if !defined(__sun__)
+/* FIXME: No time to test on all OS's for production */
+usleep(20000);
+#endif /* !__sun__ */
+return;
+}
+report("report_serial_events: sending DATA_AVAILABLE\n");
+if (!send_event(eis, SPE_DATA_AVAILABLE, 1)) {
+/* select wont block */
+/* FIXME: No time to test on all OS's for production */
+/* REMOVE goes around usleep */
+#if !defined(__sun__)
+#endif /* !__sun__ */
+}
+usleep(20000);
+}
 }
 
 /*----------------------------------------------------------
@@ -4017,64 +4002,61 @@ void report_serial_events(struct event_info_struct *eis) {
  comments:
  ----------------------------------------------------------*/
 int initialise_event_info_struct(struct event_info_struct *eis) {
-	jobject jobj = *eis->jobj;
-	JNIEnv *env = eis->env;
+int i;
+jobject jobj = *eis->jobj;
+JNIEnv *env = eis->env;
+struct event_info_struct *index = master_index;
 
-	struct event_info_struct *index = master_index;
+if (eis->initialised == 1)
+goto end;
 
-	if (eis->initialised != 1) {
-		#ifdef TIOCGICOUNT
-			memset(&eis->osis, 0, sizeof(eis->osis));
-		#endif /* TIOCGICOUNT */
+#ifdef TIOCGICOUNT
+memset(&eis->osis, 0, sizeof(eis->osis));
+#endif /* TIOCGICOUNT */
 
-		if (index) {
-			while (index->next) {
-				index = index->next;
-			}
-			index->next = eis;
-			eis->prev = index;
-			eis->next = NULL;
-		} else {
-			master_index = eis;
-			master_index->next = NULL;
-			master_index->prev = NULL;
-		}
-		for (int i = 0; i < 11; i++) {
-			eis->eventflags[i] = 0;
-		}
+if (index) {
+while (index->next) {
+index = index->next;
+}
+index->next = eis;
+eis->prev = index;
+eis->next = NULL;
+} else {
+master_index = eis;
+master_index->next = NULL;
+master_index->prev = NULL;
+}
 
-		#if !defined(TIOCSERGETLSR) && !defined(WIN32)
-			eis->output_buffer_empty_flag = 0;
-			eis->writing = 0;
-		#endif /* TIOCSERGETLSR */
+for (i = 0; i < 11; i++)
+eis->eventflags[i] = 0;
+#if !defined(TIOCSERGETLSR) && !defined(WIN32)
+eis->output_buffer_empty_flag = 0;
+eis->writing = 0;
+#endif /* TIOCSERGETLSR */
+eis->eventloop_interrupted = 0;
+eis->closing = 0;
 
-		eis->eventloop_interrupted = 0;
-		eis->closing = 0;
+eis->fd = get_java_var(env, jobj, "fd", "I");
+eis->has_tiocsergetlsr = has_line_status_register_access(eis->fd);
+eis->has_tiocgicount = driver_has_tiocgicount(eis);
 
-		eis->fd = get_java_var(env, jobj, "fd", "I");
-		eis->has_tiocsergetlsr = has_line_status_register_access(eis->fd);
-		eis->has_tiocgicount = driver_has_tiocgicount(eis);
+if (ioctl(eis->fd, TIOCMGET, &eis->omflags) < 0) {
+report("initialise_event_info_struct: Port does not support events\n");
+}
 
-		if (ioctl(eis->fd, TIOCMGET, &eis->omflags) < 0) {
-			report("initialise_event_info_struct: Port does not support events\n");
-		}
-
-		eis->send_event = (*env)->GetMethodID(env, eis->jclazz, "sendEvent", "(IZ)Z");
-
-		if (eis->send_event == NULL) {
-			report_error("initialise_event_info_struct: initialise failed!\n");
-			finalize_event_info_struct(eis);
-			return 0;
-		}
-	}
-
-	FD_ZERO(&eis->rfds);
-	FD_SET(eis->fd, &eis->rfds);
-	eis->tv_sleep.tv_sec = 0;
-	eis->tv_sleep.tv_usec = 100 * 1000;
-	eis->initialised = 1;
-	return 1;
-
+eis->send_event = (*env)->GetMethodID(env, eis->jclazz, "sendEvent", "(IZ)Z");
+if (eis->send_event == NULL)
+goto fail;
+end:
+FD_ZERO(&eis->rfds);
+FD_SET(eis->fd, &eis->rfds);
+eis->tv_sleep.tv_sec = 0;
+eis->tv_sleep.tv_usec = 100 * 1000;
+eis->initialised = 1;
+return (1);
+fail: report_error("initialise_event_info_struct: initialise failed!\n");
+finalize_event_info_struct(eis);
+return (0);
 }
 
 /*----------------------------------------------------------
@@ -4111,76 +4093,71 @@ master_index = NULL;
  exceptions:  none
  comments:	please keep this function clean.
  ----------------------------------------------------------*/
-JNIEXPORT void JNICALL RXTXPort(eventLoop)( JNIEnv *env, jobject jobj ) {
-	#ifdef WIN32
-		int i = 0;
-	#endif /* WIN32 */
-
+JNIEXPORT void JNICALL RXTXPort(eventLoop)( JNIEnv *env, jobject jobj )
+{
+#ifdef WIN32
+	int i = 0;
+#endif /* WIN32 */
 	struct event_info_struct eis;
-
 	eis.jclazz = (*env)->GetObjectClass( env, jobj );
 	eis.env = env;
 	eis.jobj = &jobj;
 	eis.initialised = 0;
 
-	ENTER("eventLoop\n");
-
-	if (!initialise_event_info_struct(&eis)) {
-		LEAVE("eventLoop:  could not init event struct!\n");
-		return;
-	}
-
-	if (!init_threads(&eis)) {
-		LEAVE("eventLoop:  could not init threads!\n");
-		return;
-	}
-
-	unlock_monitor_thread(&eis);
-	while (1) {
-		report_time_eventLoop();
+	ENTER("eventLoop\n");if ( !initialise_event_info_struct( &eis ) ) goto end;
+	if ( !init_threads( &eis ) ) goto end;
+	unlock_monitor_thread( &eis );
+	do{
+		report_time_eventLoop( );
 		do {
 			/* nothing goes between this call and select */
-			if (eis.closing){
+			if( eis.closing )
+			{
 				report("eventLoop: got interrupt\n");
-				finalize_threads(&eis);
-				finalize_event_info_struct(&eis);
-				LEAVE("eventLoop");
-				return;
+				finalize_threads( &eis );
+				finalize_event_info_struct( &eis );
+				LEAVE("eventLoop");return;
 			}
+#ifndef WIN32
+			/* report( "." ); */
+			do {
+				eis.ret = SELECT( eis.fd + 1, &eis.rfds, NULL, NULL,
+					&eis.tv_sleep );
+			} while (eis.ret < 0 && errno==EINTR);
+#else
+			/*
+			    termios.c:serial_select is instable for some
+			    reason
 
-			#ifndef WIN32
-				/* report( "." ); */
-				do {
-					eis.ret = SELECT(eis.fd + 1, &eis.rfds, NULL, NULL, &eis.tv_sleep);
-				} while (eis.ret < 0 && errno == EINTR);
-			#else
-				/*
-					termios.c:serial_select is instable for some
-					reason
-
-					polling is not blowing up.
-				*/
-				/* usleep(5000); */
-				eis.ret = 1;
-				while(i++ < 5) {
-					if(eis.eventflags[SPE_DATA_AVAILABLE]) {
-						if (port_has_changed_fionread(&eis)) {
-							send_event( &eis, SPE_DATA_AVAILABLE, 1 );
-						}
+			    polling is not blowing up.
+			*/
+/*
+			usleep(5000);
+*/
+			eis.ret=1;
+			while( i++ < 5 )
+			{
+				if(eis.eventflags[SPE_DATA_AVAILABLE] )
+				{
+					if( port_has_changed_fionread( &eis ) )
+					{
+						send_event( &eis, SPE_DATA_AVAILABLE, 1 );
 					}
-					usleep(1000);
 				}
-				i = 0;
-			#endif /* WIN32 */
-		} while (eis.ret < 0 && errno == EINTR);
-
-		if (eis.ret >= 0){
-			report_serial_events(&eis);
+				usleep(1000);
+			}
+			i = 0;
+#endif /* WIN32 */
+		}  while ( eis.ret < 0 && errno == EINTR );
+		if( eis.ret >= 0 )
+		{
+			report_serial_events( &eis );
 		}
-
-		// reset the event info structure.
-		initialise_event_info_struct(&eis);
-	}
+		initialise_event_info_struct( &eis );
+	} while( 1 );
+end:
+	LEAVE(
+"eventLoop:  Bailing!\n");
 }
 
 /*----------------------------------------------------------
@@ -4885,43 +4862,40 @@ termios_setflags( fd, index->eventflags );
  comments:
  ----------------------------------------------------------*/
 int send_event(struct event_info_struct *eis, jint type, int flag) {
-	int result;
-	JNIEnv *env;
-	if (eis) {
-		env = eis->env;
-	} else {
-		return -1;
-	}
+int result;
+JNIEnv *env;
+if (eis)
+env = eis->env;
+else
+return (-1);
 
-	ENTER( "send_event" );
-	if (!eis || eis->eventloop_interrupted > 1) {
-		report("event loop interrupted\n");
-		return JNI_TRUE;
-	}
-	report_verbose("send_event: !eventloop_interupted\n");
-	if (eis->jclazz == NULL) {
-		return JNI_TRUE;
-	}
+ENTER( "send_event" );
+if (!eis || eis->eventloop_interrupted > 1) {
+report("event loop interrupted\n");
+return JNI_TRUE;
+}
+report_verbose("send_event: !eventloop_interupted\n");
+if (eis->jclazz == NULL)
+return JNI_TRUE;
+report_verbose("send_event: jclazz\n");
 
-	report_verbose("send_event: jclazz\n");
+(*env)->ExceptionClear(env);
 
-	(*env)->ExceptionClear(env);
+report_verbose("send_event: calling\n");
+result = (*env)->CallBooleanMethod(env, *eis->jobj, eis->send_event, type,
+flag > 0 ? JNI_TRUE : JNI_FALSE);
+report_verbose("send_event: called\n");
 
-	report_verbose("send_event: calling\n");
-	result = (*env)->CallBooleanMethod(env, *eis->jobj, eis->send_event, type, flag > 0 ? JNI_TRUE : JNI_FALSE);
-	report_verbose("send_event: called\n");
-
-	#ifdef asdf
-		if(!eis || (*eis->env)->ExceptionOccurred(eis->env)) {
-			report ("send_event: an error occured calling sendEvent()\n");
-			(*eis->env)->ExceptionDescribe(eis->env);
-			(*eis->env)->ExceptionClear(eis->env);
-		}
-	#endif /* asdf */
-	/* report("e"); */
-
-	LEAVE( "send_event" );
-	return result;
+#ifdef asdf
+if(!eis || (*eis->env)->ExceptionOccurred(eis->env)) {
+report ( "send_event: an error occured calling sendEvent()\n" );
+(*eis->env)->ExceptionDescribe(eis->env);
+(*eis->env)->ExceptionClear(eis->env);
+}
+#endif /* asdf */
+/* report("e"); */
+LEAVE( "send_event" );
+return (result);
 }
 
 /*----------------------------------------------------------
