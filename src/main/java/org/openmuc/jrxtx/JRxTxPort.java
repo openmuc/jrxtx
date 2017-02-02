@@ -50,8 +50,8 @@ class JRxTxPort implements SerialPort {
             CommPortIdentifier portIdentifier = CommPortIdentifier.getPortIdentifier(portName);
 
             String theOwner = JRxTxPort.class.getCanonicalName() + System.currentTimeMillis();
-            int timeOut = 2000;
-            CommPort comPort = portIdentifier.open(theOwner, timeOut);
+
+            CommPort comPort = portIdentifier.open(theOwner, 0);
 
             if (!(comPort instanceof RXTXPort)) {
                 throw new SerialPortException("Unable to open the serial port. Port is not RXTX.");
@@ -160,11 +160,7 @@ class JRxTxPort implements SerialPort {
             InputStream serialInputStream = rxtxPort.getInputStream();
             do {
                 if (serialInputStream.available() > 0) {
-                    int read = serialInputStream.read();
-                    if (read == -1) {
-                        throw new SerialPortTimeoutException("Read timed out.");
-                    }
-                    return read;
+                    return serialInputStream.read();
                 }
                 try {
                     Thread.sleep(SLEEP_TIME);
@@ -300,12 +296,6 @@ class JRxTxPort implements SerialPort {
 
     public void setSerialPortTimeout(int serialPortTimeout) throws IOException {
         this.serialPortTimeout = serialPortTimeout;
-        if (serialPortTimeout == 0) {
-            this.rxtxPort.enableReceiveTimeout(Integer.MAX_VALUE);
-        }
-        else {
-            this.rxtxPort.enableReceiveTimeout(serialPortTimeout);
-        }
     }
 
     public void setFlowControl(FlowControl flowControl) throws IOException {
