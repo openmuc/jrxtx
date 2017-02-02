@@ -7,20 +7,16 @@ import java.io.OutputStream;
 
 /**
  * Serial port for communication using UARTs. Can be used for communication protocols such as RS-232 and RS-485.
- * 
  * <p>
  * A SerialPort is created using {@link SerialPortBuilder}. Once closed it cannot be opened again but has to be
  * recreated.
- * </p>
  */
 public interface SerialPort extends Closeable {
 
     /**
-     * Returns an input stream for this serial port. This is the only way to receive data from the communication port.
-     * 
+     * Returns the input stream for this serial port.
      * <p>
      * Closing the returned InputStream will close the associated serial port.
-     * </p>
      * 
      * @return the InputStream object that can be used to read from the port.
      * @throws IOException
@@ -29,7 +25,7 @@ public interface SerialPort extends Closeable {
     InputStream getInputStream() throws IOException;
 
     /**
-     * Returns an output stream for this serial port. This is the only way to send data to the communications port.
+     * Returns the output stream for this serial port.
      * 
      * @return the OutputStream object that can be used to write to the port.
      * @throws IOException
@@ -38,7 +34,9 @@ public interface SerialPort extends Closeable {
     OutputStream getOutputStream() throws IOException;
 
     /**
-     * Closes the port connection, sets the status to closed, and disposes of the internal streams.
+     * Closes the serial port.
+     * <p>
+     * Also closes the associated input and output streams.
      * 
      * @throws IOException
      *             if an I/O error occurred.
@@ -46,14 +44,14 @@ public interface SerialPort extends Closeable {
     void close() throws IOException;
 
     /**
-     * Returns whether the port is currently open and available for communication.
+     * Returns whether the serial port is currently open and available for communication.
      * 
-     * @return true if the port is closed.
+     * @return true if the serial port is closed.
      */
     boolean isClosed();
 
     /**
-     * Get the port name of the current serial port.
+     * Get the name of the serial port.
      * 
      * @return the serial port name.
      */

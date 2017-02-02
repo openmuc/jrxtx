@@ -116,27 +116,27 @@ class JRxTxPort implements SerialPort {
 
     public InputStream getInputStream() throws IOException {
         if (isClosed()) {
-            throw new SerialPortException("Open the serial port first i.o. to access the input stream.");
+            throw new SerialPortException("Serial port is closed");
         }
         return this.serialIs;
     }
 
     public OutputStream getOutputStream() throws IOException {
         if (isClosed()) {
-            throw new SerialPortException("Open the serial port first i.o. to access the output stream.");
+            throw new SerialPortException("Serial port is closed");
         }
 
         return this.serial0s;
     }
 
     public synchronized void close() throws IOException {
-        if (closed) {
-            throw new SerialPortException("Serial Port is already closed.");
+        if (isClosed()) {
+            return;
         }
 
         try {
-            this.serial0s.closeStreams();
-            this.serialIs.closeStreams();
+            this.serial0s.closeStream();
+            this.serialIs.closeStream();
             this.rxtxPort.close();
             this.serial0s = null;
             this.serialIs = null;
@@ -182,7 +182,7 @@ class JRxTxPort implements SerialPort {
             return rxtxPort.getInputStream().available();
         }
 
-        private void closeStreams() throws IOException {
+        private void closeStream() throws IOException {
             rxtxPort.getInputStream().close();
         }
 
@@ -231,7 +231,7 @@ class JRxTxPort implements SerialPort {
             this.serialOutputStream.flush();
         }
 
-        private void closeStreams() throws IOException {
+        private void closeStream() throws IOException {
             this.serialOutputStream.close();
         }
 
