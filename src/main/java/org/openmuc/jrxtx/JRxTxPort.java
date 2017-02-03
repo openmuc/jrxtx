@@ -65,16 +65,16 @@ class JRxTxPort implements SerialPort {
 
                 setFlowControl(flowControl, rxtxPort);
             } catch (UnsupportedCommOperationException e) {
-                String message = format("Not able to apply config on serial port.\n{0}", e.getMessage());
+                String message = format("Unable to apply config on serial port.\n{0}", e.getMessage());
                 throw new SerialPortException(message);
             }
 
             return new JRxTxPort(rxtxPort, portName, baudRate, parity, dataBits, stopBits, flowControl);
         } catch (NoSuchPortException e) {
-            String errMessage = format("Serial Port {0} not found or port is busy.", portName);
+            String errMessage = format("Serial port {0} not found or port is busy.", portName);
             throw new PortNotFoundException(errMessage);
         } catch (PortInUseException e) {
-            String errMessage = format("Serial Port {0} is already in use.", portName);
+            String errMessage = format("Serial port {0} is already in use.", portName);
             throw new PortNotFoundException(errMessage);
         }
 
@@ -170,11 +170,11 @@ class JRxTxPort implements SerialPort {
                 }
 
                 if (isClosed()) {
-                    throw new SerialPortException("Serial port has been closed..");
+                    throw new SerialPortException("Serial port has been closed.");
                 }
             } while (getSerialPortTimeout() == 0 || elapsedTime <= getSerialPortTimeout());
 
-            throw new SerialPortTimeoutException("Timed out, while reading the serial port.");
+            throw new SerialPortTimeoutException();
         }
 
         @Override
