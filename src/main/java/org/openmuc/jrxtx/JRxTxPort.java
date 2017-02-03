@@ -71,7 +71,7 @@ class JRxTxPort implements SerialPort {
 
             return new JRxTxPort(rxtxPort, portName, baudRate, parity, dataBits, stopBits, flowControl);
         } catch (NoSuchPortException e) {
-            String errMessage = format("Serial Port {0} not found.", portName);
+            String errMessage = format("Serial Port {0} not found or port is busy.", portName);
             throw new PortNotFoundException(errMessage);
         } catch (PortInUseException e) {
             String errMessage = format("Serial Port {0} is already in use.", portName);
