@@ -16,7 +16,7 @@ then
     DIR_NAME=`dirname $0`
     cd ${DIR_NAME}
     WORKING_DIRECTORY=`pwd`
-    sudo ln -s ${WORKING_DIRECTORY}/tty0tty/tty0tty64 /usr/bin/tty0tty
+    sudo cp ${WORKING_DIRECTORY}/tty0tty/tty0tty /usr/bin/tty0tty
 fi
 
 killall tty0tty

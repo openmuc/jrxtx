@@ -10,10 +10,6 @@ tty0tty - linux null modem emulator v1.2
 
    For more details, please have a look in the original tty0tty ZIP folder.
    
-
-Fraunhofer ISE uses the pts (unix98) version of tty0tty.
-
-When run connect two pseudo-ttys and show the connection names.
   - To run:
          ./tty0tty   
          
