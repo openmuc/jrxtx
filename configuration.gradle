@@ -114,10 +114,6 @@ dependencies {
 sourceSets {
 	main {
 		java.srcDirs = ['src/old-main/java', 'src/main/java']
-			
-	}
-	test {
-		java.srcDirs = ['src/old-test/java', 'src/test/java']
 	}
 }
 
@@ -207,3 +203,18 @@ task javah(dependsOn: compileJava) {
 	  }
   }
 }
+
+
+sourceSets {
+  itest {
+    compileClasspath += sourceSets.main.compileClasspath
+    runtimeClasspath += sourceSets.main.runtimeClasspath
+  }
+}
+
+task itest(type: Test){
+  systemProperty "java.library.path", "/usr/lib/jni/"
+  testClassesDir = sourceSets.itest.output.classesDir
+  classpath = sourceSets.itest.runtimeClasspath
+}
+
