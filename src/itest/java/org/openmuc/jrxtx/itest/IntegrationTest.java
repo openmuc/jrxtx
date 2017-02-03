@@ -8,7 +8,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.openmuc.jrxtx.SerialPort;
 import org.openmuc.jrxtx.SerialPortBuilder;
@@ -22,57 +24,83 @@ public class IntegrationTest {
 
     private ExecutorService executor = Executors.newFixedThreadPool(1);
 
-    @Test
-    public void ExceptionTest() throws Exception {
-        SerialPort serialPort1 = null;
-        SerialPort serialPort2 = null;
-        try {
-            serialPort1 = SerialPortBuilder.newBuilder(PORT_1_NAME).setBaudRate(2400).build();
-            serialPort2 = SerialPortBuilder.newBuilder(PORT_2_NAME).setBaudRate(2400).build();
+    SerialPort serialPort1 = null;
+    SerialPort serialPort2 = null;
 
-            InputStream is1 = serialPort1.getInputStream();
-            final InputStream is2 = serialPort2.getInputStream();
+    InputStream is1, is2;
+    OutputStream os1, os2;
 
-            OutputStream os1 = serialPort1.getOutputStream();
-            OutputStream os2 = serialPort2.getOutputStream();
+    @Before
+    public void setUp() throws IOException {
+        serialPort1 = SerialPortBuilder.newBuilder(PORT_1_NAME).setBaudRate(2400).build();
+        serialPort2 = SerialPortBuilder.newBuilder(PORT_2_NAME).setBaudRate(2400).build();
 
-            // test simple write and read
-            os1.write(99);
-            int port2received = is2.read();
-            Assert.assertEquals(99, port2received);
+        is1 = serialPort1.getInputStream();
+        is2 = serialPort2.getInputStream();
 
-            // test timeout exception
-            serialPort2.setSerialPortTimeout(300);
-            boolean timeoutExceptionThrown = false;
+        os1 = serialPort1.getOutputStream();
+        os2 = serialPort2.getOutputStream();
+    }
+
+    @After
+    public void tearDown() {
+        if (serialPort1 != null) {
             try {
-                is2.read();
-            } catch (SerialPortTimeoutException e) {
-                timeoutExceptionThrown = true;
-            }
-            Assert.assertEquals(true, timeoutExceptionThrown);
-
-            Future<Boolean> future = executor.submit(new Callable<Boolean>() {
-                public Boolean call() throws IOException {
-                    try {
-                        is2.read();
-                    } catch (SerialPortException e) {
-                        return true;
-                    }
-                    return false;
-                }
-            });
-            serialPort2.close();
-            Assert.assertEquals(true, future.get());
-
-        } finally {
-            if (serialPort1 != null) {
                 serialPort1.close();
-            }
-            if (serialPort2 != null) {
-                serialPort2.close();
+            } catch (IOException e) {
             }
         }
+        if (serialPort2 != null) {
+            try {
+                serialPort2.close();
+            } catch (IOException e) {
+            }
+        }
+    }
 
+    @Test
+    public void SerialPortCloseTest() throws Exception {
+        Future<Boolean> future = executor.submit(new Callable<Boolean>() {
+            public Boolean call() throws IOException {
+                try {
+                    is2.read();
+                } catch (SerialPortException e) {
+                    return true;
+                }
+                return false;
+            }
+        });
+        serialPort2.close();
+        Assert.assertEquals(true, future.get());
+    }
+
+    @Test
+    public void SimpleWriteReadTest() throws Exception {
+
+        os1.write(99);
+        int port2received = is2.read();
+        Assert.assertEquals(99, port2received);
+
+    }
+
+    @Test
+    public void TimoutTest() throws Exception {
+
+        serialPort2.setSerialPortTimeout(300);
+        boolean timeoutExceptionThrown = false;
+        try {
+            is2.read();
+        } catch (SerialPortTimeoutException e) {
+            timeoutExceptionThrown = true;
+        }
+        Assert.assertEquals(true, timeoutExceptionThrown);
+    }
+
+    @Test
+    public void StreamCloseTest() throws Exception {
+        Assert.assertEquals(false, serialPort2.isClosed());
+        is2.close();
+        Assert.assertEquals(true, serialPort2.isClosed());
     }
 
 }
