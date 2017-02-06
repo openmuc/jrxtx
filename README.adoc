@@ -1,10 +1,10 @@
 = jRxTx - Java Serial Communication Library
 
 jRxTx is a Java serial communication library licensed under the
-LGPLv2.1 or later. It can be used to communicate using well known
-UART-based serial protocols such as RS-232, RS-422 and RS-485. The
-goal of jRxTx is to provide a lightweight, intuitive and well
-documented API.
+LGPLv2.1 or later + linking exception. It can be used to communicate
+using well known UART-based serial protocols such as RS-232, RS-422
+and RS-485. The goal of jRxTx is to provide a lightweight, intuitive
+and well documented API.
 
 jRxTx wraps the popular http://rxtx.qbang.org/[RXTX library] for
 which development has been discontinued. In addition to the new API,
