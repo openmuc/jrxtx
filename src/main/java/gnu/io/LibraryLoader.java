@@ -24,44 +24,56 @@ class LibraryLoader {
 
     private static Set<String> successfullyLoaded = new HashSet<String>();
 
-    public synchronized static boolean loadLibsFromJar(String... toResPaths) {
+    public synchronized static void loadRxtxNative() {
+        try {
+            loadLibsFromJar("/libs");
+        } catch (LibLoadException e) {
+            try {
+                System.loadLibrary("rxtxSerial");
+            } catch (UnsatisfiedLinkError e1) {
+                System.err.println("Could not load lib from jar and from system.");
+                e.printStackTrace();
+                throw e1;
+            }
+        }
+    }
+
+    private static boolean loadLibsFromJar(String... toResPaths) throws LibLoadException {
         for (String toResPath : toResPaths) {
 
             if (successfullyLoaded.contains(toResPath)) {
                 continue; // skip if loaded already
             }
             try {
-                if (!loadLib(toResPath)) {
-                    return false;
-                }
-                successfullyLoaded.add(toResPath);
+                loadLib(toResPath);
             } catch (URISyntaxException e) {
-                return false;
+                throw new LibLoadException("Failed to load Library.", e);
             } catch (IOException e) {
-                return false;
+                throw new LibLoadException("Failed to load Library.", e);
             }
+            successfullyLoaded.add(toResPath);
         }
 
         return true;
     }
 
-    private static boolean loadLib(String libsDIr) throws URISyntaxException, IOException {
+    private static void loadLib(String libsDIr) throws URISyntaxException, IOException, LibLoadException {
 
         URL dirUrl = LibraryLoader.class.getResource(libsDIr);
 
         if (dirUrl == null) {
-            return false;
+            throw new LibLoadException("directory does not exist " + libsDIr);
         }
 
         String protocol = dirUrl.getProtocol();
         if (protocol.equals("jar")) {
-            return loadFromJar(dirUrl, libsDIr);
+            loadFromJar(dirUrl, libsDIr);
         }
         else if (protocol.equals("file")) {
-            return loadFromFile(dirUrl);
+            loadFromFile(dirUrl);
         }
         else {
-            return false;
+            throw new LibLoadException("unknown protocol: " + protocol);
         }
     }
 
@@ -79,7 +91,7 @@ class LibraryLoader {
         return true;
     }
 
-    private static boolean loadFromJar(URL dirUrl, String libsDir) throws IOException {
+    private static void loadFromJar(URL dirUrl, String libsDir) throws IOException, LibLoadException {
         String jarPath = dirUrl.getPath().substring(5, dirUrl.getPath().indexOf("!"));
 
         JarFile jar = new JarFile(URLDecoder.decode(jarPath, "UTF-8"));
@@ -95,21 +107,18 @@ class LibraryLoader {
 
             InputStream fileInputStream = jar.getInputStream(element);
             try {
-                if (!saveResStreamToFileAndLoad(element.getName(), fileInputStream)) {
-                    return false;
-                }
-
+                saveResStreamToFileAndLoad(element.getName(), fileInputStream);
             } finally {
                 saveClose(fileInputStream);
             }
         }
-        return true;
     }
 
-    private static boolean saveResStreamToFileAndLoad(String fileName, InputStream is) throws IOException {
+    private static void saveResStreamToFileAndLoad(String fileName, InputStream is)
+            throws IOException, LibLoadException {
         Matcher matcher = FILE_NAME_PATTERN.matcher(fileName);
         if (!matcher.matches()) {
-            return false;
+            throw new LibLoadException("Filename '" + fileName + "' does not match pattern.");
         }
         File tempFileLib = File.createTempFile(matcher.group(1), matcher.group(2));
         tempFileLib.deleteOnExit();
@@ -124,15 +133,10 @@ class LibraryLoader {
                 fos.write(buffer, 0, len);
             }
 
-            try {
-                System.load(tempFileLib.getAbsolutePath());
-            } catch (UnsatisfiedLinkError e) {
-                return false;
-            }
+            System.load(tempFileLib.getAbsolutePath());
         } finally {
             saveClose(fos);
         }
-        return true;
     }
 
     private static void saveClose(Closeable closeable) throws IOException {

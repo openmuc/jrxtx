@@ -74,9 +74,7 @@ public class RXTXVersion {
     private static String Version;
 
     static {
-        if (!LibraryLoader.loadLibsFromJar("/libs")) {
-            System.loadLibrary("rxtxSerial");
-        }
+        LibraryLoader.loadRxtxNative();
         Version = "RXTX-2.2pre2";
     }
 

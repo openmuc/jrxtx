@@ -81,9 +81,8 @@ public class RXTXCommDriver implements CommDriver {
     static {
         if (debug)
             System.out.println("RXTXCommDriver {}");
-    	if (!LibraryLoader.loadLibsFromJar("/libs")) {
-        	System.loadLibrary("rxtxSerial");
-    	}
+
+        LibraryLoader.loadRxtxNative();
 
         /*
          * Perform a crude check to make sure people don't mix versions of the Jar and native lib

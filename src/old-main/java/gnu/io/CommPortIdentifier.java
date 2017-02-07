@@ -115,9 +115,7 @@ public class CommPortIdentifier extends Object /* extends Vector? */
                 System.out.println("Have not implemented native_psmisc_report_owner(PortName)); in CommPortIdentifier");
         }
 
-        if (!LibraryLoader.loadLibsFromJar("/libs")) {
-            System.loadLibrary("rxtxSerial");
-        }
+        LibraryLoader.loadRxtxNative();
     }
 
     CommPortIdentifier(String pn, CommPort cp, int pt, CommDriver driver) {
