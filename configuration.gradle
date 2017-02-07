@@ -88,7 +88,7 @@ uploadArchives {
         
         licenses {
           license {
-            name 'GNU Lesser General Public License'
+            name 'GNU Lesser General Public License 2.1 or later + linking exception'
             url 'http://www.gnu.org/licenses/lgpl-2.1.html'
             distribution 'repo'
           }
@@ -113,11 +113,7 @@ dependencies {
 
 sourceSets {
 	main {
-		java.srcDirs = ['src/old-main/java', 'src/main/java']
-			
-	}
-	test {
-		java.srcDirs = ['src/old-test/java', 'src/test/java']
+		java.srcDirs = ['src/main-rxtx/java', 'src/main/java']
 	}
 }
 
@@ -207,3 +203,18 @@ task javah(dependsOn: compileJava) {
 	  }
   }
 }
+
+
+sourceSets {
+  itest {
+    compileClasspath += sourceSets.main.compileClasspath
+    runtimeClasspath += sourceSets.main.runtimeClasspath
+  }
+}
+
+task itest(type: Test){
+  systemProperty "java.library.path", "/usr/lib/jni/"
+  testClassesDir = sourceSets.itest.output.classesDir
+  classpath = sourceSets.itest.runtimeClasspath
+}
+
