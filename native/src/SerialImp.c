@@ -5768,9 +5768,6 @@ close(fd);
 sscanf(pid_buffer, "%d", &pid);
 
 if (kill((pid_t) pid, 0) && errno == ESRCH) {
-asprintf(&message, "RXTX Warning:  Removing stale lock file. %s\n", file);
-report_warning(message);
-free(message);
 if (unlink(file) != 0) {
 asprintf(&message, "RXTX Error:  Unable to \
 					remove stale lock file: %s\n",
