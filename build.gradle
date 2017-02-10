@@ -62,7 +62,10 @@ configure(javaProjects) {
   sourceCompatibility = cfgJavaVersion
   targetCompatibility = cfgJavaVersion
 
-  repositories { mavenCentral() }
+  repositories {
+    mavenCentral()
+    mavenLocal()
+  }
 
   sourceSets {
     sample
