@@ -59,7 +59,7 @@ public class IntegrationTest {
     }
 
     @Test
-    public void SerialPortCloseTest() throws Exception {
+    public void serialPortCloseTest() throws Exception {
         Future<Boolean> future = executor.submit(new Callable<Boolean>() {
             public Boolean call() throws IOException {
                 try {
@@ -75,7 +75,7 @@ public class IntegrationTest {
     }
 
     @Test
-    public void SimpleWriteReadTest() throws Exception {
+    public void simpleWriteReadTest() throws Exception {
 
         os1.write(99);
         int port2received = is2.read();
@@ -84,7 +84,7 @@ public class IntegrationTest {
     }
 
     @Test
-    public void TimoutTest() throws Exception {
+    public void timoutTest() throws Exception {
 
         serialPort2.setSerialPortTimeout(300);
         boolean timeoutExceptionThrown = false;
@@ -97,7 +97,7 @@ public class IntegrationTest {
     }
 
     @Test
-    public void StreamCloseTest() throws Exception {
+    public void streamCloseTest() throws Exception {
         Assert.assertEquals(false, serialPort2.isClosed());
         is2.close();
         Assert.assertEquals(true, serialPort2.isClosed());
