@@ -122,8 +122,6 @@ sourceSets {
 
 task copyNativeLibs(type: Copy, dependsOn: compileJava) {
   
-  println "test: " +  project.sourceSets.main.output.resourcesDir
-  
   from fileTree('native').files
   def libName = 'librxtxSerial';
   
@@ -135,31 +133,11 @@ task copyNativeLibs(type: Copy, dependsOn: compileJava) {
 }
 
 
-
-task compileNative(type:Exec) {
-  workingDir 'native'
-
-  def args = project.hasProperty('libTarget') ? project.property('libTarget') : ''
-  
-  //on linux
-  commandLine './configure ' + args
-  commandLine 'make'
-  commandLine 'make'
-  
-  //store the output instead of printing to the console:
-  standardOutput = new ByteArrayOutputStream()
-
-  //extension method stopTomcat.output() can be used to obtain the output:
-  ext.output = {
-    return standardOutput.toString()
-  }
-}
-
-task(buildNative) {
-  dependsOn(compileNative)
+task(buildWithNative) {
   dependsOn(copyNativeLibs)
+  dependsOn(build)
+  tasks.findByName('build').mustRunAfter 'copyNativeLibs'
 }
-
 
 
 clean {
