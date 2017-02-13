@@ -76,6 +76,7 @@ eclipse {
 
 tasks.withType(Javadoc) {
   exclude "**/gnu/**"
+  options.noTimestamp() 
 }
 
 
