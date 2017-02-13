@@ -25,6 +25,9 @@ has some advantages compared to the last RXTX release (version
 * The Java build system is based on Gradle. This way it is easy to add
   the native libs to the jar.
 
+Find the Javadoc of the most current release here:
+https://openmuc.github.io/jrxtx/javadoc/index.html.
+    
 == Java and Native Parts
 
 jRxTx consists of a Java library and a native library written in

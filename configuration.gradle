@@ -183,9 +183,9 @@ task javah(dependsOn: compileJava) {
 }
 
 
-task copyJavadoc(type: Copy, dependsOn: 'javadocAll') {
-  from fileTree('build/docs/javadoc').files
-  into 'docs/javadoc'
+task copyJavadoc(type: Sync, dependsOn: 'javadoc') {
+  from 'build/docs/javadoc/'
+  into 'docs/javadoc/'
 }
 
 sourceSets {
