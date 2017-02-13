@@ -32,12 +32,14 @@ project.ext {
 
 tasks.withType(Tar) {
 
+  dependsOn('copyJavadoc')
+  
   into(project.name) {
     from('./') {
       include 'build.gradle'
       include 'configuration.gradle'
       include 'license/**'
-      include 'doc/CHANGELOG.txt'
+      include 'docs/**'
       include 'gradle/wrapper/**'
       include 'gradlew'
       include 'gradlew.bat'
@@ -45,12 +47,6 @@ tasks.withType(Tar) {
       include 'src/**'
       include 'native/**'
       include 'README.adoc'
-    }
-  }
-
-  into(project.name + "/doc/") {
-    from("./build/docs/") {
-      include "javadoc/**"
     }
   }
 
@@ -78,9 +74,10 @@ eclipse {
 	}
 }
 
-javadoc {
+tasks.withType(Javadoc) {
   exclude "**/gnu/**"
 }
+
 
 uploadArchives {
   repositories {
@@ -111,7 +108,6 @@ dependencies {
   testCompile 'org.mockito:mockito-core:1.10.19'
   testCompile 'org.powermock:powermock-api-mockito:1.6.4' 
   testCompile 'org.powermock:powermock-module-junit4:1.6.2' 
-
 }
 
 sourceSets {
@@ -149,6 +145,7 @@ clean {
   	}
   
 }
+
 compileJava {
 	options.encoding = 'UTF-8'
     options.compilerArgs << "-Xlint:unchecked"
@@ -185,6 +182,11 @@ task javah(dependsOn: compileJava) {
   }
 }
 
+
+task copyJavadoc(type: Copy, dependsOn: 'javadocAll') {
+  from fileTree('build/docs/javadoc').files
+  into 'docs/javadoc'
+}
 
 sourceSets {
   itest {
