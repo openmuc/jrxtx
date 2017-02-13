@@ -6,29 +6,26 @@ using well known UART-based serial protocols such as RS-232, RS-422
 and RS-485. The goal of jRxTx is to provide a lightweight, intuitive
 and well documented API.
 
-jRxTx wraps the popular http://rxtx.qbang.org/[RXTX library] for
-which development has been discontinued. In addition to the new API,
-the original RXTX API can be accessed through jRxTx. Thus jRxTx can be
-used as drop-in replacement for RXTX.
+jRxTx wraps the popular http://rxtx.qbang.org/[RXTX] library for which
+development has been discontinued. jRxTx provides a new improved API
+compared to that of RXTX (see explanation below). In addition to the
+new API, the original RXTX API can be accessed through jRxTx. Thus
+jRxTx can be used as a drop-in replacement for RXTX. The wrapped RXTX
+has some advantages compared to the last RXTX release (version
+2.2pre2):
 
-Improvements of jRxTx compared to RXTX:
+* It includes several bug fixes that do NOT change its API though
 
-* Improved API (see explanation below)
+* The jar file is an OSGi Bundle
 
-* Includes Javadoc
-
-* The Jar file is an OSGi Bundle.
-
-* The Jar file is published on
+* The jar file is published on
   https://search.maven.org/#search%7Cga%7C1%7Ca%3A%22jrxtx%22[maven
   central].
 
-* The Java build system has been moved to Gradle.
+* The Java build system is based on Gradle. This way it is easy to add
+  the native libs to the jar.
 
-* Optionally add the native libs to the jar and load the libs from the
-  jar.
-
-== Using jRxTx
+== Java and Native Parts
 
 jRxTx consists of a Java library and a native library written in
 C. The Java library calls the native library through JNI. The Java
@@ -39,8 +36,14 @@ include the native library.
 
 While the Java library is platform independent, the native part of
 jRxTx needs to be compiled separately for different processor
-architectures and operating systems.  You thus have two options to use
-the native library:
+architectures and operating systems. Because of the large variety of
+platforms jRxTx does not ship with any precompiled native libs.
+
+The jRxTx java library is compatible with the original RXTX native
+library. Thus you can also use the old RXTX native library or the
+native library of other RXTX compatible projects such as NRJavaSerial.
+
+You have two options to use the native library:
 
 . You can install the native library so that the Java virtual machine
   can find it.
@@ -48,21 +51,25 @@ the native library:
 . You can rebuild the jrxtx jar file to include the native library of
   your choice.
 
-== Installation of Native Library
+The Java library first searches a native library inside the jar
+file. If no compatible lib can be found it tries to load the libary
+from the _java.library.path_ (e.g. /usr/lib/jni).
+
+== Installation
     
 === Linux
     
-The jRxTx native library is equivalent to the original RXTX native
+The jRxTx native library is compatible to the RXTX native
 library. Therefore on Debian based distributions all you have to do is
 install the package ‘librxtx-java’:
 
 ----
 $ sudo apt-get install librxtx-java
 ----
- 
-This will install the correct native library. Sometimes you might have
-to add a system property so that java finds the jni libs. e.g.:
--Djava.library.path=/usr/lib/jni .
+
+This will install the correct native library in
+_/usr/lib/jni_. Sometimes you might have to add a system property so
+that the JVM finds it: -Djava.library.path=/usr/lib/jni .
 
 The serial ports /dev/tty* are only accessible to members belonging to
 groups dialout and tty. You therefore have to add your user to those
@@ -85,32 +92,50 @@ specific system to the folder that is in the java.libary.path. To
 figure out the actual Java library path in your system, you can write
 a Java program that prints System.getProperty(‘java.library.path’).
 
-You can get the native library either from the last distribution
-published by rxtx.qbang.org ‘rxtx-2.2pre2-bins.zip’ or you can compile
-it on your own from the source code as explained next.
+You can get the native library either from the last official RXTX
+distribution
+https://www.openmuc.org/fileadmin/user_upload/rxtx/rxtx-2.2pre2-bins.zip[rxtx-2.2pre2-bins.zip]
+or you can compile it on your own from the source code.
 
-== Build jRxTx
+== Compile jRxTx
 
-To build jRxTx run the following command:
+=== Linux
+
+To compile the jRxTx Java library run the following command:
 
 ----
-$ ./gradlew [buildNative [-PlibTarget=<the build system e.g. i686-pc-linux-gnu>]] build 
+$ ./gradlew clean build
 ----
 
-The command 'buildNative' will build the native library. The 'build'
-command builds the Java jar archive and automatically includes the
-native lib in the jar if it was previously built. The -PlibTarget
-option is only needed if you want to compile the native library for a
-platform other than your host platform.
+The resulting jar can be found in _build/libs_.
+
+To rebuild the native library on Linux enter the folder _native_. Then run:
+
+----
+$ ./configure
+$ make
+----
+
+The compiled library (librxtxSerial.so) can be found in the _.libs/_ folder.
+
+Once you have compiled the native library you install it so that the
+JVM can find and load it. Alternatively you can compile the jar with
+the native lib included:
+
+----
+$ ./gradlew clean buildWithNative
+----
+
+This will create the jar file and include any librxtxSerial.so/.dll
+file found in the _native_ folder. A jar file created this way can
+load the native library from the jar.
+
 
 == API Improvements Over RXTX
 
-Most importantly jRxTx provides an InputStream that behaves in
-conformance to the java.io.InputStream interface. Thus it behaves like
-Java socket input stream used for IP communication.
-
-The streams provided by the original RXTX have the following
-non-conform behavior:
+The InputStream implementation provided by the original RXTX violates
+the contract of the general java.io.InputStream interface. It has the
+following two problems:
     
 * A timeout does not throw an exception but instead returns -1. But
   according to the InputStream interface -1 should only be returned if
@@ -121,5 +146,9 @@ non-conform behavior:
   while another thread is blocking in read() causes the close()
   function to block as well.
 
+jRxTx provides an InputStream implementation that conforms to the
+java.io.InputStream interface and behaves very similarly to the stream
+provided by java.net.Socket used for IP communication.
+    
 The event listener available in RXTX was removed in jRxTx because it
 is not needed for data stream reading.
