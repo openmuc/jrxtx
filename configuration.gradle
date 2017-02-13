@@ -1,11 +1,11 @@
 
 project.ext {
 
-  cfgJavaVersion = '1.5'
+  cfgJavaVersion = "1.5"
 
-  cfgVersion = '0.0.2-SNAPSHOT'
+  cfgVersion = "0.0.2-SNAPSHOT"
   
-  cfgGroup = 'org.openmuc'
+  cfgGroup = "org.openmuc"
 
   cfgCopyDependencies = false
 
@@ -32,21 +32,21 @@ project.ext {
 
 tasks.withType(Tar) {
 
-  dependsOn('copyJavadoc')
+  dependsOn("copyJavadoc")
   
   into(project.name) {
-    from('./') {
-      include 'build.gradle'
-      include 'configuration.gradle'
-      include 'license/**'
-      include 'docs/**'
-      include 'gradle/wrapper/**'
-      include 'gradlew'
-      include 'gradlew.bat'
-      include 'build/libs/**'
-      include 'src/**'
-      include 'native/**'
-      include 'README.adoc'
+    from("./") {
+      include "build.gradle"
+      include "configuration.gradle"
+      include "license/**"
+      include "docs/**"
+      include "gradle/wrapper/**"
+      include "gradlew"
+      include "gradlew.bat"
+      include "build/libs/**"
+      include "src/**"
+      include "native/**"
+      include "README.adoc"
     }
   }
 
@@ -54,23 +54,23 @@ tasks.withType(Tar) {
 
 //------------------project specific configurations--------------------
 
-apply plugin: 'java'
-apply plugin: 'eclipse'
-apply plugin: 'osgi'
-apply plugin: 'maven'
-apply plugin: 'signing'
+apply plugin: "java"
+apply plugin: "eclipse"
+apply plugin: "osgi"
+apply plugin: "maven"
+apply plugin: "signing"
 
 
 jar {
   manifest {
-    name = 'jRxTx'
-    instruction 'Export-Package', '!*.internal.*,*'
+    name = "jRxTx"
+    instruction "Export-Package", "!*.internal.*,*"
   }
 }
 
 eclipse {
 	jdt {
-		javaRuntimeName = 'J2SE-1.5'
+		javaRuntimeName = "J2SE-1.5"
 	}
 }
 
@@ -84,14 +84,14 @@ uploadArchives {
   repositories {
     mavenDeployer {
       pom.project {
-        name 'jRxTx'
-        description 'jRxTx is a library for Java serial communication.'
+        name "jRxTx"
+        description "jRxTx is a library for Java serial communication."
         
         licenses {
           license {
-            name 'GNU Lesser General Public License 2.1 or later + linking exception'
-            url 'http://www.gnu.org/licenses/lgpl-2.1.html'
-            distribution 'repo'
+            name "GNU Lesser General Public License 2.1 or later + linking exception"
+            url "http://www.gnu.org/licenses/lgpl-2.1.html"
+            distribution "repo"
           }
         }
       }
@@ -101,46 +101,46 @@ uploadArchives {
 
 jar {
   manifest { // the manifest of the default jar is of type OsgiManifest
-    instruction 'Import-Package', '!gnu.io.internal.*, *'
+    instruction "Import-Package", "!gnu.io.internal.*, *"
   }
 }
 
 dependencies {
-  testCompile 'org.mockito:mockito-core:1.10.19'
-  testCompile 'org.powermock:powermock-api-mockito:1.6.4' 
-  testCompile 'org.powermock:powermock-module-junit4:1.6.2' 
+  testCompile "org.mockito:mockito-core:1.10.19"
+  testCompile "org.powermock:powermock-api-mockito:1.6.4" 
+  testCompile "org.powermock:powermock-module-junit4:1.6.2" 
 }
 
 sourceSets {
 	main {
-		java.srcDirs = ['src/main-rxtx/java', 'src/main/java']
+		java.srcDirs = ["src/main-rxtx/java", "src/main/java"]
 	}
 }
 
 task copyNativeLibs(type: Copy, dependsOn: compileJava) {
   
-  from fileTree('native').files
-  def libName = 'librxtxSerial';
+  from fileTree("native").files
+  def libName = "librxtxSerial";
   
-  include libName + '.so'
-  include libName + '.dll'
+  include libName + ".so"
+  include libName + ".dll"
   def resDir = project.sourceSets.main.output.resourcesDir
   
-  into resDir.absolutePath + '/libs'
+  into resDir.absolutePath + "/libs"
 }
 
 
 task(buildWithNative) {
   dependsOn(copyNativeLibs)
   dependsOn(build)
-  tasks.findByName('build').mustRunAfter 'copyNativeLibs'
+  tasks.findByName("build").mustRunAfter "copyNativeLibs"
 }
 
 
 clean {
-  file('native').listFiles().each{
+  file("native").listFiles().each{
   	File f ->  
-  		if (f.getName().contains('unknown')) {
+  		if (f.getName().contains("unknown")) {
   			delete f
   		}
   	}
@@ -148,7 +148,7 @@ clean {
 }
 
 compileJava {
-	options.encoding = 'UTF-8'
+	options.encoding = "UTF-8"
     options.compilerArgs << "-Xlint:unchecked"
 }
 
@@ -157,36 +157,36 @@ compileJava {
 task javah(dependsOn: compileJava) {
   doLast{
 	  def Nclasses = [	
-	    'gnu.io.RXTXCommDriver',
-	    'gnu.io.CommPortIdentifier',
-	    'gnu.io.RXTXVersion',
-	    'gnu.io.I2C',
-	    'gnu.io.LPRPort',
-	    'gnu.io.RXTXPort',
-	    'gnu.io.Zystem',
-	    'gnu.io.Raw',
-	    'gnu.io.RS485',
-	    'gnu.io.ParallelPort'
+	    "gnu.io.RXTXCommDriver",
+	    "gnu.io.CommPortIdentifier",
+	    "gnu.io.RXTXVersion",
+	    "gnu.io.I2C",
+	    "gnu.io.LPRPort",
+	    "gnu.io.RXTXPort",
+	    "gnu.io.Zystem",
+	    "gnu.io.Raw",
+	    "gnu.io.RS485",
+	    "gnu.io.ParallelPort"
 	  ];
 	    
-	  def nativeIncludes = 'native/src/include'
+	  def nativeIncludes = "native/src/include"
 	  def classpath = sourceSets.main.output.classesDir
 	  for (Nclass in Nclasses) {
 	      
-	    logger.info('Generating header for ' + Nclass)
+	    logger.info("Generating header for " + Nclass)
 	      
 	    exec {
-		  executable 'javah'
-		  args '-d', '$nativeIncludes', '-classpath', '$classpath' , Nclass
+		  executable "javah"
+		  args "-d", "$nativeIncludes", "-classpath", "$classpath" , Nclass
 	    }
 	  }
   }
 }
 
 
-task copyJavadoc(type: Sync, dependsOn: 'javadoc') {
-  from 'build/docs/javadoc/'
-  into 'docs/javadoc/'
+task copyJavadoc(type: Sync, dependsOn: "javadoc") {
+  from "build/docs/javadoc/"
+  into "docs/javadoc/"
 }
 
 sourceSets {
