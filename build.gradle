@@ -21,7 +21,7 @@ apply from: "configuration.gradle"
 
 asciidoctor {
   backends = ["pdf", "html5"]
-  attributes	"stylesheet": "openmuc-asciidoc.css",
+  attributes    "stylesheet": "openmuc-asciidoc.css",
   "toc2": "left",
   "sampleSrc": file("src/sample/java"),
   "source-highlighter" : "coderay",
@@ -31,7 +31,7 @@ asciidoctor {
   resources {
     from("$sourceDir") {
       include "images/**"
-    }	
+    }
   }
 }
 
@@ -90,14 +90,14 @@ configure(javaProjects) {
     dependencies {
       testCompile "org.slf4j:slf4j-simple:1.6.1"
     }
-    coverageFormats = ["html", "xml"]				
-    coverageIgnoreTrivial = true					
-    coverageIgnores = ["org.slf4j.Logger.*"]			
+    coverageFormats = ["html", "xml"]
+    coverageIgnoreTrivial = true
+    coverageIgnores = ["org.slf4j.Logger.*"]
     coverageReportDir = new File("$buildDir/reports/cobertura")
     coverageTestTasks {
       project.tasks.withType(Test).matching {it.name == "test"}
     }
- 	  
+   
   }
 
   sonarqube {
