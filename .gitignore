@@ -20,3 +20,5 @@ doc/userguide/*.pdf
 gradle-app.setting
 .factorypath
 .apt_generated/
+#created by openiec61850 clientgui:
+lastconnection.properties
