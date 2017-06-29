@@ -5,14 +5,14 @@ buildscript {
     }
   }
   dependencies {
-    classpath "net.saliman:gradle-cobertura-plugin:2.2.8"
+    classpath "net.saliman:gradle-cobertura-plugin:2.4.0"
     classpath group: "org.asciidoctor", name: "asciidoctorj-pdf", version: "1.5.0-alpha.11"
     classpath "biz.aQute.bnd:biz.aQute.bnd.gradle:3.0.0"
   }
 }
 
 plugins {
-  id "org.sonarqube" version "1.0"
+  id "org.sonarqube" version "2.5"
   id "org.asciidoctor.convert" version "1.5.3"
 }
 
@@ -86,7 +86,6 @@ configure(javaProjects) {
   }
 
   cobertura {
-  
     dependencies {
       testCompile "org.slf4j:slf4j-simple:1.6.1"
     }
@@ -96,8 +95,7 @@ configure(javaProjects) {
     coverageReportDir = new File("$buildDir/reports/cobertura")
     coverageTestTasks {
       project.tasks.withType(Test).matching {it.name == "test"}
-    }
-   
+    }   
   }
 
   sonarqube {
