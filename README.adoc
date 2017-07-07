@@ -7,9 +7,12 @@ and RS-485. The goal of jRxTx is to provide a lightweight, intuitive
 and well documented API.
 
 jRxTx wraps the popular http://rxtx.qbang.org/[RXTX] library for which
-development has been discontinued. jRxTx provides a new improved API
-compared to that of RXTX (see explanation below). In addition to the
-new API, the original RXTX API can be accessed through jRxTx. Thus
+development has been discontinued. jRxTx provides two kinds of APIs:
+1) the original RXTX API and 2) a new improved API.
+
+
+== Original RXTX API
+
 jRxTx can be used as a drop-in replacement for RXTX. The wrapped RXTX
 has some advantages compared to the last RXTX release (version
 2.2pre2):
@@ -27,7 +30,32 @@ has some advantages compared to the last RXTX release (version
 
 Find the Javadoc of the most current release here:
 https://openmuc.github.io/jrxtx/javadoc/index.html.
+
+== New jRxTx API
+
+In addition to the original RXTX API jRxTx provides a new API with the
+following advantages:
+
+The InputStream implementation provided by the original RXTX violates
+the contract of the general java.io.InputStream interface. It has the
+following two problems:
     
+* A timeout does not throw an exception but instead returns -1. But
+  according to the InputStream interface -1 should only be returned if
+  the stream is closed (i.e. the end of stream is reached).
+
+* A thread blocking in InputStream.read() cannot be interrupted by
+  closing the associated serial port. Trying to close the serial port
+  while another thread is blocking in read() causes the close()
+  function to block as well.
+
+jRxTx provides an InputStream implementation that conforms to the
+java.io.InputStream interface and behaves very similarly to the stream
+provided by java.net.Socket used for IP communication.
+    
+The event listener available in RXTX was removed in jRxTx because it
+is not needed for data stream reading.
+        
 == Java and Native Parts
 
 jRxTx consists of a Java library and a native library written in
@@ -133,25 +161,3 @@ This will create the jar file and include any librxtxSerial.so/.dll
 file found in the _native_ folder. A jar file created this way can
 load the native library from the jar.
 
-
-== API Improvements Over RXTX
-
-The InputStream implementation provided by the original RXTX violates
-the contract of the general java.io.InputStream interface. It has the
-following two problems:
-    
-* A timeout does not throw an exception but instead returns -1. But
-  according to the InputStream interface -1 should only be returned if
-  the stream is closed (i.e. the end of stream is reached).
-
-* A thread blocking in InputStream.read() cannot be interrupted by
-  closing the associated serial port. Trying to close the serial port
-  while another thread is blocking in read() causes the close()
-  function to block as well.
-
-jRxTx provides an InputStream implementation that conforms to the
-java.io.InputStream interface and behaves very similarly to the stream
-provided by java.net.Socket used for IP communication.
-    
-The event listener available in RXTX was removed in jRxTx because it
-is not needed for data stream reading.
