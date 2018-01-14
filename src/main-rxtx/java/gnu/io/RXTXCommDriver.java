@@ -340,7 +340,7 @@ public class RXTXCommDriver implements CommDriver {
         String val = null;
         Properties origp = System.getProperties(); // save system properties
 
-        String[] ext_dirs = System.getProperty("java.ext.dirs").split(":");
+        String[] ext_dirs = System.getProperty("java.ext.dirs", System.getProperty("user.home")).split(":");
         String fs = System.getProperty("file.separator");
         for (int n = 0; n < ext_dirs.length; ++n) {
             String ext_file = "?";
