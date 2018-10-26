@@ -101,7 +101,7 @@ uploadArchives {
 
 jar {
   manifest { // the manifest of the default jar is of type OsgiManifest
-    instruction "Import-Package", "!gnu.io.internal.*, *"
+      instruction "Import-Package", "!gnu.io.internal.*, *"
   }
 }
 
@@ -120,15 +120,40 @@ sourceSets {
 task copyNativeLibs(type: Copy, dependsOn: compileJava) {
   
   from fileTree("native").files
-  def libName = "librxtxSerial";
-  
-  include libName + ".so"
+  def libName = "librxtxSerial"
+
+
   include libName + ".dll"
+  include libName + ".jnilib"
+  include libName + ".so"
+
   def resDir = project.sourceSets.main.output.resourcesDir
   
   into resDir.absolutePath + "/libs"
+
 }
 
+def bundleNativeCode = (String[])[]
+
+if (file("native/librxtxSerial.dll").exists()){
+    bundleNativeCode = bundleNativeCode.plus("libs/librxtxSerial.dll;osname=Win32;processor=x86")
+}
+if (file("native/librxtxSerial.jnilib").exists()){
+    bundleNativeCode = bundleNativeCode.plus("libs/librxtxSerial.jnilib;osname=MacOSX;processor=x86-64")
+}
+if (file("native/.libs/librxtxSerial.so").exists()){
+    bundleNativeCode = bundleNativeCode.plus("libs/librxtxSerial.so;osname=Linux;processor=x86-64")
+}
+
+bundleNativeCode = bundleNativeCode.join(',')
+if(bundleNativeCode.length() > 0) {
+    println("test")
+    jar {
+        manifest {
+            instruction "Bundle-NativeCode", bundleNativeCode
+        }
+    }
+}
 
 task(buildWithNative) {
   dependsOn(copyNativeLibs)
