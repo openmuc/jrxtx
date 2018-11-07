@@ -431,7 +431,19 @@ fix_comm_jar() {
 # determin java include directory
 [ case $OS_NAME in
 	Mac\ OS\ X)
-        JAVAINCLUDEDIR=$JPATH/../../../Headers
+	    JAVAINCLUDEDIR="$JPATH/../../../Headers"
+        candidates=(
+        "$JPATH/../../../Headers"
+        "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/JavaVM.framework/Headers"
+        "/System/Library/Frameworks/JavaVM.framework/Headers/"
+        )
+        for candidate in "${candidates[@]}"; do
+            if [ -d "$candidate" ]; then
+                echo "Found Java include dir $candidate"
+                JAVAINCLUDEDIR="$candidate"
+                break;
+            fi
+        done
         ;;
 	*)
         JAVAINCLUDEDIR=$JPATH/include
@@ -605,7 +617,7 @@ Mac\ OS\ X)
 		echo "library os.arch... "${OS_ARCH}
 	fi
 
-	GLIBTOOL="\$(SHELL) glibtool"
+	GLIBTOOL="\$(SHELL) glibtool --tag=CC"
 	LINK="cc $LDFLAGS -bundle -framework CoreFoundation -framework IOKit -o librxtx\$*.jnilib "
 	OBJECT_EXTENSION="o"
 	LIB_EXTENSION="jnilib"

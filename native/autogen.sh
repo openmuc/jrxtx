@@ -17,7 +17,7 @@ DIE=0
 
 # avoid libtool on Mac OS X codename Darwin Dmitry
 
-
+LIBTOOLIZE=libtoolize
 if test `uname` != "Darwin"; then
 (libtool --version) < /dev/null > /dev/null 2>&1 || {
     echo
@@ -26,6 +26,8 @@ if test `uname` != "Darwin"; then
     echo "(or a newer version if it is available)"
     DIE=1
 }
+else
+    LIBTOOLIZE=glibtoolize
 fi
 
 (automake --version) < /dev/null > /dev/null 2>&1 || {
@@ -75,7 +77,7 @@ do
     	    if test -d $k; then aclocalinclude="$aclocalinclude -I $k"; \
     	    else echo "**Warning**: No such directory \`$k'.  Ignored."; fi; \
     	done; \
-    	libtoolize --copy --force; \
+    	$LIBTOOLIZE --copy --force; \
     	aclocal $aclocalinclude; \
     	autoheader; automake --add-missing --gnu; autoheader; autoconf)
     fi
