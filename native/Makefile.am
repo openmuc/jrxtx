@@ -26,6 +26,8 @@ VPATH = @srcdir@
 AUTOMAKE_OPTIONS = foreign
 INCLUDES= -I$(TOP) -I$(DEST) -I. $(JAVAINCLUDE) $(JAVANATINC)
 
+CLASSTOP=gnu
+
 # linking java-jdk headers to lib
 AM_LDFLAGS = -l$(JAVANATINC) -l$(JAVANATINC)
 
