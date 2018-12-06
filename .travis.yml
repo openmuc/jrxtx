@@ -8,3 +8,6 @@ notifications:
   email: true
   on_success: never
   on_failure: always
+
+script:
+ - "bash jrxtx/src/test/setup-virtual-serial-ports.sh"

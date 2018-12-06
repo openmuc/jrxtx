@@ -1,0 +1,86 @@
+version = '1.0.1'
+group = 'org.openmuc'
+def libName = 'librxtxSerial'
+
+dependencies {
+    compile project(':gnu-io')
+    testCompile project(':gnu-io').sourceSets.main.output
+}
+
+jar {
+    from project(':gnu-io').sourceSets.main.output
+
+    manifest {
+        attributes('Export-Package': 'org.openmuc.jrxtx, gnu.io')
+        attributes('Bundle-Name': 'jRxTx')
+        attributes('Bundle-SymbolicName': project.group+'.'+project.name)
+    }
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            repository(url: "https://plugins.gradle.org/m2/")
+            pom.project {
+                name "jRxTx"
+                description "jRxTx is a library for Java serial communication."
+        
+                licenses {
+                    license {
+                        name "GNU Lesser General Public License 2.1 or later + linking exception"
+                        url "http://www.gnu.org/licenses/lgpl-2.1.html"
+                        distribution "repo"
+                    }
+                }
+            }
+        }
+    }
+}
+
+task copyNativeLibs(type: Copy) {
+    def Set<File> libs
+    def libInclude = "**/${libName}"
+    def resDir = project(':jrxtx').sourceSets.main.output.resourcesDir
+
+    libs = fileTree(dir: "${project.rootDir}/native", includes: ["${libInclude}.so", "${libInclude}.dll", "${libInclude}.jnilib" ]).files
+    from libs
+    into resDir.absolutePath + '/libs'
+
+    // The resulting Manifest was missing Bundle-NativeCode, so the native librarys could not be loaded in an osgi context 
+    // credits to b-dreissigacker
+    def Set<String> bundleNativeLibs = []
+    def String bundleNativeCode
+
+    doLast {
+        libs.each {
+            if ( it.getName().endsWith('.dll') ) bundleNativeLibs.add('libs/'+it.getName()+';osname=Win32;processor=x86')
+            if ( it.getName().endsWith('.so') ) bundleNativeLibs.add('libs/'+it.getName()+';osname=Linux;processor=x86-64')
+            if ( it.getName().endsWith('.jnilib') ) bundleNativeLibs.add('libs/'+it.getName()+';osname=MacOSX;processor=x86-64')
+        }
+
+        bundleNativeCode = bundleNativeLibs.join(',')
+        if(bundleNativeCode.length() > 0) {
+            jar {
+                manifest {
+                    attributes('Bundle-NativeCode': bundleNativeCode)
+                }
+            }
+        }
+    }
+}
+
+task(buildWithNative) {
+    dependsOn(copyNativeLibs)
+    dependsOn(jar)
+    tasks.findByName("jar").mustRunAfter "copyNativeLibs"
+}
+
+tasks.withType(Test) {
+    dependsOn copyNativeLibs
+    mustRunAfter copyNativeLibs
+}
+
+task copyJavadoc(type: Sync, dependsOn: "javadoc") {
+    from "${project(':jrxtx').docsDir.getAbsolutePath()}/javadoc/"
+    into "${project.rootDir}/docs/javadoc/"
+}
