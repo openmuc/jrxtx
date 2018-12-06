@@ -143,8 +143,7 @@ The resulting jar can be found in _build/libs_.
 To rebuild the native library on Linux enter the folder _native_. Then run:
 
 ----
-$ ./configure
-$ make
+$ ./BUILD.sh
 ----
 
 The compiled library (librxtxSerial.so) can be found in the _.libs/_ folder.

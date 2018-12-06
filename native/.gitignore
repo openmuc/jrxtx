@@ -16,3 +16,9 @@ librxtxSerial.la
 libtool
 stamp-h1
 stamp-h.in
+
+Makefile.in
+config.h.in
+configure
+ltmain.sh
+missing

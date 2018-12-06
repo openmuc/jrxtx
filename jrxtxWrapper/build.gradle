@@ -1,0 +1,35 @@
+version = project(':jrxtx').version
+group = project(':jrxtx').group
+
+dependencies {
+  compile project(':jrxtx')
+}
+
+jar {
+  from project(':jrxtx').sourceSets.main.output
+  manifest {
+    attributes('Bundle-Name': 'jRxTxWrapper')
+    attributes('Export-Package': 'org.openmuc.jrxtx')
+    attributes('Bundle-SymbolicName': project.group+'.'+project.name)
+  }
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            repository(url: "https://plugins.gradle.org/m2/")
+            pom.project {
+                name "jRxTxWrapper"
+                description "jRxTxWrapper is a library for Java serial communication."
+        
+                licenses {
+                    license {
+                        name "GNU Lesser General Public License 2.1 or later + linking exception"
+                        url "http://www.gnu.org/licenses/lgpl-2.1.html"
+                        distribution "repo"
+                    }
+                }
+            }
+        }
+    }
+}
