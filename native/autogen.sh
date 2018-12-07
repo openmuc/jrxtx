@@ -19,7 +19,7 @@ DIE=0
 
 LIBTOOLIZE=libtoolize
 if test `uname` != "Darwin"; then
-(libtool --version) < /dev/null > /dev/null 2>&1 || {
+(libtoolize --version) < /dev/null > /dev/null 2>&1 || {
     echo
     echo "**Error**: You must have "\`libtool\'" installed to compile rxtx."
     echo "Get ftp://ftp.gnu.org/pub/gnu/libtool-1.2.tar.gz"

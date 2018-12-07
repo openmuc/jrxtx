@@ -1,0 +1,64 @@
+group = 'org.openmuc'
+
+jar {
+    manifest {
+        attributes('Export-Package': 'gnu.io')
+        attributes('Bundle-Name': 'gnu.io')
+        attributes('Bundle-SymbolicName': 'gnu.io')
+    }
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            repository(url: "https://plugins.gradle.org/m2/")
+            pom.project {
+                name "gnu.io"
+                description "gnu.io is a library for Java serial communication."
+        
+                licenses {
+                    license {
+                        name "GNU Lesser General Public License 2.1 or later + linking exception"
+                        url "http://www.gnu.org/licenses/lgpl-2.1.html"
+                        distribution "repo"
+                    }
+                }
+            }
+        }
+    }
+}
+
+task javah(dependsOn: compileJava) {
+  doLast{
+          def Nclasses = [
+            "gnu.io.RXTXCommDriver",
+            "gnu.io.CommPortIdentifier",
+            "gnu.io.RXTXVersion",
+            "gnu.io.I2C",
+            "gnu.io.LPRPort",
+            "gnu.io.RXTXPort",
+            "gnu.io.Zystem",
+            "gnu.io.Raw",
+            "gnu.io.RS485",
+            "gnu.io.ParallelPort"
+          ];
+
+          def nativeIncludes = "${project.rootDir}/native/src/include"
+          def classpath = project(':gnu-io').sourceSets.main.output.classesDir
+          for (Nclass in Nclasses) {
+
+            logger.info("Generating header for " + Nclass)
+
+            exec {
+                  executable "javah"
+                  args "-d", "$nativeIncludes", "-classpath", "$classpath" , Nclass
+            }
+        }
+    }
+}
+
+compileJava {
+    options.encoding = "UTF-8"
+    options.compilerArgs << "-Xlint:unchecked"
+}
+
