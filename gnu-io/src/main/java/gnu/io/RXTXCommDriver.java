@@ -77,6 +77,7 @@ public class RXTXCommDriver implements CommDriver {
     private final static boolean debug = false;
     private final static boolean devel = false;
     private final static boolean noVersionOutput = "true".equals(System.getProperty("gnu.io.rxtx.NoVersionOutput"));
+    private final static int MAXIMUM_NUMBER_OF_COM_PORTS = 4096;
 
     static {
         if (debug)
@@ -86,9 +87,9 @@ public class RXTXCommDriver implements CommDriver {
 
         /*
          * Perform a crude check to make sure people don't mix versions of the Jar and native lib
-         * 
+         *
          * Mixing the libs can create a nightmare.
-         * 
+         *
          * It could be possible to move this over to RXTXVersion but All we want to do is warn people when first loading
          * the Library.
          */
@@ -137,10 +138,10 @@ public class RXTXCommDriver implements CommDriver {
     private final String[] getValidPortPrefixes(String CandidatePortPrefixes[]) {
         /*
          * 256 is the number of prefixes ( COM, cua, ttyS, ...) not the number of devices (ttyS0, ttyS1, ttyS2, ...)
-         * 
+         *
          * On a Linux system there are about 400 prefixes in deviceDirectory. registerScannedPorts() assigns
          * CandidatePortPrefixes to something less than 50 prefixes.
-         * 
+         *
          * Trent
          */
 
@@ -207,7 +208,7 @@ public class RXTXCommDriver implements CommDriver {
          * FIXME quick fix to get COM1-8 on windows working. The Read test is not working properly and its crunch
          * time... if(osName.toLowerCase().indexOf("windows") != -1 ) { for( i=0;i < CandidateDeviceNames.length;i++ ) {
          * CommPortIdentifier.addPortName( CandidateDeviceNames[i], PortType, this ); } return;
-         * 
+         *
          * }
          */
         if (debug) {
@@ -227,7 +228,7 @@ public class RXTXCommDriver implements CommDriver {
                     /*
                      * this determines: device file Valid ports /dev/ttyR[0-9]* != /dev/ttyS[0-9]* /dev/ttySI[0-9]* !=
                      * /dev/ttyS[0-9]* /dev/ttyS[0-9]* == /dev/ttyS[0-9]*
-                     * 
+                     *
                      * Otherwise we check some ports multiple times. Perl would rock here.
                      *
                      * If the above passes, we try to read from the port. If there is no err the port is added. Trent
@@ -273,9 +274,9 @@ public class RXTXCommDriver implements CommDriver {
      * <p>From the NullDriver.java CommAPI sample.
      *
      * added printerport stuff Holger Lehmann July 12, 1999 IBM
-     * 
+     *
      * Added ttyM for Moxa boards Removed obsolete device cuaa Peter Bennett January 02, 2000 Bencom
-     * 
+     *
      */
 
     /**
@@ -415,12 +416,12 @@ public class RXTXCommDriver implements CommDriver {
             CandidateDeviceNames = temp;
         }
         else if (osName.toLowerCase().indexOf("windows") != -1) {
-            String[] temp = new String[259];
-            for (int i = 1; i <= 256; i++) {
+            String[] temp = new String[MAXIMUM_NUMBER_OF_COM_PORTS + 3];
+            for (int i = 1; i <= MAXIMUM_NUMBER_OF_COM_PORTS; i++) {
                 temp[i - 1] = "COM" + i;
             }
             for (int i = 1; i <= 3; i++) {
-                temp[i + 255] = "LPT" + i;
+                temp[i + MAXIMUM_NUMBER_OF_COM_PORTS - 1] = "LPT" + i;
             }
             CandidateDeviceNames = temp;
         }
@@ -428,7 +429,7 @@ public class RXTXCommDriver implements CommDriver {
             /*
              * Solaris uses a few different ways to identify ports. They could be /dev/term/a /dev/term0 /dev/cua/a
              * /dev/cuaa the /dev/???/a appears to be on more systems.
-             * 
+             *
              * The uucp lock files should not cause problems.
              */
             /*
@@ -441,9 +442,9 @@ public class RXTXCommDriver implements CommDriver {
              */
 
             /*
-             * 
+             *
              * ok.. Look the the dirctories representing the port kernel driver interface.
-             * 
+             *
              * If there are entries there are possibly ports we can use and need to enumerate.
              */
 
@@ -484,9 +485,9 @@ public class RXTXCommDriver implements CommDriver {
              * a list. You may add additional ports here but be warned that too many will significantly slow down port
              * enumeration. Linux 2.6 has udev support which should be faster as only ports the kernel finds should be
              * exposed in /dev
-             * 
+             *
              * See also how to override port enumeration and specifying port in INSTALL.
-             * 
+             *
              * taj
              */
 
@@ -638,10 +639,10 @@ public class RXTXCommDriver implements CommDriver {
              * Get the Parallel port prefixes for the running os Holger Lehmann July 12, 1999 IBM
              */
             if (osName.equals("Linux")
-            /*
-             * || osName.equals("NetBSD") FIXME || osName.equals("HP-UX") FIXME || osName.equals("Irix") FIXME ||
-             * osName.equals("BeOS") FIXME || osName.equals("Compaq's Digital UNIX") FIXME
-             */
+                /*
+                 * || osName.equals("NetBSD") FIXME || osName.equals("HP-UX") FIXME || osName.equals("Irix") FIXME ||
+                 * osName.equals("BeOS") FIXME || osName.equals("Compaq's Digital UNIX") FIXME
+                 */
             ) {
                 String[] temp = { "lp" // linux printer port
                 };
