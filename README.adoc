@@ -116,7 +116,7 @@ Afterwards you have to log out and log back in in order for the group
 changes to become active.
         
 
-=== Windows
+=== Windows and macOS
 
 On Windows you need to copy the native library of RXTX for your
 specific system to the folder that is in the java.libary.path. To
